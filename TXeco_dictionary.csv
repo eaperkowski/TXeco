@@ -20,6 +20,7 @@ narea,gN/m^2,leaf nitrogen content per unit leaf area
 leaf.cn,unitless,ratio of leaf carbon content (c.mass) to leaf nitrogen content (n.mass)
 chi,unitless,Ratio of leaf intercellular CO2 to atmospheric CO2 (referenced as leaf Ci:Ca)
 beta,unitless,unit cost of acquiring and using nitrogen relative to water
+soil.no3n,ppm,soil nitrogen availability; measured in composite soil samples sent to and quantified at Texas A&M Agrilife facility
 sg.bedrock,meters,SoilGrids2.0: bedrock depth
 sg.bulkdens,kg/dm^3,SoilGrids2.0: bulk density of the fine earth fraction
 sg.cec,cmol(c)/kg,SoilGrids2.0: cation exchange capacity
