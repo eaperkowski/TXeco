@@ -11,57 +11,34 @@ photo,unitless,photosynthetic pathway (C3 or C4)
 duration,unitless,species growth duration (annual or perennial)
 n.fixer,unitless,"ability to associate with symbiotic nitrogen fixing bacteria (yes = N-fixer, no = non-fixer)"
 pft,unitless,"plant functional group (c3_nonfixer, c4_nonfixer, c3_fixer)"
+dry.biomass,g,dry leaf biomass
+leaf.area,cm^2,fresh leaf area
 n.mass,gN g^-1,leaf nitrogen content per unit leaf dry biomass
 c.mass,gC g^-1,leaf carbon content per unit leaf dry biomass
-leaf.area,cm^2,fresh leaf area
-dry.biomass,g,dry leaf biomass
 marea,g/m^2,leaf mass per unit leaf area
 narea,gN/m^2,leaf nitrogen content per unit leaf area
 leaf.cn,unitless,ratio of leaf carbon content (c.mass) to leaf nitrogen content (n.mass)
+d13C,‰,leaf delta carbon 13 discrimination
+d15N,‰,leaf delta nitrogen 15 discrimination
 chi,unitless,Ratio of leaf intercellular CO2 to atmospheric CO2 (referenced as leaf Ci:Ca)
 beta,unitless,unit cost of acquiring and using nitrogen relative to water
-soil.no3n,ppm,soil nitrogen availability; measured in composite soil samples sent to and quantified at Texas A&M Agrilife facility
-sg.bedrock,meters,SoilGrids2.0: bedrock depth
-sg.bulkdens,kg/dm^3,SoilGrids2.0: bulk density of the fine earth fraction
-sg.cec,cmol(c)/kg,SoilGrids2.0: cation exchange capacity
-sg.perc.gravel,%,SoilGrids2.0: volumetric fraction of coarse fragments (>2mm)
-sg.perc.clay,%,SoilGrids2.0: proportion of clay particles (<0.002mm) in fine earth fraction
-sg.perc.sand,%,SoilGrids2.0: proportion of sand particles (>0.05mm) in fine earth fraction
-sg.perc.silt,%,SoilGrids2.0: proportion of silt particles (>0.002mm and <0.05mm) in fine earth fraction
-sg.om,g/kg,"Soil organic matter, converted from SoilGrids2.0 organic carbon content (g/kg)"
-wfc,mm,"water content at field capacity, estimated using SPLASH model"
-pwp,mm,"water content at permanent wilting point, estimated using SPLASH model"
-whc,mm,"water holding capacity, estimated using SPLASH model"
-wn1_perc,%,Soil moisture content relative to water holding capacity of day before sampling date
-wn2_perc,%,Mean daily soil moisture content relative to water holding capacity of the 2 days leading up to sampling date
-wn3_perc,%,Mean daily soil moisture content relative to water holding capacity of the 3 days leading up to sampling date
-wn4_perc,%,Mean daily soil moisture content relative to water holding capacity of the 4 days leading up to sampling date
-wn5_perc,%,Mean daily soil moisture content relative to water holding capacity of the 5 days leading up to sampling date
-wn6_perc,%,Mean daily soil moisture content relative to water holding capacity of the 6 days leading up to sampling date
-wn7_perc,%,Mean daily soil moisture content relative to water holding capacity of the 7 days leading up to sampling date
-wn8_perc,%,Mean daily soil moisture content relative to water holding capacity of the 8 days leading up to sampling date
-wn9_perc,%,Mean daily soil moisture content relative to water holding capacity of the 9 days leading up to sampling date
-wn10_perc,%,Mean daily soil moisture content relative to water holding capacity of the 10 days leading up to sampling date
-wn15_perc,%,Mean daily soil moisture content relative to water holding capacity of the 15 days leading up to sampling date
-wn20_perc,%,Mean daily soil moisture content relative to water holding capacity of the 20 days leading up to sampling date
-wn30_perc,%,Mean daily soil moisture content relative to water holding capacity of the 30 days leading up to sampling date
-wn60_perc,%,Mean daily soil moisture content relative to water holding capacity of the 60 days leading up to sampling date
-wn90_perc,%,Mean daily soil moisture content relative to water holding capacity of the 90 days leading up to sampling date
-vpd1,kPa,Vapor pressure deficit of the day before sampling date
-vpd2,kPa,Mean daily vapor pressure deficit of the 2 days leading up to sampling date
-vpd3,kPa,Mean daily vapor pressure deficitof the 3 days leading up to sampling date
-vpd4,kPa,Mean daily vapor pressure deficit of the 4 days leading up to sampling date
-vpd5,kPa,Mean daily vapor pressure deficit of the 5 days leading up to sampling date
-vpd6,kPa,Mean daily vapor pressure deficit of the 6 days leading up to sampling date
-vpd7,kPa,Mean daily vapor pressure deficit of the 7 days leading up to sampling date
-vpd8,kPa,Mean daily vapor pressure deficit of the 8 days leading up to sampling date
-vpd9,kPa,Mean daily vapor pressure deficit of the 9 days leading up to sampling date
-vpd10,kPa,Mean daily vapor pressure deficit of the 10 days leading up to sampling date
-vpd15,kPa,Mean daily vapor pressure deficit of the 15 days leading up to sampling date
-vpd20,kPa,Mean daily vapor pressure deficit of the 20 days leading up to sampling date
-vpd30,kPa,Mean daily vapor pressure deficit of the 30 days leading up to sampling date
-vpd60,kPa,Mean daily vapor pressure deficit of the 60 days leading up to sampling date
-vpd90,kPa,Mean daily vapor pressure deficit of the 90 days leading up to sampling date
+prcp01,mm,Precipitation total of the day before sampling date
+prcp02,mm,Precipitation total of the 2 days before sampling date
+prcp03,mm,Precipitation total of the 3 days before sampling date
+prcp04,mm,Precipitation total of the 4 days before sampling date
+prcp05,mm,Precipitation total of the 5 days before sampling date
+prcp06,mm,Precipitation total of the 6 days before sampling date
+prcp07,mm,Precipitation total of the 7 days before sampling date
+prcp08,mm,Precipitation total of the 8 days before sampling date
+prcp09,mm,Precipitation total of the 9 days before sampling date
+prcp10,mm,Precipitation total of the 10 days before sampling date
+prcp15,mm,Precipitation total of the 15 days before sampling date
+prcp20,mm,Precipitation total of the 20 days before sampling date
+prcp30,mm,Precipitation total of the 30 days before sampling date
+prcp60,mm,Precipitation total of the 60 days before sampling date
+prcp90,mm,Precipitation total of the 90 days before sampling date
+prcp365,mm,Precipitation total of the 365 days before sampling date
+map.15yr,mm,Mean annual precipitation from 2006-2020
 tavg1,degC,Mean daily air temperature of the day before sampling date
 tavg2,degC,Mean daily air temperature of the 2 days leading up to sampling date
 tavg3,degC,Mean daily air temperatureof the 3 days leading up to sampling date
@@ -77,5 +54,53 @@ tavg20,degC,Mean daily air temperature of the 20 days leading up to sampling dat
 tavg30,degC,Mean daily air temperature of the 30 days leading up to sampling date
 tavg60,degC,Mean daily air temperature of the 60 days leading up to sampling date
 tavg90,degC,Mean daily air temperature of the 90 days leading up to sampling date
-map.15yr,mm,Mean annual precipitation from 2006-2020
+tavg365,deg C,Mean daily air temperature of the 365 days leading up to sampling date
 mat.15yr,degC,Mean annual temperature from 2006-2020
+vpd1,kPa,Vapor pressure deficit of the day before sampling date
+vpd2,kPa,Mean daily vapor pressure deficit of the 2 days leading up to sampling date
+vpd3,kPa,Mean daily vapor pressure deficitof the 3 days leading up to sampling date
+vpd4,kPa,Mean daily vapor pressure deficit of the 4 days leading up to sampling date
+vpd5,kPa,Mean daily vapor pressure deficit of the 5 days leading up to sampling date
+vpd6,kPa,Mean daily vapor pressure deficit of the 6 days leading up to sampling date
+vpd7,kPa,Mean daily vapor pressure deficit of the 7 days leading up to sampling date
+vpd8,kPa,Mean daily vapor pressure deficit of the 8 days leading up to sampling date
+vpd9,kPa,Mean daily vapor pressure deficit of the 9 days leading up to sampling date
+vpd10,kPa,Mean daily vapor pressure deficit of the 10 days leading up to sampling date
+vpd15,kPa,Mean daily vapor pressure deficit of the 15 days leading up to sampling date
+vpd20,kPa,Mean daily vapor pressure deficit of the 20 days leading up to sampling date
+vpd30,kPa,Mean daily vapor pressure deficit of the 30 days leading up to sampling date
+vpd60,kPa,Mean daily vapor pressure deficit of the 60 days leading up to sampling date
+vpd90,kPa,Mean daily vapor pressure deficit of the 90 days leading up to sampling date
+vpd365,kPa,Mean daily vapor pressure deficit of the 365 days leading up to sampling date
+soil.pH,unitless,soil pH
+soil.ec,umhos/cm,soil electrical conductivity
+soil.no3n,ppm,soil nitrate-nitrite concentration
+soil.phos,ppm,soil phosphorus concentration
+soil.potassium,ppm,soil potassium concentration
+bedrock_sg,meters,SoilGrids2.0: bedrock depth
+bulkdens_sg,kg/dm^3,SoilGrids2.0: bulk density of the fine earth fraction
+perc.gravel_sg,%,SoilGrids2.0: volumetric fraction of coarse fragments (>2mm)
+om_sg,g/kg,"Soil organic matter, converted from SoilGrids2.0 organic carbon content (g/kg)"
+perc.sand,%,% sand content
+perc.silt,%,% silt content
+perc.clay,%,% clay content
+texture.method,unitless,method of quantifying soil texture
+usda.texture,unitless,soil texture based on USDA soil texture triangle
+wfc,mm,"water content at field capacity, estimated using SPLASH model"
+pwp,mm,"water content at permanent wilting point, estimated using SPLASH model"
+whc,mm,"water holding capacity, estimated using SPLASH model"
+wn01_perc,%,Soil moisture content relative to water holding capacity of day before sampling date
+wn02_perc,%,Mean daily soil moisture content relative to water holding capacity of the 2 days leading up to sampling date
+wn03_perc,%,Mean daily soil moisture content relative to water holding capacity of the 3 days leading up to sampling date
+wn04_perc,%,Mean daily soil moisture content relative to water holding capacity of the 4 days leading up to sampling date
+wn05_perc,%,Mean daily soil moisture content relative to water holding capacity of the 5 days leading up to sampling date
+wn06_perc,%,Mean daily soil moisture content relative to water holding capacity of the 6 days leading up to sampling date
+wn07_perc,%,Mean daily soil moisture content relative to water holding capacity of the 7 days leading up to sampling date
+wn08_perc,%,Mean daily soil moisture content relative to water holding capacity of the 8 days leading up to sampling date
+wn09_perc,%,Mean daily soil moisture content relative to water holding capacity of the 9 days leading up to sampling date
+wn10_perc,%,Mean daily soil moisture content relative to water holding capacity of the 10 days leading up to sampling date
+wn15_perc,%,Mean daily soil moisture content relative to water holding capacity of the 15 days leading up to sampling date
+wn20_perc,%,Mean daily soil moisture content relative to water holding capacity of the 20 days leading up to sampling date
+wn30_perc,%,Mean daily soil moisture content relative to water holding capacity of the 30 days leading up to sampling date
+wn60_perc,%,Mean daily soil moisture content relative to water holding capacity of the 60 days leading up to sampling date
+wn90_perc,%,Mean daily soil moisture content relative to water holding capacity of the 90 days leading up to sampling date
