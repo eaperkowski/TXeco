@@ -41,19 +41,12 @@ length(df$pft[df$pft == "c3_nonlegume"])
 length(df$pft[df$pft == "c4_nonlegume"])
 df$pft <- factor(df$pft, levels = c("c3_legume", "c4_nonlegume", "c3_nonlegume"))
 
-length(df$pft[df$pft == "c4_nonlegume" & !is.na(df$chi)])
-length(unique(df$NCRS.code))
+## How many species within each pft class?
+df %>% group_by(pft) %>% distinct(NCRS.code) %>%
+  summarize(n.pft = length(NCRS.code))
 
-## How many annuals within c3 legume/c3 nonlegume?
-length(df$pft[df$pft == "c3_nonlegume" & df$duration == "annual"])
-length(df$pft[df$pft == "c3_legume" & df$duration == "annual"])
-length(df$pft[df$pft == "c3_nonlegume"])
-length(df$pft[df$pft == "c3_nonlegume" | df$pft == "c3_legume"])
-length(df$pft[df$pft == "c4_nonlegume"]) / 504
 
-hist(df$beta)
-hist(df$beta[df$pft != "c4_nonlegume"])
-hist(df$beta[df$pft == "c4_nonlegume"])
+dplyr::distinct(df$NCRS.code[df$pft == "c3_legume"])
 
 ##########################################################################
 ## Beta
