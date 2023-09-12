@@ -45,8 +45,10 @@ df$pft <- factor(df$pft, levels = c("c3_legume", "c4_nonlegume", "c3_nonlegume")
 df %>% group_by(pft) %>% distinct(NCRS.code) %>%
   summarize(n.pft = length(NCRS.code))
 
-
-dplyr::distinct(df$NCRS.code[df$pft == "c3_legume"])
+## How many NA values for chi (i.e., not between 0.1 and 0.95)
+df %>% filter(is.na(chi)) %>%
+  group_by(pft) %>%
+  summarize(removed.chi = length(!is.na(chi)))
 
 ##########################################################################
 ## Beta
@@ -77,6 +79,9 @@ test(emtrends(beta,~pft, "soil.no3n"))
 test(emtrends(beta, ~1, "soil.no3n"))
 test(emtrends(beta, ~1, "wn90_perc"))
 emmeans(beta, pairwise~pft)
+
+
+
 
 ##########################################################################
 ## Chi
@@ -139,7 +144,7 @@ r.squaredGLMM(narea)
 
 ## Post hoc comparisons
 test(emtrends(narea, pairwise~pft, "chi"))
-test(emtrends(narea, ~1, "soil.no3n"))
+test(emtrends(narea, ~1, "soil.no3n", type = "response"))
 test(emtrends(narea, ~1, "wn90_perc"))
 
 emmeans(narea, pairwise~pft)
@@ -168,8 +173,6 @@ Anova(nmass)
 r.squaredGLMM(nmass)
 
 # Post hoc tests
-test(emtrends(nmass, pairwise~pft, "chi"))
-test(emtrends(nmass, ~wn90_perc, "soil.no3n", at = list(wn90_perc = seq(0.15,0.75,0.01))))
 test(emtrends(nmass, ~1, "wn90_perc"))
 test(emtrends(nmass, ~1, "soil.no3n"))
 emmeans(nmass, pairwise~pft)
@@ -199,9 +202,6 @@ Anova(marea)
 r.squaredGLMM(marea)
 
 # Post-hoc comparisons
-test(emtrends(marea, pairwise~pft, "chi"))
-test(emtrends(marea, ~wn90_perc*pft, "soil.no3n",
-              at = list(wn90_perc = seq(0.15, 0.75, 0.01))))
 test(emtrends(marea, pairwise~pft, "chi"))
 test(emtrends(marea, pairwise~pft, "soil.no3n"))
 
