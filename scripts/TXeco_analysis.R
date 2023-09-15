@@ -219,6 +219,40 @@ df.psem$narea.trans <- log(df$narea)
 df.psem$nmass.trans <- log(df$n.leaf)
 df.psem$marea.trans <- log(df$marea)
 
+
+narea_psem_hypothesized <- psem (
+  
+  ## Narea model
+  narea = lme(narea.trans ~ marea.trans + nmass.trans,
+              random = ~ 1 | NCRS.code, 
+              data = df.psem, na.action = na.omit),
+  
+  ## Nmass model
+  nmass = lme(nmass.trans ~ chi,
+              random = ~ 1 | NCRS.code, 
+              data = df.psem, na.action = na.omit),
+  
+  ## Marea model
+  marea = lme(marea.trans ~ chi,
+              random = ~ 1 | NCRS.code, 
+              data = df.psem, na.action = na.omit),
+  
+  ## Chi model
+  chi = lme(chi ~ vpd90 + beta.trans,
+            random = ~ 1 | NCRS.code, 
+            data = df.psem, na.action = na.omit),
+  
+  ## Beta model
+  beta = lme(beta.trans ~ soil.no3n + wn90_perc + n.fixer + photo,
+             random = ~ 1 | NCRS.code, 
+             data = df.psem, na.action = na.omit))
+summary(narea_psem_hypothesized)
+
+
+
+
+
+
 ## Base Narea PSEM model (before optimization)
 narea_psem_preopt <- psem(
   
