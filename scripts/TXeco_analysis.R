@@ -111,12 +111,13 @@ r.squaredGLMM(chi)
 
 ## Post-hoc comparisons 
 test(emtrends(chi, ~1, "vpd90"))
+test(emtrends(chi, ~pft, "vpd90"))
 
 test(emtrends(chi, ~1, "wn90_perc"))
 test(emtrends(chi, pairwise~pft, "wn90_perc"))
 
 test(emtrends(chi, ~1, "soil.no3n"))
-test(emtrends(chi, pairwise~pft, "soil.no3n"))
+test(emtrends(chi, ~pft, "soil.no3n"))
 
 emmeans(chi, pairwise~pft)
 
@@ -177,6 +178,9 @@ r.squaredGLMM(nmass)
 # Post hoc tests
 test(emtrends(nmass, ~1, "wn90_perc"))
 test(emtrends(nmass, ~1, "soil.no3n"))
+
+test(emtrends(nmass, ~wn90_perc, "soil.no3n", at = list(wn90_perc = c(0.3, 0.5, 0.7))))
+
 emmeans(nmass, pairwise~pft)
 
 ##########################################################################
@@ -204,9 +208,11 @@ Anova(marea)
 r.squaredGLMM(marea)
 
 # Post-hoc comparisons
+
 test(emtrends(marea, pairwise~pft, "chi"))
 test(emtrends(marea, pairwise~pft, "soil.no3n"))
-
+test(emtrends(marea, ~wn90_perc*pft, 
+              "soil.no3n", at = list(wn90_perc = c(0.3, 0.5, 0.7))))
 emmeans(marea, pairwise~pft)
 
 ##########################################################################
@@ -214,7 +220,7 @@ emmeans(marea, pairwise~pft)
 ##########################################################################
 df.psem <- df
 df.psem$n.fixer <- ifelse(df.psem$n.fixer == "yes", 1, 0)
-df.psem$photo <- ifelse(df.psem$photo == "c3", 1, 0)
+df.psem$photo <- ifelse(df.psem$photo == "c4", 1, 0)
 
 df.psem$beta.trans <- sqrt(df$beta)
 df.psem$narea.trans <- log(df$narea)
@@ -298,7 +304,7 @@ narea_psem_opt <- psem(
   
   ## Correlated errors
   soil.no3n %~~% vpd90,
-  vpd90 %~~% beta.trans,
+  beta.trans %~~% vpd90,
   nmass.trans %~~% wn90_perc)
 
 summary(narea_psem_opt)
@@ -334,9 +340,6 @@ df %>% group_by(pft) %>%
             med.beta = median(beta, na.rm = TRUE),
             sd.beta = sd(beta, na.rm = TRUE)) %>%
   data.frame()
-
-
-
 
 ##########################################################################
 ## Tables
@@ -409,9 +412,8 @@ table3 <- data.frame(Anova(chi)) %>%
   arrange(treatment)  %>%
   replace(is.na(.), "-")
 
-write.csv(table3, "../working_drafts/tables/TXeco_table3_chi.csv", 
-          row.names = FALSE)
-
+# write.csv(table3, "../working_drafts/tables/TXeco_table3_chi.csv", 
+#           row.names = FALSE)
 
 ## Table 4 (Coefficients + model results summary)
 narea.coefs <- data.frame(summary(narea)$coefficient) %>%
@@ -500,8 +502,8 @@ table4 <- narea.table %>% full_join(nmass.table) %>%
   arrange(treatment) %>%
   replace(is.na(.), "-")
 
-write.csv(table4, "../working_drafts/tables/TXeco_table4_leafN.csv", 
-          row.names = FALSE)
+# write.csv(table4, "../working_drafts/tables/TXeco_table4_leafN.csv", 
+#           row.names = FALSE)
 
 
 ## Table 5 (SEM results)
