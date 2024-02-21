@@ -19,22 +19,21 @@ emm_options(opt.digits = FALSE)
 df <- read.csv("../../TXeco/data/TXeco_data.csv",
                na.strings = c("NA", "NaN")) %>%
   filter(site != "Fayette_2019_04") %>%
+  filter(pft != "c3_shrub" | is.na(pft)) %>%
+  filter(NCRS.code != "PRGL2") %>%
   mutate(pft = ifelse(pft == "c4_graminoid", 
                       "c4_nonlegume",
                       ifelse(pft == "c3_graminoid" | pft == "c3_forb",
                              "c3_nonlegume", 
                              ifelse(pft == "c3_legume", 
                                     "c3_legume", 
-                                    ifelse(pft == "c3_shrub",
-                                           "c3_nonlegume",
-                                           NA)))),
+                                    NA))),
          beta = ifelse(beta > 2000, NA, beta),
          beta = ifelse(pft == "c4_nonlegume" & beta > 400, NA, beta),
          beta = ifelse(pft == "c3_legume" & beta > 1000, NA, beta),
          marea = ifelse(marea > 1000, NA, marea),
          pft = factor(pft, 
-                      levels = c("c3_legume", "c4_nonlegume", "c3_nonlegume"))) %>%
-  filter(!is.na(pft))
+                      levels = c("c3_legume", "c4_nonlegume", "c3_nonlegume")))
 
 ## Add colorblind friendly palette
 cbbPalette3 <- c("#DDAA33", "#BB5566", "#004488")
@@ -55,10 +54,11 @@ df %>% filter(is.na(chi)) %>%
   group_by(pft) %>%
   summarize(removed.chi = length(!is.na(chi)))
 
+
 ##########################################################################
 ## Beta
 ##########################################################################
-df$beta[c(403, 422)] <- NA
+#df$beta[c(64, 212, 363, 382)] <- NA
 
 beta <- lmer(sqrt(beta) ~ wn90_perc * soil.no3n * pft + (1 | NCRS.code), 
              data = df)
@@ -88,10 +88,10 @@ emmeans(beta, pairwise~pft)
 ##########################################################################
 ## Chi
 ##########################################################################
-df$chi[c(134, 382, 412, 510)] <- NA
-df$chi[c(451, 454, 503)] <- NA
-df$chi[c(178, 445, 496)] <- NA
-df$chi[c(233)] <- NA
+#df$chi[c(126, 346, 465)] <- NA
+#df$chi[c(372, 460)] <- NA
+#df$chi[c(170, 411, 414, 456)] <- NA
+#df$chi[c(216, 405)] <- NA
 
 chi <- lmer(chi ~ (vpd90 + (wn90_perc * soil.no3n)) * pft + 
               (1 | NCRS.code), data = df)
@@ -125,7 +125,7 @@ emmeans(chi, pairwise~pft)
 ## Narea
 ##########################################################################
 df$narea[df$narea > 10] <- NA
-df$narea[284] <- NA
+df$narea[c(258)] <- NA
 
 # Fit model
 narea <- lmer(log(narea) ~ (chi + (soil.no3n * wn90_perc)) * pft + (1 | NCRS.code),
@@ -155,7 +155,7 @@ emmeans(narea, pairwise~pft)
 ##########################################################################
 ## Nmass
 ##########################################################################
-df$n.leaf[504] <- NA
+df$n.leaf[461] <- NA
 
 # Fit model
 nmass <- lmer(log(n.leaf) ~ (chi + (soil.no3n * wn90_perc)) * pft + (1 | NCRS.code),
@@ -187,7 +187,7 @@ emmeans(nmass, pairwise~pft)
 ## Marea
 ##########################################################################
 df$marea[df$marea > 1000] <- NA
-df$marea[c(20, 21, 284, 318)] <- NA
+df$marea[c(20, 21, 255, 258, 289)] <- NA
 
 # Fit model
 marea <- lmer(log(marea) ~ (chi + (soil.no3n * wn90_perc)) * pft + (1 | NCRS.code),
@@ -215,7 +215,7 @@ test(emtrends(marea, ~wn90_perc*pft,
 emmeans(marea, pairwise~pft)
 
 ##########################################################################
-## Structural equation model
+## Structural equation model - all photosynthetic pathways
 ##########################################################################
 df.psem <- df
 df.psem$n.fixer <- ifelse(df.psem$n.fixer == "yes", 1, 0)
@@ -226,7 +226,9 @@ df.psem$narea.trans <- log(df$narea)
 df.psem$nmass.trans <- log(df$n.leaf)
 df.psem$marea.trans <- log(df$marea)
 
-df.psem_c4 <- subset(df.psem$pf)
+df.psem.c3 <- subset(df.psem, photo == 0)
+df.psem.c4 <- subset(df.psem, photo == 1)
+
 
 ## Base Narea PSEM model (before optimization)
 narea_psem_preopt <- psem(
@@ -311,95 +313,31 @@ narea_psem_opt <- psem(
 summary(narea_psem_opt)
 plot(narea_psem_opt)
 
-line.thick <- data.frame(summary(narea_psem_opt)$coefficients,
-                         line.thickness = abs(summary(
-                           narea_psem_opt)$coefficients$Std.Estimate) * 16.67)
 
-line.thick <- line.thick %>%
-  mutate(line.thickness = round(line.thickness, digits = 2)) %>%
-  dplyr::select(-Var.9)
-
-ggplot(data=line.thick, aes(x = abs(Std.Estimate), 
-                            y = line.thickness)) + 
-  geom_smooth() +
-  geom_point()
-#scale_y_continuous(limits = c(0,15.2), breaks = seq(0, 15, 5))
-
-summary(narea_psem_opt)$coefficients %>%
-  data.frame() %>%
-  group_by(Response) %>%
-  arrange(Response, -abs(Std.Estimate)) %>%
-  data.frame()
-
-
-
-## TRY PSEM WITH ONLY C3
-narea_psem_opt_c3 <- psem(
+##########################################################################
+## Structural equation model - C3 only
+##########################################################################
+narea_psem_preopt_c3 <- psem(
   
   ## Narea model
   narea = lme(narea.trans ~ marea.trans + nmass.trans,
               random = ~ 1 | NCRS.code, 
-              data = subset(df.psem, photo == 0), na.action = na.omit),
+              data = df.psem.c3, na.action = na.omit),
   
   ## Nmass model
-  nmass = lme(nmass.trans ~ chi + beta.trans + soil.no3n + marea.trans + n.fixer,
+  nmass = lme(nmass.trans ~ chi + marea.trans + soil.no3n,
               random = ~ 1 | NCRS.code, 
-              data = subset(df.psem, photo == 0), na.action = na.omit),
-  
-  ## Marea model
-  marea = lme(marea.trans ~ chi + soil.no3n + beta.trans,
-              random = ~ 1 | NCRS.code, 
-              data = subset(df.psem, photo == 0), na.action = na.omit),
-  
-  ## Chi model
-  chi = lme(chi ~ beta.trans + vpd90 + wn90_perc + soil.no3n, 
-            random = ~ 1 | NCRS.code,
-            data = subset(df.psem, photo == 0), na.action = na.omit),
-  
-  ## Beta model
-  beta = lme(beta.trans ~ soil.no3n + wn90_perc + n.fixer,
-             random = ~ 1 | NCRS.code, data = subset(df.psem, photo == 0), 
-             na.action = na.omit),
-  
-  ## Soil N model
-  soiln = lme(soil.no3n ~ wn90_perc, random = ~ 1 | NCRS.code, 
-              data = subset(df.psem, photo == 0), na.action = na.omit),
-  
-  ## Soil moisture
-  soil.moisture = lme(wn90_perc ~ vpd90, random = ~ 1 | NCRS.code, 
-                      data = subset(df.psem, photo == 0), na.action = na.omit),
-  
-  
-  ## Correlated errors
-  soil.no3n %~~% vpd90,
-  beta.trans %~~% vpd90,
-  nmass.trans %~~% wn90_perc)
-
-summary(narea_psem_opt_c3)
-
-
-## TRY PSEM WITH ONLY C4
-narea_psem_opt_c4 <- psem(
-  
-  ## Narea model
-  narea = lme(narea.trans ~ marea.trans + nmass.trans,
-              random = ~ 1 | NCRS.code, 
-              data = df.psem, na.action = na.omit),
-  
-  ## Nmass model
-  nmass = lme(nmass.trans ~ chi + beta.trans + soil.no3n + marea.trans,
-              random = ~ 1 | NCRS.code, 
-              data = df.psem, na.action = na.omit),
+              data = df.psem.c3, na.action = na.omit),
   
   ## Marea model
   marea = lme(marea.trans ~ chi + soil.no3n,
               random = ~ 1 | NCRS.code, 
-              data = df.psem, na.action = na.omit),
+              data = df.psem.c3, na.action = na.omit),
   
   ## Chi model
-  chi = lme(chi ~ beta.trans + vpd90 + wn90_perc, 
+  chi = lme(chi ~ beta.trans + soil.no3n + vpd90, 
             random = ~ 1 | NCRS.code,
-            data = df.psem, na.action = na.omit),
+            data = df.psem.c3, na.action = na.omit),
   
   ## Beta model
   beta = lme(beta.trans ~ soil.no3n + wn90_perc,
@@ -408,22 +346,151 @@ narea_psem_opt_c4 <- psem(
   
   ## Soil N model
   soiln = lme(soil.no3n ~ wn90_perc, random = ~ 1 | NCRS.code, 
-              data = df.psem, na.action = na.omit),
+              data = df.psem.c3, na.action = na.omit),
   
   ## Soil moisture
   soil.moisture = lme(wn90_perc ~ vpd90, random = ~ 1 | NCRS.code, 
-                      data = df.psem, na.action = na.omit),
-  
-  ## Correlated errors
-  soil.no3n %~~% vpd90,
-  beta.trans %~~% vpd90,
-  nmass.trans %~~% wn90_perc
-  )
+                      data = df.psem.c3, na.action = na.omit))
+summary(narea_psem_preopt_c3)
 
+
+narea_psem_opt_c3 <- psem(
+  
+  ## Narea model
+  narea = lme(narea.trans ~ marea.trans + nmass.trans,
+              random = ~ 1 | NCRS.code, 
+              data = df.psem.c3, na.action = na.omit),
+  
+  ## Nmass model
+  nmass = lme(nmass.trans ~ chi + marea.trans + soil.no3n + n.fixer,
+              random = ~ 1 | NCRS.code, 
+              data = df.psem.c3, na.action = na.omit),
+  
+  ## Marea model
+  marea = lme(marea.trans ~ chi + soil.no3n,
+              random = ~ 1 | NCRS.code, 
+              data = df.psem.c3, na.action = na.omit),
+  
+  ## Chi model
+  chi = lme(chi ~ beta.trans + soil.no3n + vpd90 + n.fixer, 
+            random = ~ 1 | NCRS.code,
+            data = df.psem.c3, na.action = na.omit),
+  
+  ## Beta model
+  beta = lme(beta.trans ~ soil.no3n + wn90_perc,
+             random = ~ 1 | NCRS.code, data = df.psem, 
+             na.action = na.omit),
+  
+  ## Soil N model
+  soiln = lme(soil.no3n ~ wn90_perc, random = ~ 1 | NCRS.code, 
+              data = df.psem.c3, na.action = na.omit),
+  
+  ## Soil moisture
+  soil.moisture = lme(wn90_perc ~ vpd90, random = ~ 1 | NCRS.code, 
+                      data = df.psem.c3, na.action = na.omit),
+  
+  # Correlated errors
+  vpd90 %~~% soil.no3n,
+  beta.trans %~~% vpd90,
+  nmass.trans %~~% wn90_perc)
 
 summary(narea_psem_opt_c3)
+
+line.thick.c3 <- data.frame(
+  summary(narea_psem_opt_c3)$coefficients,
+  line.thickness = abs(summary(
+    narea_psem_opt_c3)$coefficients$Std.Estimate) * 16.67) %>%
+  mutate(line.thickness = round(line.thickness, digits = 2)) %>%
+  dplyr::select(-Var.9)
+
+
+##########################################################################
+## Structural equation model - C4 only
+##########################################################################
+narea_psem_preopt_c4 <- psem(
+  
+  ## Narea model
+  narea = lme(narea.trans ~ marea.trans + nmass.trans,
+              random = ~ 1 | NCRS.code, 
+              data = df.psem.c4, na.action = na.omit),
+  
+  ## Nmass model
+  nmass = lme(nmass.trans ~ chi + marea.trans + soil.no3n,
+              random = ~ 1 | NCRS.code, 
+              data = df.psem.c4, na.action = na.omit),
+  
+  ## Marea model
+  marea = lme(marea.trans ~ chi + soil.no3n,
+              random = ~ 1 | NCRS.code, 
+              data = df.psem.c4, na.action = na.omit),
+  
+  ## Chi model
+  chi = lme(chi ~ beta.trans + soil.no3n + vpd90, 
+            random = ~ 1 | NCRS.code,
+            data = df.psem.c4, na.action = na.omit),
+  
+  ## Beta model
+  beta = lme(beta.trans ~ soil.no3n + wn90_perc,
+             random = ~ 1 | NCRS.code, data = df.psem, 
+             na.action = na.omit),
+  
+  ## Soil N model
+  soiln = lme(soil.no3n ~ wn90_perc, random = ~ 1 | NCRS.code, 
+              data = df.psem.c4, na.action = na.omit),
+  
+  ## Soil moisture
+  soil.moisture = lme(wn90_perc ~ vpd90, random = ~ 1 | NCRS.code, 
+                      data = df.psem.c4, na.action = na.omit))
+summary(narea_psem_preopt_c4)
+
+
+narea_psem_opt_c4 <- psem(
+  
+  ## Narea model
+  narea = lme(narea.trans ~ marea.trans + nmass.trans,
+              random = ~ 1 | NCRS.code, 
+              data = df.psem.c4, na.action = na.omit),
+  
+  ## Nmass model
+  nmass = lme(nmass.trans ~ chi + marea.trans + soil.no3n,
+              random = ~ 1 | NCRS.code, 
+              data = df.psem.c4, na.action = na.omit),
+  
+  ## Marea model
+  marea = lme(marea.trans ~ chi + soil.no3n,
+              random = ~ 1 | NCRS.code, 
+              data = df.psem.c4, na.action = na.omit),
+  
+  ## Chi model
+  chi = lme(chi ~ beta.trans + soil.no3n + vpd90, 
+            random = ~ 1 | NCRS.code,
+            data = df.psem.c4, na.action = na.omit),
+  
+  ## Beta model
+  beta = lme(beta.trans ~ soil.no3n + wn90_perc,
+             random = ~ 1 | NCRS.code, data = df.psem, 
+             na.action = na.omit),
+  
+  ## Soil N model
+  soiln = lme(soil.no3n ~ wn90_perc, random = ~ 1 | NCRS.code, 
+              data = df.psem.c4, na.action = na.omit),
+  
+  ## Soil moisture
+  soil.moisture = lme(wn90_perc ~ vpd90, random = ~ 1 | NCRS.code, 
+                      data = df.psem.c4, na.action = na.omit),
+  
+  # Correlated errors
+  vpd90 %~~% soil.no3n,
+  beta.trans %~~% vpd90,
+  nmass.trans %~~% wn90_perc)
 summary(narea_psem_opt_c4)
 
+line.thick.c4 <- data.frame(
+  summary(narea_psem_opt_c4)$coefficients,
+  line.thickness = abs(summary(
+    narea_psem_opt_c4)$coefficients$Std.Estimate) * 16.67) %>%
+  mutate(line.thickness = round(line.thickness, digits = 2)) %>%
+  dplyr::select(-Var.9)
 
 
 
