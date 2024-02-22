@@ -35,9 +35,6 @@ df <- read.csv("../../TXeco/data/TXeco_data.csv",
          pft = factor(pft, 
                       levels = c("c3_legume", "c4_nonlegume", "c3_nonlegume")))
 
-## Add colorblind friendly palette
-cbbPalette3 <- c("#DDAA33", "#BB5566", "#004488")
-
 ## Number of species
 length(unique(df$NCRS.code))
 
@@ -53,7 +50,6 @@ df %>% group_by(pft) %>% distinct(NCRS.code) %>%
 df %>% filter(is.na(chi)) %>%
   group_by(pft) %>%
   summarize(removed.chi = length(!is.na(chi)))
-
 
 ##########################################################################
 ## Beta
@@ -491,11 +487,6 @@ line.thick.c4 <- data.frame(
     narea_psem_opt_c4)$coefficients$Std.Estimate) * 16.67) %>%
   mutate(line.thickness = round(line.thickness, digits = 2)) %>%
   dplyr::select(-Var.9)
-
-
-
-
-
 
 ##########################################################################
 ## Mean and standard deviation of beta
