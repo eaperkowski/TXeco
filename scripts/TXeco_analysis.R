@@ -74,7 +74,6 @@ r.squaredGLMM(beta)
 
 # Post-hoc comparisons
 test(emtrends(beta, ~pft, "wn90_perc"))
-test(emtrends(beta,~pft, "soil.no3n"))
 
 # Individual effects
 test(emtrends(beta, ~1, "soil.no3n"))
@@ -143,8 +142,8 @@ r.squaredGLMM(narea)
 
 ## Post hoc comparisons
 test(emtrends(narea, pairwise~pft, "chi"))
-test(emtrends(narea, ~1, "soil.no3n", type = "response"))
-test(emtrends(narea, ~1, "wn90_perc"))
+test(emtrends(narea, ~pft, "soil.no3n", type = "response"))
+test(emtrends(narea, ~pft, "wn90_perc", type = "response"))
 
 emmeans(narea, pairwise~pft)
 
