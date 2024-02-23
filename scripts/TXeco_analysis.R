@@ -35,6 +35,7 @@ df <- read.csv("../../TXeco/data/TXeco_data.csv",
          pft = factor(pft, 
                       levels = c("c3_legume", "c4_nonlegume", "c3_nonlegume")))
 
+
 ## Number of species
 length(unique(df$NCRS.code))
 
@@ -205,9 +206,8 @@ r.squaredGLMM(marea)
 
 # Post-hoc comparisons
 test(emtrends(marea, pairwise~pft, "chi"))
+test(emtrends(marea, pairwise~pft, "wn90_perc"))
 test(emtrends(marea, pairwise~pft, "soil.no3n"))
-test(emtrends(marea, ~wn90_perc*pft, 
-              "soil.no3n", at = list(wn90_perc = c(0.3, 0.5, 0.7))))
 emmeans(marea, pairwise~pft)
 
 ##########################################################################
@@ -321,7 +321,7 @@ narea_psem_preopt_c3 <- psem(
               data = df.psem.c3, na.action = na.omit),
   
   ## Nmass model
-  nmass = lme(nmass.trans ~ chi + marea.trans + soil.no3n,
+  nmass = lme(nmass.trans ~ chi + marea.trans + soil.no3n + n.fixer,
               random = ~ 1 | NCRS.code, 
               data = df.psem.c3, na.action = na.omit),
   
@@ -336,7 +336,7 @@ narea_psem_preopt_c3 <- psem(
             data = df.psem.c3, na.action = na.omit),
   
   ## Beta model
-  beta = lme(beta.trans ~ soil.no3n + wn90_perc,
+  beta = lme(beta.trans ~ soil.no3n + wn90_perc + n.fixer,
              random = ~ 1 | NCRS.code, data = df.psem, 
              na.action = na.omit),
   
@@ -368,12 +368,12 @@ narea_psem_opt_c3 <- psem(
               data = df.psem.c3, na.action = na.omit),
   
   ## Chi model
-  chi = lme(chi ~ beta.trans + soil.no3n + vpd90 + n.fixer, 
+  chi = lme(chi ~ beta.trans + wn90_perc + vpd90, 
             random = ~ 1 | NCRS.code,
             data = df.psem.c3, na.action = na.omit),
   
   ## Beta model
-  beta = lme(beta.trans ~ soil.no3n + wn90_perc,
+  beta = lme(beta.trans ~ soil.no3n + wn90_perc + n.fixer,
              random = ~ 1 | NCRS.code, data = df.psem, 
              na.action = na.omit),
   
@@ -388,7 +388,8 @@ narea_psem_opt_c3 <- psem(
   # Correlated errors
   vpd90 %~~% soil.no3n,
   beta.trans %~~% vpd90,
-  nmass.trans %~~% wn90_perc)
+  nmass.trans %~~% wn90_perc,
+  chi %~~% soil.no3n)
 
 summary(narea_psem_opt_c3)
 
@@ -398,7 +399,7 @@ line.thick.c3 <- data.frame(
     narea_psem_opt_c3)$coefficients$Std.Estimate) * 16.67) %>%
   mutate(line.thickness = round(line.thickness, digits = 2)) %>%
   dplyr::select(-Var.9)
-
+line.thick.c3
 
 ##########################################################################
 ## Structural equation model - C4 only
@@ -421,7 +422,7 @@ narea_psem_preopt_c4 <- psem(
               data = df.psem.c4, na.action = na.omit),
   
   ## Chi model
-  chi = lme(chi ~ beta.trans + soil.no3n + vpd90, 
+  chi = lme(chi ~ beta.trans + soil.no3n + wn90_perc + vpd90, 
             random = ~ 1 | NCRS.code,
             data = df.psem.c4, na.action = na.omit),
   
@@ -458,7 +459,7 @@ narea_psem_opt_c4 <- psem(
               data = df.psem.c4, na.action = na.omit),
   
   ## Chi model
-  chi = lme(chi ~ beta.trans + soil.no3n + vpd90, 
+  chi = lme(chi ~ beta.trans + wn90_perc + vpd90, 
             random = ~ 1 | NCRS.code,
             data = df.psem.c4, na.action = na.omit),
   
@@ -487,7 +488,7 @@ line.thick.c4 <- data.frame(
     narea_psem_opt_c4)$coefficients$Std.Estimate) * 16.67) %>%
   mutate(line.thickness = round(line.thickness, digits = 2)) %>%
   dplyr::select(-Var.9)
-
+line.thick.c4
 ##########################################################################
 ## Mean and standard deviation of beta
 ##########################################################################
