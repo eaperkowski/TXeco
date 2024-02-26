@@ -33,7 +33,7 @@ df <- read.csv("../../TXeco/data/TXeco_data.csv",
          beta = ifelse(pft == "c3_legume" & beta > 1000, NA, beta),
          marea = ifelse(marea > 1000, NA, marea),
          pft = factor(pft, 
-                      levels = c("c3_legume", "c4_nonlegume", "c3_nonlegume")))
+                      levels = c("c3_legume", "c4_nonlegume", "c3_nonlegume"))) 
 
 
 ## Number of species
@@ -689,11 +689,17 @@ write.csv(table5, "../working_drafts/tables/TXeco_table5_SEMclean.csv",
 
 
 ## Mean and standard deviation of beta
-min(subset(df, pft != "c4_nonlegume")$beta, na.rm = TRUE)
-max(subset(df, pft != "c4_nonlegume")$beta, na.rm = TRUE)
-mean(subset(df, pft != "c4_nonlegume")$beta, na.rm = TRUE)
-median(subset(df, pft != "c4_nonlegume")$beta, na.rm = TRUE)
-sd(subset(df, pft != "c4_nonlegume")$beta, na.rm = TRUE)
+min(subset(df, pft == "c3_legume")$beta, na.rm = TRUE)
+max(subset(df, pft == "c3_legume")$beta, na.rm = TRUE)
+mean(subset(df, pft == "c3_legume")$beta, na.rm = TRUE)
+median(subset(df, pft == "c3_legume")$beta, na.rm = TRUE)
+sd(subset(df, pft == "c3_legume")$beta, na.rm = TRUE)
+
+min(subset(df, pft == "c3_nonlegume")$beta, na.rm = TRUE)
+max(subset(df, pft == "c3_nonlegume")$beta, na.rm = TRUE)
+mean(subset(df, pft == "c3_nonlegume")$beta, na.rm = TRUE)
+median(subset(df, pft == "c3_nonlegume")$beta, na.rm = TRUE)
+sd(subset(df, pft == "c3_nonlegume")$beta, na.rm = TRUE)
 
 min(subset(df, pft == "c4_nonlegume")$beta, na.rm = TRUE)
 max(subset(df, pft == "c4_nonlegume")$beta, na.rm = TRUE)
