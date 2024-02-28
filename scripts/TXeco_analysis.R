@@ -20,7 +20,8 @@ df <- read.csv("../../TXeco/data/TXeco_data.csv",
                na.strings = c("NA", "NaN")) %>%
   filter(site != "Fayette_2019_04") %>%
   filter(pft != "c3_shrub" | is.na(pft)) %>%
-  filter(NCRS.code != "PRGL2") %>%
+  filter(NCRS.code != "PRGL2" & NCRS.code != "CAAM2" & NCRS.code != "RHAM" &
+           NCRS.code != "RUTR") %>%
   mutate(pft = ifelse(pft == "c4_graminoid", 
                       "c4_nonlegume",
                       ifelse(pft == "c3_graminoid" | pft == "c3_forb",
@@ -51,6 +52,13 @@ df %>% group_by(pft) %>% distinct(NCRS.code) %>%
 df %>% filter(is.na(chi)) %>%
   group_by(pft) %>%
   summarize(removed.chi = length(!is.na(chi)))
+
+## How many reps per species?
+spp.number <- df %>%
+  group_by(NCRS.code) %>%
+  summarize(n.spp = length(NCRS.code))
+
+write.csv(spp.number, "../tables/TXeco_tableS1_spp_data_notClean.csv", row.names = FALSE)
 
 ##########################################################################
 ## Beta
@@ -121,7 +129,7 @@ emmeans(chi, pairwise~pft)
 ## Narea
 ##########################################################################
 df$narea[df$narea > 10] <- NA
-df$narea[c(258)] <- NA
+df$narea[c(254)] <- NA
 
 # Fit model
 narea <- lmer(log(narea) ~ (chi + (soil.no3n * wn90_perc)) * pft + (1 | NCRS.code),
@@ -151,7 +159,7 @@ emmeans(narea, pairwise~pft)
 ##########################################################################
 ## Nmass
 ##########################################################################
-df$n.leaf[461] <- NA
+df$n.leaf[454] <- NA
 
 # Fit model
 nmass <- lmer(log(n.leaf) ~ (chi + (soil.no3n * wn90_perc)) * pft + (1 | NCRS.code),
@@ -183,7 +191,7 @@ emmeans(nmass, pairwise~pft)
 ## Marea
 ##########################################################################
 df$marea[df$marea > 1000] <- NA
-df$marea[c(20, 21, 255, 258, 289)] <- NA
+df$marea[c(20, 21, 252, 254, 283)] <- NA
 
 # Fit model
 marea <- lmer(log(marea) ~ (chi + (soil.no3n * wn90_perc)) * pft + (1 | NCRS.code),
@@ -539,7 +547,7 @@ table2$treatment <- c("Intercept",
                       "N * PFT", 
                       "SM * N * PFT")
 
-write.csv(table2, "../working_drafts/tables/TXeco_table2_beta.csv", 
+write.csv(table2, "../tables/TXeco_table2_beta.csv", 
           row.names = FALSE)
 
 ## Table 3 (Coefficients and model summary)
@@ -570,8 +578,8 @@ table3 <- data.frame(Anova(chi)) %>%
   arrange(treatment)  %>%
   replace(is.na(.), "-")
 
-# write.csv(table3, "../working_drafts/tables/TXeco_table3_chi.csv", 
-#           row.names = FALSE)
+write.csv(table3, "../tables/TXeco_table3_chi.csv", 
+          row.names = FALSE)
 
 ## Table 4 (Coefficients + model results summary)
 narea.coefs <- data.frame(summary(narea)$coefficient) %>%
@@ -660,31 +668,50 @@ table4 <- narea.table %>% full_join(nmass.table) %>%
   arrange(treatment) %>%
   replace(is.na(.), "-")
 
-# write.csv(table4, "../working_drafts/tables/TXeco_table4_leafN.csv", 
-#           row.names = FALSE)
+write.csv(table4, "../tables/TXeco_table4_leafN.csv", 
+          row.names = FALSE)
 
 
 ## Table 5 (SEM results)
-table5.coefs <- summary(narea_psem_opt)$coefficients[, c(1:8)] %>%
+table5.c3.coefs <- summary(narea_psem_opt_c3)$coefficients[, c(1:8)] %>%
   as.data.frame() %>%
   mutate(Std.Error = ifelse(Std.Error == "-", NA, Std.Error),
          across(Estimate:Std.Estimate, as.numeric),
          across(Estimate:Std.Estimate, round, 3),
-         p_val = ifelse(P.Value < 0.001, "<0.001", P.Value),
+         p_val_c3 = ifelse(P.Value < 0.001, "<0.001", P.Value),
          Std.Estimate = round(Std.Estimate, digits = 3)) %>%
-  dplyr::select(resp = Response, pred = Predictor, std_est = Std.Estimate, 
-                p_val)
+  dplyr::select(resp = Response, pred = Predictor, std_est_c3 = Std.Estimate, 
+                p_val_c3)
+table5.c3 <- summary(narea_psem_opt_c3)$R2 %>%
+  dplyr::select(resp = Response, r2_marg_c3 = Marginal, r2_cond_c3 = Conditional) %>%
+  full_join(table5.c3.coefs) %>%
+  dplyr::select(resp, pred, r2_marg_c3, r2_cond_c3, std_est_c3, p_val_c3)
 
-table5 <- summary(narea_psem_opt)$R2 %>%
-  dplyr::select(resp = Response, r2_marg = Marginal,
-                r2_cond = Conditional) %>%
-  full_join(table5.coefs) %>%
+
+table5.c4.coefs <- summary(narea_psem_opt_c4)$coefficients[, c(1:8)] %>%
+  as.data.frame() %>%
+  mutate(Std.Error = ifelse(Std.Error == "-", NA, Std.Error),
+         across(Estimate:Std.Estimate, as.numeric),
+         across(Estimate:Std.Estimate, round, 3),
+         p_val_c4 = ifelse(P.Value < 0.001, "<0.001", P.Value),
+         Std.Estimate = round(Std.Estimate, digits = 3)) %>%
+  dplyr::select(resp = Response, pred = Predictor, std_est_c4 = Std.Estimate, 
+                p_val_c4)
+table5.c4 <- summary(narea_psem_opt_c4)$R2 %>%
+  dplyr::select(resp = Response, r2_marg_c4 = Marginal, r2_cond_c4 = Conditional) %>%
+  full_join(table5.c4.coefs) %>%
+  dplyr::select(resp, pred, r2_marg_c4, r2_cond_c4, std_est_c4, p_val_c4)
+
+table5_merged <- table5.c3 %>% full_join(table5.c4) %>%
+  mutate(resp = factor(resp, 
+                       levels = c("narea.trans", "nmass.trans", "marea.trans",
+                                  "chi", "beta.trans", "wn90_perc", "soil.no3n",
+                                  "~~nmass.trans", "~~chi", "~~beta.trans", 
+                                  "~~vpd90"))) %>%
   group_by(resp) %>%
-  arrange(-abs(std_est), .by_group = TRUE) %>%
-  dplyr::select(resp, pred, r2_marg, r2_cond, std_est:p_val)
+  arrange(-abs(std_est_c3), .by_group = TRUE)
 
-
-write.csv(table5, "../working_drafts/tables/TXeco_table5_SEMclean.csv", 
+write.csv(table5_merged, "../tables/TXeco_table5_SEMclean.csv", 
           row.names = FALSE)
 
 
