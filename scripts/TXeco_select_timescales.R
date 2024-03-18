@@ -16,7 +16,8 @@ df <- read.csv("../../TXeco/data/TXeco_data.csv",
                na.strings = c("NA", "NaN")) %>%
   filter(site != "Fayette_2019_04") %>%
   filter(pft != "c3_shrub" | is.na(pft)) %>%
-  filter(NCRS.code != "PRGL2") %>%
+  filter(NCRS.code != "PRGL2" & NCRS.code != "CAAM2" & NCRS.code != "RHAM" &
+           NCRS.code != "RUTR") %>%
   mutate(pft = ifelse(pft == "c4_graminoid", 
                       "c4_nonlegume",
                       ifelse(pft == "c3_graminoid" | pft == "c3_forb",
@@ -186,7 +187,7 @@ wn.beta <- ggplot(data = aicc.results, aes(x = day, y = aicc.wn)) +
              fill = "red", shape = 21, size = 3, alpha = 0.75) +
   geom_line() +
   scale_x_continuous(limits = c(0, 90), breaks = seq(0, 90, 30)) +
-  scale_y_continuous(limits = c(2780, 2790), breaks = seq(2780, 2790, 2)) +
+  scale_y_continuous(limits = c(2733, 2745), breaks = seq(2733, 2745, 3)) +
   labs(x = "Days prior to measurement", y = expression(bold("AIC"["c"])),
        title = expression(bold("Soil moisture (% WHC)"))) +
   theme_bw(base_size = 18) +
@@ -194,6 +195,7 @@ wn.beta <- ggplot(data = aicc.results, aes(x = day, y = aicc.wn)) +
         axis.title = element_text(face = "bold"),
         plot.title = element_text(face = "bold"),
         panel.border = element_rect(linewidth = 1.25))
+wn.beta
 
 vpd.chi <- ggplot(data = aicc.results, aes(x = day, y = aicc.vpd)) +
   geom_point(size = 3, alpha = 0.75) +
@@ -201,7 +203,7 @@ vpd.chi <- ggplot(data = aicc.results, aes(x = day, y = aicc.vpd)) +
              fill = "red", shape = 21, size = 3, alpha = 0.75) +
   geom_line() +
   scale_x_continuous(limits = c(0, 90), breaks = seq(0, 90, 30)) +
-  scale_y_continuous(limits = c(-796, -780), breaks = seq(-796, -780, 4)) +
+  scale_y_continuous(limits = c(-785, -770), breaks = seq(-785, -770, 3)) +
   labs(x = "Days prior to measurement", y = NULL,
        title = "VPD (kPa)") +
   theme_bw(base_size = 18) +
@@ -209,6 +211,7 @@ vpd.chi <- ggplot(data = aicc.results, aes(x = day, y = aicc.vpd)) +
         axis.title = element_text(face = "bold"),
         plot.title = element_text(face = "bold"),
         panel.border = element_rect(linewidth = 1.25))
+vpd.chi
 
 png(filename = "../../TX_ecolab_leafNitrogen/working_drafts/figs/TXeco_figS1_aicc_results.png",
     width = 10, height = 4.5, units = 'in', res = 600)
