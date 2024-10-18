@@ -53,7 +53,7 @@ df %>% group_by(pft) %>% distinct(NCRS.code) %>%
   summarize(n.pft = length(NCRS.code))
 
 ## How many species within each pft class? (not including legume classification)
-df %>% group_by(photo) %>% distinct(NCRS.code) %>%
+df %>% group_by(pft) %>% distinct(NCRS.code) %>%
   summarize(n.pft = length(NCRS.code))
 
 ## How many NA values for chi (i.e., not between 0.1 and 0.95)
@@ -62,169 +62,276 @@ df %>% filter(is.na(chi)) %>%
   summarize(removed.chi = length(!is.na(chi)))
 
 ## How many reps per species?
-spp.number <- df %>%
+df %>%
   group_by(NCRS.code) %>%
   summarize(n.spp = length(NCRS.code))
 
 ##########################################################################
-## Beta
+## Beta - C3
 ##########################################################################
-beta <- lmer(sqrt(beta) ~ wn90_perc * soil.no3n * photo + (1 | NCRS.code), 
-             data = df)
+df$beta[404] <- NA
+
+beta_c3 <- lmer(log(beta) ~ wn90_perc * soil.no3n + (1 | NCRS.code), 
+             data = subset(df, pft != "c3_legume" & photo == "c3"))
 
 # Check model assumptions
-plot(beta)
-qqnorm(residuals(beta))
-qqline(residuals(beta))
-densityPlot(residuals(beta))
-shapiro.test(residuals(beta))
-outlierTest(beta)
+plot(beta_c3)
+qqnorm(residuals(beta_c3))
+qqline(residuals(beta_c3))
+densityPlot(residuals(beta_c3))
+shapiro.test(residuals(beta_c3))
+outlierTest(beta_c3)
 
 # Model output
-summary(beta)
-Anova(beta)
-r.squaredGLMM(beta)
-
-# Post-hoc comparisons
-test(emtrends(beta, ~photo, "wn90_perc"))
+summary(beta_c3)
+Anova(beta_c3)
+r.squaredGLMM(beta_c3)
 
 # Individual effects
 test(emtrends(beta, ~1, "soil.no3n"))
 test(emtrends(beta, ~1, "wn90_perc"))
-emmeans(beta, pairwise~photo)
 
 ##########################################################################
-## Chi
+## Beta - C4
 ##########################################################################
-chi <- lmer(chi ~ (vpd90 + (wn90_perc * soil.no3n)) * photo + 
-              (1 | NCRS.code), data = df)
+beta_c4 <- lmer(log(beta) ~ wn90_perc * soil.no3n + (1 | NCRS.code), 
+             data = subset(df, pft != "c3_legume" & photo == "c4"))
 
 # Check model assumptions
-plot(chi)
-qqnorm(residuals(chi))
-qqline(residuals(chi))
-densityPlot(residuals(chi))
-shapiro.test(residuals(chi))
-outlierTest(chi)
+plot(beta_c4)
+qqnorm(residuals(beta_c4))
+qqline(residuals(beta_c4))
+densityPlot(residuals(beta_c4))
+shapiro.test(residuals(beta_c4))
+outlierTest(beta_c4)
 
 # Model output
-summary(chi)
-Anova(chi)
-r.squaredGLMM(chi)
+summary(beta_c4)
+Anova(beta_c4)
+r.squaredGLMM(beta_c4)
+
+# Post-hoc comparisons
+test(emtrends(beta_c4, ~1, "wn90_perc"))
+test(emtrends(beta_c4, ~1, "soil.no3n"))
+
+##########################################################################
+## Chi - C3
+##########################################################################
+df$chi[404] <- NA
+
+chi_c3 <- lmer(chi ~ (vpd90 + (wn90_perc * soil.no3n)) + (1 | NCRS.code), 
+              data = subset(df, pft != "c3_legume" & photo == "c3"))
+
+# Check model assumptions
+plot(chi_c3)
+qqnorm(residuals(chi_c3))
+qqline(residuals(chi_c3))
+densityPlot(residuals(chi_c3))
+shapiro.test(residuals(chi_c3))
+outlierTest(chi_c3)
+
+# Model output
+summary(chi_c3)
+Anova(chi_c3)
+r.squaredGLMM(chi_c3)
 
 ## Post-hoc comparisons 
-test(emtrends(chi, ~1, "vpd90"))
-test(emtrends(chi, ~photo, "vpd90"))
-
-test(emtrends(chi, ~1, "wn90_perc"))
-test(emtrends(chi, pairwise~photo, "wn90_perc"))
-
-test(emtrends(chi, ~1, "soil.no3n"))
-test(emtrends(chi, ~photo, "soil.no3n"))
-
-emmeans(chi, pairwise~photo)
+test(emtrends(chi_c3, ~1, "vpd90"))
 
 ##########################################################################
-## Narea
+## Chi - C4
 ##########################################################################
-df$narea[df$narea > 10] <- NA
-df$narea[c(254)] <- NA
-
-# Fit model
-narea <- lmer(log(narea) ~ (chi + (soil.no3n * wn90_perc)) * photo + (1 | NCRS.code),
-              data = df)
+chi_c4 <- lmer(chi ~ (vpd60 + (wn90_perc * soil.no3n)) + (1 | NCRS.code), 
+               data = subset(df, pft != "c3_legume" & photo == "c4"))
 
 # Check model assumptions
-plot(narea)
-qqnorm(residuals(narea))
-qqline(residuals(narea))
-hist(residuals(narea))
-densityPlot(residuals(narea))
-shapiro.test(residuals(narea))
-outlierTest(narea)
+plot(chi_c4)
+qqnorm(residuals(chi_c4))
+qqline(residuals(chi_c4))
+densityPlot(residuals(chi_c4))
+shapiro.test(residuals(chi_c4))
+outlierTest(chi_c4)
 
 # Model output
-summary(narea)
-Anova(narea)
-r.squaredGLMM(narea)
+summary(chi_c4)
+Anova(chi_c4)
+r.squaredGLMM(chi_c4)
 
-## Post hoc comparisons
-test(emtrends(narea, pairwise~photo, "chi"))
-test(emtrends(narea, ~1, "soil.no3n", type = "response"))
-test(emtrends(narea, ~1, "wn90_perc", type = "response"))
-emmeans(narea, pairwise~photo)
+## Post-hoc comparisons 
+test(emtrends(chi_c3, ~1, "vpd90"))
 
 ##########################################################################
-## Nmass
+## Narea - C3
+##########################################################################
+df$narea[df$narea > 10] <- NA
+
+# Fit model
+narea_c3 <- lmer(log(narea) ~ (chi + (soil.no3n * wn90_perc)) + (1 | NCRS.code),
+              data = subset(df, pft != "c3_legume" & photo == "c3"))
+
+# Check model assumptions
+plot(narea_c3)
+qqnorm(residuals(narea_c3))
+qqline(residuals(narea_c3))
+hist(residuals(narea_c3))
+densityPlot(residuals(narea_c3))
+shapiro.test(residuals(narea_c3))
+outlierTest(narea_c3)
+
+# Model output
+summary(narea_c3)
+Anova(narea_c3)
+r.squaredGLMM(narea_c3)
+
+## Post hoc comparisons
+test(emtrends(narea_c3, ~1, "chi", type = "response"))
+test(emtrends(narea_c3, ~1, "wn90_perc", type = "response"))
+
+test(emtrends(narea_c3, ~wn90_perc, "soil.no3n", type = "response", 
+              at = list(wn90_perc = seq(0.2, 0.7, 0.01))))
+
+
+##########################################################################
+## Narea - C4
+##########################################################################
+df$narea[df$narea > 10] <- NA
+df$narea[c(252, 254)] <- NA
+
+# Fit model
+narea_c4 <- lmer(log(narea) ~ (chi + (soil.no3n * wn90_perc)) + (1 | NCRS.code),
+                 data = subset(df, pft != "c3_legume" & photo == "c4"))
+
+# Check model assumptions
+plot(narea_c4)
+qqnorm(residuals(narea_c4))
+qqline(residuals(narea_c4))
+hist(residuals(narea_c4))
+densityPlot(residuals(narea_c4))
+shapiro.test(residuals(narea_c4))
+outlierTest(narea_c4)
+
+# Model output
+summary(narea_c4)
+Anova(narea_c4)
+r.squaredGLMM(narea_c4)
+
+##########################################################################
+## Nmass - C3
 ##########################################################################
 df$n.leaf[454] <- NA
 
 # Fit model
-nmass <- lmer(log(n.leaf) ~ (chi + (soil.no3n * wn90_perc)) * photo + (1 | NCRS.code),
-              data = df)
+nmass_c3 <- lmer(log(n.leaf) ~ (chi + (soil.no3n * wn90_perc)) + (1 | NCRS.code),
+              data = subset(df, pft != "c3_legume" & photo == "c3"))
 
 # Check model assumptions
-plot(nmass)
-qqnorm(residuals(nmass))
-qqline(residuals(nmass))
-hist(residuals(nmass))
-densityPlot(residuals(nmass))
-shapiro.test(residuals(nmass))
-outlierTest(nmass)
+plot(nmass_c3)
+qqnorm(residuals(nmass_c3))
+qqline(residuals(nmass_c3))
+hist(residuals(nmass_c3))
+densityPlot(residuals(nmass_c3))
+shapiro.test(residuals(nmass_c3))
+outlierTest(nmass_c3)
 
 # Model output
-summary(nmass)
-Anova(nmass)
-r.squaredGLMM(nmass)
+summary(nmass_c3)
+Anova(nmass_c3)
+r.squaredGLMM(nmass_c3)
 
 # Post hoc tests
-test(emtrends(nmass, ~1, "soil.no3n"))
-test(emtrends(nmass, ~wn90_perc, "soil.no3n", at = list(wn90_perc = c(0.3, 0.5, 0.7))))
-emmeans(nmass, pairwise~photo)
+test(emtrends(nmass_c3, ~1, "soil.no3n"))
 
 ##########################################################################
-## Marea
+## Nmass - C4
 ##########################################################################
-df$marea[df$marea > 1000] <- NA
-df$marea[c(11, 20, 21, 252, 254, 283)] <- NA
-
 # Fit model
-marea <- lmer(log(marea) ~ (chi + (soil.no3n * wn90_perc)) * photo + (1 | NCRS.code),
-              data = df)
+nmass_c4 <- lmer(log(n.leaf) ~ (chi + (soil.no3n * wn90_perc)) + (1 | NCRS.code),
+                 data = subset(df, pft != "c3_legume" & photo == "c4"))
 
 # Check model assumptions
-plot(marea)
-qqnorm(residuals(marea))
-qqline(residuals(marea))
-hist(residuals(marea))
-densityPlot(residuals(marea))
-shapiro.test(residuals(marea))
-outlierTest(marea)
+plot(nmass_c4)
+qqnorm(residuals(nmass_c4))
+qqline(residuals(nmass_c4))
+hist(residuals(nmass_c4))
+densityPlot(residuals(nmass_c4))
+shapiro.test(residuals(nmass_c4))
+outlierTest(nmass_c4)
 
 # Model output
-round(summary(marea)$coefficients, digits = 3)
-Anova(marea)
-r.squaredGLMM(marea)
+summary(nmass_c4)
+Anova(nmass_c4)
+r.squaredGLMM(nmass_c4)
+
+# Post hoc tests
+test(emtrends(nmass_c4, ~1, "soil.no3n"))
+
+
+##########################################################################
+## Marea - C3
+##########################################################################
+df$marea[c(20, 21)] <- NA
+
+# Fit model
+marea_c3 <- lmer(log(marea) ~ (chi + (soil.no3n * wn90_perc)) + (1 | NCRS.code),
+              data = subset(df, pft != "c3_legume" & photo == "c3"))
+
+# Check model assumptions
+plot(marea_c3)
+qqnorm(residuals(marea_c3))
+qqline(residuals(marea_c3))
+hist(residuals(marea_c3))
+densityPlot(residuals(marea_c3))
+shapiro.test(residuals(marea_c3))
+outlierTest(marea_c3)
+
+# Model output
+round(summary(marea_c3)$coefficients, digits = 3)
+Anova(marea_c3)
+r.squaredGLMM(marea_c3)
 
 # Post-hoc comparisons
-test(emtrends(marea, pairwise~photo, "chi"))
-test(emtrends(marea, ~1, "soil.no3n"))
+test(emtrends(marea_c3, ~1, "chi"))
+test(emtrends(marea_c3, ~1, "soil.no3n"))
 
-emmeans(marea, pairwise~photo)
+
+##########################################################################
+## Marea - C3
+##########################################################################
+df$marea[c(252, 254)] <- NA
+
+# Fit model
+marea_c4 <- lmer(log(marea) ~ (chi + (soil.no3n * wn90_perc)) + (1 | NCRS.code),
+                 data = subset(df, pft != "c3_legume" & photo == "c4"))
+
+# Check model assumptions
+plot(marea_c4)
+qqnorm(residuals(marea_c4))
+qqline(residuals(marea_c4))
+hist(residuals(marea_c4))
+densityPlot(residuals(marea_c4))
+shapiro.test(residuals(marea_c4))
+outlierTest(marea_c4)
+
+# Model output
+round(summary(marea_c4)$coefficients, digits = 3)
+Anova(marea_c4)
+r.squaredGLMM(marea_c4)
+
+# Post-hoc comparisons
+test(emtrends(marea_c4, ~1, "soil.no3n"))
 
 ##########################################################################
 ## Structural equation model - all photosynthetic pathways
 ##########################################################################
-df.psem <- df
-df.psem$photo <- ifelse(df.psem$photo == "c4", 1, 0)
+df.psem <- subset(df, pft!= "c3_legume")
 
-df.psem$beta.trans <- sqrt(df$beta)
-df.psem$narea.trans <- log(df$narea)
-df.psem$nmass.trans <- log(df$n.leaf)
-df.psem$marea.trans <- log(df$marea)
+df.psem$beta.trans <- log(df.psem$beta)
+df.psem$narea.trans <- log(df.psem$narea)
+df.psem$nmass.trans <- log(df.psem$n.leaf)
+df.psem$marea.trans <- log(df.psem$marea)
 
-df.psem.c3 <- subset(df.psem, photo == 0)
-df.psem.c4 <- subset(df.psem, photo == 1)
+df.psem.c3 <- subset(df.psem, photo == "c3")
+df.psem.c4 <- subset(df.psem, photo == "c4")
 
 ##########################################################################
 ## Structural equation model - C3 only
@@ -253,7 +360,7 @@ narea_psem_preopt_c3 <- psem(
   
   ## Beta model
   beta = lme(beta.trans ~ soil.no3n + wn90_perc,
-             random = ~ 1 | NCRS.code, data = df.psem, 
+             random = ~ 1 | NCRS.code, data = df.psem.c3, 
              na.action = na.omit),
   
   ## Soil N model
@@ -284,13 +391,13 @@ narea_psem_opt_c3 <- psem(
               data = df.psem.c3, na.action = na.omit),
   
   ## Chi model
-  chi = lme(chi ~ beta.trans + wn90_perc + vpd90, 
+  chi = lme(chi ~ beta.trans + soil.no3n + vpd90, 
             random = ~ 1 | NCRS.code,
             data = df.psem.c3, na.action = na.omit),
   
   ## Beta model
   beta = lme(beta.trans ~ soil.no3n + wn90_perc,
-             random = ~ 1 | NCRS.code, data = df.psem, 
+             random = ~ 1 | NCRS.code, data = df.psem.c3, 
              na.action = na.omit),
   
   ## Soil N model
@@ -301,9 +408,8 @@ narea_psem_opt_c3 <- psem(
   soil.moisture = lme(wn90_perc ~ vpd90, random = ~ 1 | NCRS.code, 
                       data = df.psem.c3, na.action = na.omit),
   
-  # Correlated errors
-  vpd90 %~~% soil.no3n,
-  chi %~~% soil.no3n,
+  ## Correlated errors
+  soil.no3n %~~% vpd90,
   beta.trans %~~% vpd90,
   nmass.trans %~~% wn90_perc)
 
@@ -338,21 +444,23 @@ narea_psem_preopt_c4 <- psem(
               data = df.psem.c4, na.action = na.omit),
   
   ## Chi model
-  chi = lme(chi ~ beta.trans + wn90_perc + vpd90, 
+  chi = lme(chi ~ beta.trans + wn90_perc + soil.no3n + vpd60, 
             random = ~ 1 | NCRS.code,
             data = df.psem.c4, na.action = na.omit),
   
   ## Beta model
   beta = lme(beta.trans ~ soil.no3n + wn90_perc,
-             random = ~ 1 | NCRS.code, data = df.psem, 
-             na.action = na.omit),
+             random = ~ 1 | NCRS.code, 
+             data = df.psem.c4, na.action = na.omit),
   
   ## Soil N model
-  soiln = lme(soil.no3n ~ wn90_perc, random = ~ 1 | NCRS.code, 
+  soiln = lme(soil.no3n ~ wn90_perc, 
+              random = ~ 1 | NCRS.code, 
               data = df.psem.c4, na.action = na.omit),
   
   ## Soil moisture
-  soil.moisture = lme(wn90_perc ~ vpd90, random = ~ 1 | NCRS.code, 
+  soil.moisture = lme(wn90_perc ~ vpd60, 
+                      random = ~ 1 | NCRS.code, 
                       data = df.psem.c4, na.action = na.omit))
 summary(narea_psem_preopt_c4)
 
@@ -375,28 +483,30 @@ narea_psem_opt_c4 <- psem(
               data = df.psem.c4, na.action = na.omit),
   
   ## Chi model
-  chi = lme(chi ~ beta.trans + wn90_perc + vpd90, 
+  chi = lme(chi ~ beta.trans + wn90_perc + soil.no3n + vpd60, 
             random = ~ 1 | NCRS.code,
             data = df.psem.c4, na.action = na.omit),
   
   ## Beta model
   beta = lme(beta.trans ~ soil.no3n + wn90_perc,
-             random = ~ 1 | NCRS.code, data = df.psem, 
-             na.action = na.omit),
+             random = ~ 1 | NCRS.code, 
+             data = df.psem.c4, na.action = na.omit),
   
   ## Soil N model
-  soiln = lme(soil.no3n ~ wn90_perc, random = ~ 1 | NCRS.code, 
+  soiln = lme(soil.no3n ~ wn90_perc, 
+              random = ~ 1 | NCRS.code, 
               data = df.psem.c4, na.action = na.omit),
   
   ## Soil moisture
-  soil.moisture = lme(wn90_perc ~ vpd90, random = ~ 1 | NCRS.code, 
+  soil.moisture = lme(wn90_perc ~ vpd60, 
+                      random = ~ 1 | NCRS.code, 
                       data = df.psem.c4, na.action = na.omit),
   
-  # Correlated errors
-  vpd90 %~~% soil.no3n,
-  chi %~~% soil.no3n,
-  beta.trans %~~% vpd90,
-  nmass.trans %~~% wn90_perc)
+  ## Correlated errors
+  soil.no3n %~~% vpd60,
+  beta.trans %~~% vpd60,
+  nmass.trans %~~% vpd60)
+
 summary(narea_psem_opt_c4)
 
 line.thick.c4 <- data.frame(
@@ -410,7 +520,8 @@ line.thick.c4
 ##########################################################################
 ## Mean and standard deviation of beta
 ##########################################################################
-df %>% group_by(photo) %>%
+df %>% filter(pft != "c3_legume") %>%
+  group_by(photo) %>%
   summarize(min.beta = min(beta, na.rm = TRUE),
             max.beta = max(beta, na.rm = TRUE),
             mean.beta = mean(beta, na.rm = TRUE),
@@ -458,7 +569,7 @@ table2$treatment <- c("Intercept",
                       "N * C3/C4", 
                       "SM * N * C3/C4")
 
-write.csv(table2, "../tables/TXeco_table2_beta.csv", 
+write.csv(table2, "../../TX_ecolab_leafNitrogen/working_drafts/tables/TXeco_table2_beta.csv", 
           row.names = FALSE)
 
 ## Table 3 (Coefficients and model summary)

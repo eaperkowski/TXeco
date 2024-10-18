@@ -34,7 +34,8 @@ df <- read.csv("../../TXeco/data/TXeco_data.csv",
          photo = factor(photo, levels = c("c3", "c4")))
 
 ## Add colorblind friendly palette and facet labels
-cbbPalette3 <- c("#1965B0", "#DC050C")
+cbbPalette3 <- c("#446455", "#FDD262")
+
 
 pft_labels <- c("C[3]", "C[4]")
 names(pft_labels) <- c("c3", "c4")
@@ -45,282 +46,147 @@ length(df$pft[df$pft == "c3_nonlegume"])
 length(df$pft[df$pft == "c4_nonlegume"])
 
 ## Remove outliers from statistical models
+df$beta[404] <- NA
+df$chi[404] <- NA
 df$narea[df$narea > 10] <- NA
-df$narea[c(254)] <- NA
+df$narea[c(252, 254)] <- NA
 df$n.leaf[454] <- NA
-df$marea[df$marea > 1000] <- NA
-df$marea[c(11, 20, 21, 252, 254, 283)] <- NA
+df$marea[c(20, 21, 252, 254)] <- NA
 
 ## Add general models
-beta <- lmer(sqrt(beta) ~ wn90_perc * soil.no3n * photo + (1 | NCRS.code), 
-             data = df)
-chi <- lmer(chi ~ (vpd90+ (wn90_perc * soil.no3n)) * photo + (1 | NCRS.code), 
-            data = df)
-narea <- lmer(log(narea) ~ (chi + (soil.no3n * wn90_perc)) * photo + 
-                (1 | NCRS.code), data = df)
-nmass <- lmer(log(n.leaf) ~ (chi + (soil.no3n * wn90_perc)) * photo + 
-                (1 | NCRS.code), data = df)
-marea <- lmer(log(marea) ~ (chi + (soil.no3n * wn90_perc)) * photo + 
-                (1 | NCRS.code), data = df)
+beta_c3 <- lmer(log(beta) ~ wn90_perc * soil.no3n + (1 | NCRS.code), 
+                data = subset(df, pft != "c3_legume" & photo == "c3"))
+beta_c4 <- lmer(log(beta) ~ wn90_perc * soil.no3n + (1 | NCRS.code), 
+                data = subset(df, pft != "c3_legume" & photo == "c4"))
+chi_c3 <- lmer(chi ~ (vpd90 + (wn90_perc * soil.no3n)) + (1 | NCRS.code), 
+               data = subset(df, pft != "c3_legume" & photo == "c3"))
+chi_c4 <- lmer(chi ~ (vpd60 + (wn90_perc * soil.no3n)) + (1 | NCRS.code), 
+               data = subset(df, pft != "c3_legume" & photo == "c4"))
+narea_c3 <- lmer(log(narea) ~ (chi + (soil.no3n * wn90_perc)) + (1 | NCRS.code),
+                 data = subset(df, pft != "c3_legume" & photo == "c3"))
+narea_c4 <- lmer(log(narea) ~ (chi + (soil.no3n * wn90_perc)) + (1 | NCRS.code),
+                 data = subset(df, pft != "c3_legume" & photo == "c4"))
+nmass_c3 <- lmer(log(n.leaf) ~ (chi + (soil.no3n * wn90_perc)) + (1 | NCRS.code),
+                 data = subset(df, pft != "c3_legume" & photo == "c3"))
+nmass_c4 <- lmer(log(n.leaf) ~ (chi + (soil.no3n * wn90_perc)) + (1 | NCRS.code),
+                 data = subset(df, pft != "c3_legume" & photo == "c4"))
+marea_c3 <- lmer(log(marea) ~ (chi + (soil.no3n * wn90_perc)) + (1 | NCRS.code),
+                 data = subset(df, pft != "c3_legume" & photo == "c3"))
+marea_c4 <- lmer(log(marea) ~ (chi + (soil.no3n * wn90_perc)) + (1 | NCRS.code),
+                 data = subset(df, pft != "c3_legume" & photo == "c4"))
 
 ##########################################################################
-## Beta - soil N
 ##########################################################################
-Anova(beta)
-test(emtrends(beta, ~photo, "soil.no3n"))
+# C3
+##########################################################################
+##########################################################################
 
-beta.no3n.ind <- data.frame(emmeans(beta, ~1, "soil.no3n",
-                                    at = list(soil.no3n = seq(0, 80, 1))))
+##########################################################################
+## Beta - soil N (C3)
+##########################################################################
+Anova(beta_c3)
+
+beta_no3n_c3 <- data.frame(emmeans(beta_c3, ~1, "soil.no3n",
+                                   at = list(soil.no3n = seq(0, 80, 1))))
 
 ## Plot
-beta.no3n <- ggplot(data = df, aes(x = soil.no3n, y = sqrt(beta))) +
-  geom_point(aes(fill = photo, shape = photo), size = 3, alpha = 0.75) +
-  geom_ribbon(data = beta.no3n.ind, 
+beta_no3n_c3_plot <- ggplot(data = subset(df, pft == "c3_nonlegume"), 
+                            aes(x = soil.no3n, y = log(beta))) +
+  geom_point(size = 3, alpha = 0.6, shape = 21, fill = "#446455") +
+  geom_ribbon(data = beta_no3n_c3, 
               aes(x = soil.no3n, y = emmean, ymin = lower.CL, 
-                  ymax = upper.CL), fill = "black", alpha = 0.5) +
-  geom_line(data = beta.no3n.ind, aes(x = soil.no3n, y = emmean), 
-            linewidth = 2, color = "black") +
-  scale_fill_manual(values = c(cbbPalette3), 
-                    labels = c(expression("C"[3]),
-                               expression("C"[4]))) +
-  scale_shape_manual(values = c(21, 22),
-                     labels = c(expression("C"[3]),
-                                expression("C"[4]))) +
+                  ymax = upper.CL), fill = "#446455", alpha = 0.5) +
+  geom_line(data = beta_no3n_c3, aes(x = soil.no3n, y = emmean), 
+            linewidth = 2, color = "#446455") +
   scale_x_continuous(limits = c(-1, 80), breaks = seq(0, 80, 20)) +
-  scale_y_continuous(limits = c(0, 45), breaks = seq(0, 45, 15)) +
+  scale_y_continuous(limits = c(2, 8), breaks = seq(2, 8, 2)) +
   labs(x = expression(bold("N availability (ppm NO"[3]*"-N)")),
-       y = expression(bold(sqrt(beta))),
-       fill = "Photosynthetic pathway") +
+       y = expression(bold("ln "*beta))) +
   theme_bw(base_size = 18) +
   theme(legend.text.align = 0,
         panel.border = element_rect(linewidth = 1.25),
-        legend.title = element_text(face = "bold")) +
-  guides(fill = guide_legend(override.aes = list(shape = c(21, 22),
-                                                 size = 6, alpha = 1)),
-         shape = "none")
-beta.no3n
+        legend.title = element_text(face = "bold"))
+beta_no3n_c3_plot
 
 ##########################################################################
-## Beta - soil moisture parsed by photosynthetic pathway
+## Beta - soil moisture (C3)
 ##########################################################################
-Anova(beta)
-test(emtrends(beta, ~photo, "wn90_perc"))
+Anova(beta_c3)
 
-beta.sm.pft <- data.frame(emmeans(beta, ~photo, "wn90_perc",
-                                  at = list(wn90_perc = seq(0,1,0.01)))) %>%
-  filter(photo == "c3")
+beta_wn_c3 <- data.frame(emmeans(beta_c3, ~1, "wn90_perc",
+                                   at = list(wn90_perc = seq(0.15,0.75,0.1))))
 
-# Plot
-beta.h2o <- ggplot(data = subset(df, !is.na(pft)), 
-                   aes(x = wn90_perc, y = sqrt(beta))) +
-  geom_point(aes(fill = photo, shape = photo), size = 3, alpha = 0.75) +
-  geom_ribbon(data = beta.sm.pft,
-              aes(x = wn90_perc, y = emmean, ymin = lower.CL,
-                  ymax = upper.CL),
-              alpha = 0.5, fill = "#1965B0") +
-  geom_line(data = beta.sm.pft,
-            aes(x = wn90_perc, y = emmean),
-            size = 2, color = "#1965B0") +
-  scale_fill_manual(values = c(cbbPalette3), 
-                    labels = c(expression("C"[3]),
-                               expression("C"[4]))) +
-  scale_shape_manual(values = c(21, 22),
-                     labels = c(expression("C"[3]),
-                                expression("C"[4]))) +
+## Plot
+beta_wn_c3_plot <- ggplot(data = subset(df, pft == "c3_nonlegume"), 
+                            aes(x = wn90_perc, y = log(beta))) +
+  geom_point(size = 3, alpha = 0.6, shape = 21, fill = "#446455") +
+  geom_ribbon(data = beta_wn_c3, 
+              aes(x = wn90_perc, y = emmean, ymin = lower.CL, 
+                  ymax = upper.CL), fill = "#446455", alpha = 0.5) +
+  geom_line(data = beta_wn_c3, aes(x = wn90_perc, y = emmean), 
+            linewidth = 2, color = "#446455") +
   scale_x_continuous(limits = c(0.125, 0.775), breaks = seq(0.15, 0.75, 0.15),
                      labels = seq(15, 75, 15)) +
-  scale_y_continuous(limits = c(0, 45), breaks = seq(0, 45, 15)) +
+  scale_y_continuous(limits = c(2, 8), breaks = seq(2, 8, 2)) +
   labs(x = expression(bold("Soil moisture (% WHC)")),
-       y = expression(bold(sqrt(beta))),
-       fill = "Photosynthetic pathway",
-       color = "Photosynthetic pathway") +
-  guides(fill = guide_legend(override.aes = list(shape = c(21, 22),
-                                                 size = 6, alpha = 1)),
-         shape = "none") +
+       y = expression(bold("ln "*beta))) +
   theme_bw(base_size = 18) +
   theme(legend.text.align = 0,
-        panel.border = element_rect(size = 1.25),
+        panel.border = element_rect(linewidth = 1.25),
         legend.title = element_text(face = "bold"))
-beta.h2o
+beta_wn_c3_plot
 
-##########################################################################
-## Write beta plot
-##########################################################################
-# Write plot
-jpeg("../plots/TXeco_fig3_beta.jpg", width = 10, 
-     height = 5, units = 'in', res = 600)
-ggarrange(beta.no3n, beta.h2o,
-          nrow = 1, ncol = 2, common.legend = TRUE, legend = "bottom", 
-          align = "hv", labels = c("(a)", "(b)"), font.label = list(size = 18))
-dev.off()
 
 ##########################################################################
 ## Chi - VPD
 ##########################################################################
-Anova(chi)
-test(emtrends(chi, ~photo, "vpd90"))
+Anova(chi_c3)
 
-chi.vpd.pft <- data.frame(
-  emmeans(chi, ~photo, "vpd90", at = list(vpd90 = seq(0.9, 1.4, 0.01)))) %>%
-  filter(photo == "c3")
+chi_vpd_c3 <- data.frame(
+  emmeans(chi_c3, ~1, "vpd90", at = list(vpd90 = seq(0.9, 1.4, 0.01))))
 
-chi.vpd <- ggplot(data = df, aes(x = vpd90, y = chi)) +
-  geom_point(aes(fill = photo, shape = photo), size = 3, alpha = 0.75) +
-  geom_ribbon(data = chi.vpd.pft, 
+chi_vpd_c3_plot <- ggplot(data = subset(df, pft == "c3_nonlegume"),
+                          aes(x = vpd90, y = chi)) +
+  geom_point(size = 3, alpha = 0.6, shape = 21, fill = "#446455") +
+  geom_ribbon(data = chi_vpd_c3, 
               aes(x = vpd90, y = emmean, ymin = lower.CL, 
-                  ymax = upper.CL), alpha = 0.5, fill = "#1965B0") +
-  geom_line(data = chi.vpd.pft, aes(x = vpd90, y = emmean), 
-            size = 2, color = "#1965B0") +
-  scale_fill_manual(values = c(cbbPalette3), 
-                     labels = c(expression("C"[3]),
-                                expression("C"[4]))) +
-  scale_color_manual(values = c(cbbPalette3), 
-                    labels = c(expression("C"[3]),
-                               expression("C"[4]))) +
-  scale_shape_manual(values = c(21, 22),
-                     labels = c(expression("C"[3]),
-                                expression("C"[4]))) +
+                  ymax = upper.CL), fill = "#446455", alpha = 0.5) +
+  geom_line(data = chi_vpd_c3, aes(x = vpd90, y = emmean), 
+            linewidth = 2, color = "#446455") +
   scale_x_continuous(limits = c(0.9, 1.4), breaks = seq(0.9, 1.4, 0.1)) +
-  scale_y_continuous(limits = c(-0.005, 1), breaks = seq(0, 1, 0.25)) +
+  scale_y_continuous(limits = c(0.6, 1), breaks = seq(0.6, 1, 0.1)) +
   labs(x = expression(bold("Vapor pressure deficit (kPa)")),
-       y = expression(bold("Leaf C"["i"]*" : C"["a"]*" (unitless)")),
-       fill = expression(bold("Photosynthetic pathway"))) +
+       y = expression(bold("Leaf C"["i"]*" : C"["a"]*" (unitless)"))) +
   theme_bw(base_size = 18) +
   theme(legend.text.align = 0,
-        panel.border = element_rect(size = 1.25)) +
-  guides(fill = guide_legend(override.aes = list(shape = c(21, 22),
-                                                 size = 6, alpha = 1)),
-         shape = "none", color = "none")
-chi.vpd
-
-##########################################################################
-## Chi - soil N
-##########################################################################
-Anova(chi)
-test(emtrends(chi, ~photo, "soil.no3n"))
-
-chi.no3n.pft <- data.frame(emmeans(chi, ~photo, "soil.no3n",
-                                  at = list(soil.no3n = seq(0,80,1)))) %>%
-  filter(photo == "c4")
-
-chi.no3n <- ggplot(data = df, aes(x = soil.no3n, y = chi)) +
-  geom_point(aes(fill = photo, shape = photo), 
-             size = 3, alpha = 0.75) +
-  geom_ribbon(data = chi.no3n.pft, 
-              aes(x = soil.no3n, y = emmean, ymin = lower.CL, 
-                  ymax = upper.CL), alpha = 0.5, fill = "#DC050C") +
-  geom_line(data = chi.no3n.pft, 
-            aes(x = soil.no3n, y = emmean), 
-            size = 2, color = "#DC050C") +
-  scale_fill_manual(values = c(cbbPalette3), 
-                    labels = c(expression("C"[3]), 
-                               expression("C"[4]))) +
-  scale_shape_manual(values = c(21, 22),
-                     labels = c(expression("C"[3]), 
-                                expression("C"[4]))) +
-  scale_x_continuous(limits = c(-1, 80), breaks = seq(0, 80, 20)) +
-  scale_y_continuous(limits = c(-0.005, 1), breaks = seq(0, 1, 0.25)) +
-  labs(x = expression(bold("N availability (ppm NO"[3]*"-N)")),
-       y = expression(bold("Leaf C"["i"]*" : C"["a"]*" (unitless)")),
-       fill = expression(bold("Photosynthetic pathway")),
-       color = expression(bold("Photosynthetic pathway"))) +
-  theme_bw(base_size = 18) +
-  theme(legend.text.align = 0,
-        panel.border = element_rect(size = 1.25)) +
-  guides(fill = guide_legend(override.aes = list(shape = c(21, 22),
-                                                 size = 6, alpha = 1)),
-         shape = "none", color = "none")
-chi.no3n
-
-##########################################################################
-## Chi - Soil moisture
-##########################################################################
-Anova(chi)
-test(emtrends(chi, ~photo, "wn90_perc"))
-
-chi.sm.pft <- data.frame(
-  emmeans(chi, ~photo, "wn90_perc", at = list(wn90_perc = seq(0.15,0.75,0.1)))) %>%
-  filter(photo == "c4")
-
-chi.sm <- ggplot(data = df, aes(x = wn90_perc, y = chi)) +
-  geom_point(aes(fill = photo, shape = photo), size = 3, alpha = 0.75) +
-  geom_ribbon(data = chi.sm.pft, 
-              aes(x = wn90_perc, y = emmean, ymin = lower.CL, 
-                  ymax = upper.CL), fill = "#DC050C", alpha = 0.5) +
-  geom_line(data = chi.sm.pft, 
-            aes(x = wn90_perc, y = emmean), 
-            size = 2, color = "#DC050C") +
-  scale_fill_manual(values = c(cbbPalette3), 
-                    labels = c(expression("C"[3]), 
-                               expression("C"[4]))) +
-  scale_shape_manual(values = c(21, 22),
-                     labels = c(expression("C"[3]), 
-                                expression("C"[4]))) +
-  scale_x_continuous(limits = c(0.125, 0.775), breaks = seq(0.15, 0.75, 0.15),
-                     labels = seq(15, 75, 15)) +
-  scale_y_continuous(limits = c(-0.005, 1), breaks = seq(0, 1, 0.25)) +
-  labs(x = expression(bold("Soil moisture (% WHC)")),
-       y = expression(bold("Leaf C"["i"]*" : C"["a"]*" (unitless)")),
-       fill = expression(bold("Photosynthetic pathway")),
-       color = expression(bold("Photosynthetic pathway"))) +
-  theme_bw(base_size = 18) +
-  theme(legend.text.align = 0,
-        panel.border = element_rect(size = 1.25)) +
-  guides(fill = guide_legend(override.aes = list(shape = c(21, 22),
-                                                 size = 6, alpha = 1)),
-         shape = "none", color = "none")
-chi.sm
-
-##########################################################################
-## Write chi plot
-##########################################################################
-jpeg("../plots/TXeco_fig4_chi.jpg",
-    width = 4.5, height = 12, units = 'in', res = 600)
-ggarrange(chi.vpd, chi.no3n, chi.sm,
-          nrow = 3, ncol = 1, common.legend = TRUE, legend = "bottom", 
-          align = "hv", labels = c("(a)", "(b)", "(c)"), hjust = 0,
-          font.label = list(size = 18))
-dev.off()
+        panel.border = element_rect(size = 1.25))
+chi_vpd_c3_plot
 
 ##########################################################################
 ## Narea - chi
 ##########################################################################
-Anova(narea)
-test(emtrends(narea, ~photo, "chi"))
+Anova(narea_c3)
 
-narea.chi.pft <- data.frame(emmeans(narea, ~photo, "chi",
-                                     at = list(chi = seq(0, 1, 0.01)))) %>%
-  filter(photo == "c3" & chi > 0.55)
+narea_chi_c3 <- data.frame(emmeans(narea_c3, ~1, "chi",
+                                     at = list(chi = seq(0, 1, 0.01))))
 
-narea.chi <- ggplot(data = subset(df, !is.na(pft)),
+narea_chi_c3_plot <- ggplot(data = subset(df, pft == "c3_nonlegume"),
                     aes(x = chi, y = log(narea))) +
-  geom_point(aes(fill = photo, shape = photo), size = 3, alpha = 0.75) +
-  geom_ribbon(data = narea.chi.pft, 
-              aes(x = chi, y = emmean, ymin = lower.CL, ymax = upper.CL), 
-              alpha = 0.5, fill = "#1965B0") +
-  geom_line(data = narea.chi.pft,
-            aes(x = chi, y = emmean),
-            size = 2, color = "#1965B0") +
-  scale_fill_manual(values = c(cbbPalette3), 
-                    labels = c(expression("C"[3]), 
-                               expression("C"[4]))) +
-  scale_shape_manual(values = c(21, 22),
-                     labels = c(expression("C"[3]), 
-                                expression("C"[4]))) +
-  scale_x_continuous(limits = c(0, 1), breaks = seq(0, 1, 0.25)) +
+  geom_point(size = 3, alpha = 0.6, shape = 21, fill = "#446455") +
+  geom_ribbon(data = narea_chi_c3, 
+              aes(x = chi, y = emmean, ymin = lower.CL, 
+                  ymax = upper.CL), fill = "#446455", alpha = 0.5) +
+  geom_line(data = narea_chi_c3, aes(x = chi, y = emmean), 
+            linewidth = 2, color = "#446455") +
+  scale_x_continuous(limits = c(0.6, 1), breaks = seq(0.6, 1, 0.1)) +
   scale_y_continuous(limits = c(-1, 3), breaks = seq(-1, 3, 1)) +
   labs(x = expression(bold("Leaf C"["i"]*" : C"["a"]*" (unitless)")),
-       y = expression(bold(ln*" N"["area"]*" (gN m"^"-2"*")")),
-       fill = expression(bold("Photosynthetic pathway")),
-       color = expression(bold("Photosynthetic pathway"))) +
+       y = expression(bold(ln*" N"["area"]*" (gN m"^"-2"*")"))) +
   theme_bw(base_size = 18) +
   theme(legend.text.align = 0,
         panel.border = element_rect(size = 1.25),
-        panel.grid.minor.y = element_blank()) +
-  guides(fill = guide_legend(override.aes = list(shape = c(21, 22),
-                                                 size = 6, alpha = 1)),
-         shape = "none", color = "none")
-narea.chi
+        panel.grid.minor.y = element_blank())
+narea_chi_c3_plot
 
 ##########################################################################
 ## Narea - soil N

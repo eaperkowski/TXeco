@@ -32,143 +32,347 @@ df <- read.csv("../../TXeco/data/TXeco_data.csv",
          pft = factor(pft, 
                       levels = c("c3_legume", "c4_nonlegume", "c3_nonlegume")))
 
+df.nolegume <- subset(df, pft != "c3_legume")
+
 ###############################################################################
-# Iterative models for soil moisture and beta
+# Iterative models for soil moisture and beta (C4)
 ###############################################################################
-wn90 <- lmer(sqrt(beta) ~ wn90_perc + (1 | NCRS.code), data = df)
-wn60 <- lmer(sqrt(beta) ~ wn60_perc + (1 | NCRS.code), data = df)
-wn30 <- lmer(sqrt(beta) ~ wn30_perc + (1 | NCRS.code), data = df)
-wn20 <- lmer(sqrt(beta) ~ wn20_perc + (1 | NCRS.code), data = df)
-wn15 <- lmer(sqrt(beta) ~ wn15_perc + (1 | NCRS.code), data = df)
-wn10 <- lmer(sqrt(beta) ~ wn10_perc + (1 | NCRS.code), data = df)
-wn9 <- lmer(sqrt(beta) ~ wn09_perc + (1 | NCRS.code), data = df)
-wn8 <- lmer(sqrt(beta) ~ wn08_perc + (1 | NCRS.code), data = df)
-wn7 <- lmer(sqrt(beta) ~ wn07_perc + (1 | NCRS.code), data = df)
-wn6 <- lmer(sqrt(beta) ~ wn06_perc + (1 | NCRS.code), data = df)
-wn5 <- lmer(sqrt(beta) ~ wn05_perc + (1 | NCRS.code), data = df)
-wn4 <- lmer(sqrt(beta) ~ wn04_perc + (1 | NCRS.code), data = df)
-wn3 <- lmer(sqrt(beta) ~ wn03_perc + (1 | NCRS.code), data = df)
-wn2 <- lmer(sqrt(beta) ~ wn02_perc + (1 | NCRS.code), data = df)
-wn1 <- lmer(sqrt(beta) ~ wn01_perc + (1 | NCRS.code), data = df)
+wn90.c3 <- lmer(beta ~ wn90_perc + (1 | NCRS.code), 
+                data = subset(df.nolegume, photo = "c3"))
+wn60.c3 <- lmer(beta ~ wn60_perc + (1 | NCRS.code), 
+                data = subset(df.nolegume, photo = "c3"))
+wn30.c3 <- lmer(beta ~ wn30_perc + (1 | NCRS.code), 
+                data = subset(df.nolegume, photo = "c3"))
+wn20.c3 <- lmer(beta ~ wn20_perc + (1 | NCRS.code), 
+                data = subset(df.nolegume, photo = "c3"))
+wn15.c3 <- lmer(beta ~ wn15_perc + (1 | NCRS.code), 
+                data = subset(df.nolegume, photo = "c3"))
+wn10.c3 <- lmer(beta ~ wn10_perc + (1 | NCRS.code), 
+                data = subset(df.nolegume, photo = "c3"))
+wn9.c3 <- lmer(beta ~ wn09_perc + (1 | NCRS.code), 
+               data = subset(df.nolegume, photo = "c3"))
+wn8.c3 <- lmer(beta ~ wn08_perc + (1 | NCRS.code), 
+               data = subset(df.nolegume, photo = "c3"))
+wn7.c3 <- lmer(beta ~ wn07_perc + (1 | NCRS.code), 
+               data = subset(df.nolegume, photo = "c3"))
+wn6.c3 <- lmer(beta ~ wn06_perc + (1 | NCRS.code), 
+               data = subset(df.nolegume, photo = "c3"))
+wn5.c3 <- lmer(beta ~ wn05_perc + (1 | NCRS.code), 
+               data = subset(df.nolegume, photo = "c3"))
+wn4.c3 <- lmer(beta ~ wn04_perc + (1 | NCRS.code), 
+               data = subset(df.nolegume, photo = "c3"))
+wn3.c3 <- lmer(beta ~ wn03_perc + (1 | NCRS.code), 
+               data = subset(df.nolegume, photo = "c3"))
+wn2.c3 <- lmer(beta ~ wn02_perc + (1 | NCRS.code), 
+               data = subset(df.nolegume, photo = "c3"))
+wn1.c3 <- lmer(beta ~ wn01_perc + (1 | NCRS.code), 
+               data = subset(df.nolegume, photo = "c3"))
 
 # Model selection across timescales
-wn90.modelSelect <- data.frame(day = 90, var = "wn", AICc = AICc(wn90), 
-                               RMSE = RMSE.merMod(wn90), r.squaredGLMM(wn90))
-wn60.modelSelect <- data.frame(day = 60, var = "wn", AICc = AICc(wn60), 
-                               RMSE = RMSE.merMod(wn60), r.squaredGLMM(wn60))
-wn30.modelSelect <- data.frame(day = 30, var = "wn", AICc = AICc(wn30), 
-                               RMSE = RMSE.merMod(wn30), r.squaredGLMM(wn30))
-wn20.modelSelect <- data.frame(day = 20, var = "wn", AICc = AICc(wn20), 
-                               RMSE = RMSE.merMod(wn20), r.squaredGLMM(wn20))
-wn15.modelSelect <- data.frame(day = 15, var = "wn", AICc = AICc(wn15), 
-                               RMSE = RMSE.merMod(wn15), r.squaredGLMM(wn15))
-wn10.modelSelect <- data.frame(day = 10, var = "wn", AICc = AICc(wn10), 
-                               RMSE = RMSE.merMod(wn10), r.squaredGLMM(wn10))
-wn9.modelSelect <- data.frame(day = 9, var = "wn", AICc = AICc(wn9), 
-                              RMSE = RMSE.merMod(wn9), r.squaredGLMM(wn9))
-wn8.modelSelect <- data.frame(day = 8, var = "wn", AICc = AICc(wn8), 
-                              RMSE = RMSE.merMod(wn8), r.squaredGLMM(wn8))
-wn7.modelSelect <- data.frame(day = 7, var = "wn", AICc = AICc(wn7), 
-                              RMSE = RMSE.merMod(wn7), r.squaredGLMM(wn7))
-wn6.modelSelect <- data.frame(day = 6, var = "wn", AICc = AICc(wn6), 
-                              RMSE = RMSE.merMod(wn6), r.squaredGLMM(wn6))
-wn5.modelSelect <- data.frame(day = 5, var = "wn", AICc = AICc(wn5), 
-                              RMSE = RMSE.merMod(wn5), r.squaredGLMM(wn5))
-wn4.modelSelect <- data.frame(day = 4, var = "wn", AICc = AICc(wn4), 
-                              RMSE = RMSE.merMod(wn4), r.squaredGLMM(wn4))
-wn3.modelSelect <- data.frame(day = 3, var = "wn", AICc = AICc(wn3), 
-                              RMSE = RMSE.merMod(wn3), r.squaredGLMM(wn3))
-wn2.modelSelect <- data.frame(day = 2, var = "wn", AICc = AICc(wn2), 
-                              RMSE = RMSE.merMod(wn2), r.squaredGLMM(wn2))
-wn1.modelSelect <- data.frame(day = 1, var = "wn", AICc = AICc(wn1), 
-                              RMSE = RMSE.merMod(wn1), r.squaredGLMM(wn1))
+wn90.c3.modelSelect <- data.frame(day = 90, var = "wn", AICc = AICc(wn90.c3), 
+                                  RMSE = RMSE.merMod(wn90.c3), r.squaredGLMM(wn90.c3))
+wn60.c3.modelSelect <- data.frame(day = 60, var = "wn", AICc = AICc(wn60.c3), 
+                                  RMSE = RMSE.merMod(wn60.c3), r.squaredGLMM(wn60.c3))
+wn30.c3.modelSelect <- data.frame(day = 30, var = "wn", AICc = AICc(wn30.c3), 
+                                  RMSE = RMSE.merMod(wn30.c3), r.squaredGLMM(wn30.c3))
+wn20.c3.modelSelect <- data.frame(day = 20, var = "wn", AICc = AICc(wn20.c3), 
+                                  RMSE = RMSE.merMod(wn20.c3), r.squaredGLMM(wn20.c3))
+wn15.c3.modelSelect <- data.frame(day = 15, var = "wn", AICc = AICc(wn15.c3), 
+                                  RMSE = RMSE.merMod(wn15.c3), r.squaredGLMM(wn15.c3))
+wn10.c3.modelSelect <- data.frame(day = 10, var = "wn", AICc = AICc(wn10.c3), 
+                                  RMSE = RMSE.merMod(wn10.c3), r.squaredGLMM(wn10.c3))
+wn9.c3.modelSelect <- data.frame(day = 9, var = "wn", AICc = AICc(wn9.c3), 
+                                 RMSE = RMSE.merMod(wn9.c3), r.squaredGLMM(wn9.c3))
+wn8.c3.modelSelect <- data.frame(day = 8, var = "wn", AICc = AICc(wn8.c3), 
+                                 RMSE = RMSE.merMod(wn8.c3), r.squaredGLMM(wn8.c3))
+wn7.c3.modelSelect <- data.frame(day = 7, var = "wn", AICc = AICc(wn7.c3), 
+                                 RMSE = RMSE.merMod(wn7.c3), r.squaredGLMM(wn7.c3))
+wn6.c3.modelSelect <- data.frame(day = 6, var = "wn", AICc = AICc(wn6.c3), 
+                                 RMSE = RMSE.merMod(wn6.c3), r.squaredGLMM(wn6.c3))
+wn5.c3.modelSelect <- data.frame(day = 5, var = "wn", AICc = AICc(wn5.c3), 
+                                 RMSE = RMSE.merMod(wn5.c3), r.squaredGLMM(wn5.c3))
+wn4.c3.modelSelect <- data.frame(day = 4, var = "wn", AICc = AICc(wn4.c3), 
+                                 RMSE = RMSE.merMod(wn4.c3), r.squaredGLMM(wn4.c3))
+wn3.c3.modelSelect <- data.frame(day = 3, var = "wn", AICc = AICc(wn3.c3), 
+                                 RMSE = RMSE.merMod(wn3.c3), r.squaredGLMM(wn3.c3))
+wn2.c3.modelSelect <- data.frame(day = 2, var = "wn", AICc = AICc(wn2.c3), 
+                                 RMSE = RMSE.merMod(wn2.c3), r.squaredGLMM(wn2.c3))
+wn1.c3.modelSelect <- data.frame(day = 1, var = "wn", AICc = AICc(wn1.c3), 
+                                 RMSE = RMSE.merMod(wn1.c3), r.squaredGLMM(wn1.c3))
 
-aicc.results.wn <- wn30.modelSelect %>% 
-  full_join(wn60.modelSelect) %>% full_join(wn90.modelSelect) %>%
-  full_join(wn20.modelSelect) %>% full_join(wn15.modelSelect) %>% 
-  full_join(wn10.modelSelect) %>% full_join(wn9.modelSelect) %>% 
-  full_join(wn8.modelSelect) %>% full_join(wn7.modelSelect) %>%
-  full_join(wn6.modelSelect) %>% full_join(wn5.modelSelect) %>% 
-  full_join(wn4.modelSelect) %>% full_join(wn3.modelSelect) %>% 
-  full_join(wn2.modelSelect) %>% full_join(wn1.modelSelect) %>%
+aicc.results.wn_c3 <- wn30.c3.modelSelect %>% 
+  full_join(wn60.c3.modelSelect) %>% full_join(wn90.c3.modelSelect) %>%
+  full_join(wn20.c3.modelSelect) %>% full_join(wn15.c3.modelSelect) %>% 
+  full_join(wn10.c3.modelSelect) %>% full_join(wn9.c3.modelSelect) %>% 
+  full_join(wn8.c3.modelSelect) %>% full_join(wn7.c3.modelSelect) %>%
+  full_join(wn6.c3.modelSelect) %>% full_join(wn5.c3.modelSelect) %>% 
+  full_join(wn4.c3.modelSelect) %>% full_join(wn3.c3.modelSelect) %>% 
+  full_join(wn2.c3.modelSelect) %>% full_join(wn1.c3.modelSelect) %>%
   arrange(day) %>%
-  dplyr::select(day, aicc.wn = AICc, rmse.wn = RMSE)
+  dplyr::select(day, aicc.wn = AICc, rmse.wn = RMSE) %>%
+  mutate(photo = "c3")
 # 90-day soil moisture is best model
 
-plot(aicc.results.wn$day, aicc.results.wn$aicc.wn)
-
+plot(aicc.results.wn_c3$day, aicc.results.wn_c3$aicc.wn)
 
 ###############################################################################
-# Iterative models for mean VPD and chi
+# Iterative models for soil moisture and beta (C4)
 ###############################################################################
-vpd90 <- lmer(chi ~ vpd90 + (1 | NCRS.code), data = df)
-vpd60 <- lmer(chi ~ vpd60 + (1 | NCRS.code), data = df)
-vpd30 <- lmer(chi ~ vpd30 + (1 | NCRS.code), data = df)
-vpd20 <- lmer(chi ~ vpd20 + (1 | NCRS.code), data = df)
-vpd15 <- lmer(chi ~ vpd15 + (1 | NCRS.code), data = df)
-vpd10 <- lmer(chi ~ vpd10 + (1 | NCRS.code), data = df)
-vpd9 <- lmer(chi ~ vpd09 + (1 | NCRS.code), data = df)
-vpd8 <- lmer(chi ~ vpd08 + (1 | NCRS.code), data = df)
-vpd7 <- lmer(chi ~ vpd07 + (1 | NCRS.code), data = df)
-vpd6 <- lmer(chi ~ vpd06 + (1 | NCRS.code), data = df)
-vpd5 <- lmer(chi ~ vpd05 + (1 | NCRS.code), data = df)
-vpd4 <- lmer(chi ~ vpd04 + (1 | NCRS.code), data = df)
-vpd3 <- lmer(chi ~ vpd03 + (1 | NCRS.code), data = df)
-vpd2 <- lmer(chi ~ vpd02 + (1 | NCRS.code), data = df)
-vpd1 <- lmer(chi ~ vpd01 + (1 | NCRS.code), data = df)
+wn90.c4 <- lmer(beta ~ wn90_perc + (1 | NCRS.code), 
+                data = subset(df.nolegume, photo == "c4"))
+wn60.c4 <- lmer(beta ~ wn60_perc + (1 | NCRS.code), 
+                data = subset(df.nolegume, photo == "c4"))
+wn30.c4 <- lmer(beta ~ wn30_perc + (1 | NCRS.code), 
+                data = subset(df.nolegume, photo == "c4"))
+wn20.c4 <- lmer(beta ~ wn20_perc + (1 | NCRS.code), 
+                data = subset(df.nolegume, photo == "c4"))
+wn15.c4 <- lmer(beta ~ wn15_perc + (1 | NCRS.code), 
+                data = subset(df.nolegume, photo == "c4"))
+wn10.c4 <- lmer(beta ~ wn10_perc + (1 | NCRS.code), 
+                data = subset(df.nolegume, photo == "c4"))
+wn9.c4 <- lmer(beta ~ wn09_perc + (1 | NCRS.code), 
+               data = subset(df.nolegume, photo == "c4"))
+wn8.c4 <- lmer(beta ~ wn08_perc + (1 | NCRS.code), 
+               data = subset(df.nolegume, photo == "c4"))
+wn7.c4 <- lmer(beta ~ wn07_perc + (1 | NCRS.code), 
+               data = subset(df.nolegume, photo == "c4"))
+wn6.c4 <- lmer(beta ~ wn06_perc + (1 | NCRS.code), 
+               data = subset(df.nolegume, photo == "c4"))
+wn5.c4 <- lmer(beta ~ wn05_perc + (1 | NCRS.code), 
+               data = subset(df.nolegume, photo == "c4"))
+wn4.c4 <- lmer(beta ~ wn04_perc + (1 | NCRS.code), 
+               data = subset(df.nolegume, photo == "c4"))
+wn3.c4 <- lmer(beta ~ wn03_perc + (1 | NCRS.code), 
+               data = subset(df.nolegume, photo == "c4"))
+wn2.c4 <- lmer(beta ~ wn02_perc + (1 | NCRS.code), 
+               data = subset(df.nolegume, photo == "c4"))
+wn1.c4 <- lmer(beta ~ wn01_perc + (1 | NCRS.code), 
+               data = subset(df.nolegume, photo == "c4"))
 
 # Model selection across timescales
-vpd90.modelSelect <- data.frame(day = 90, var = "vpd", AICc = AICc(vpd90), 
-                                RMSE = RMSE.merMod(vpd90), r.squaredGLMM(vpd90))
-vpd60.modelSelect <- data.frame(day = 60, var = "vpd", AICc = AICc(vpd60), 
-                                RMSE = RMSE.merMod(vpd60), r.squaredGLMM(vpd60))
-vpd30.modelSelect <- data.frame(day = 30, var = "vpd", AICc = AICc(vpd30), 
-                                RMSE = RMSE.merMod(vpd30), r.squaredGLMM(vpd30))
-vpd20.modelSelect <- data.frame(day = 20, var = "vpd", AICc = AICc(vpd20), 
-                                RMSE = RMSE.merMod(vpd20), r.squaredGLMM(vpd20))
-vpd15.modelSelect <- data.frame(day = 15, var = "vpd", AICc = AICc(vpd15), 
-                                RMSE = RMSE.merMod(vpd15), r.squaredGLMM(vpd15))
-vpd10.modelSelect <- data.frame(day = 10, var = "vpd", AICc = AICc(vpd10), 
-                                RMSE = RMSE.merMod(vpd10), r.squaredGLMM(vpd10))
-vpd9.modelSelect <- data.frame(day = 9, var = "vpd", AICc = AICc(vpd9), 
-                               RMSE = RMSE.merMod(vpd9), r.squaredGLMM(vpd9))
-vpd8.modelSelect <- data.frame(day = 8, var = "vpd", AICc = AICc(vpd8), 
-                               RMSE = RMSE.merMod(vpd8), r.squaredGLMM(vpd8))
-vpd7.modelSelect <- data.frame(day = 7, var = "vpd", AICc = AICc(vpd7), 
-                               RMSE = RMSE.merMod(vpd7), r.squaredGLMM(vpd7))
-vpd6.modelSelect <- data.frame(day = 6, var = "vpd", AICc = AICc(vpd6), 
-                               RMSE = RMSE.merMod(vpd6), r.squaredGLMM(vpd6))
-vpd5.modelSelect <- data.frame(day = 5, var = "vpd", AICc = AICc(vpd5), 
-                               RMSE = RMSE.merMod(vpd5), r.squaredGLMM(vpd5))
-vpd4.modelSelect <- data.frame(day = 4, var = "vpd", AICc = AICc(vpd4), 
-                               RMSE = RMSE.merMod(vpd4), r.squaredGLMM(vpd4))
-vpd3.modelSelect <- data.frame(day = 3, var = "vpd", AICc = AICc(vpd3), 
-                               RMSE = RMSE.merMod(vpd3), r.squaredGLMM(vpd3))
-vpd2.modelSelect <- data.frame(day = 2, var = "vpd", AICc = AICc(vpd2), 
-                               RMSE = RMSE.merMod(vpd2), r.squaredGLMM(vpd2))
-vpd1.modelSelect <- data.frame(day = 1, var = "vpd", AICc = AICc(vpd1), 
-                               RMSE = RMSE.merMod(vpd1), r.squaredGLMM(vpd1))
+wn90.c4.modelSelect <- data.frame(day = 90, var = "wn", AICc = AICc(wn90.c4), 
+                               RMSE = RMSE.merMod(wn90.c4), r.squaredGLMM(wn90.c4))
+wn60.c4.modelSelect <- data.frame(day = 60, var = "wn", AICc = AICc(wn60.c4), 
+                               RMSE = RMSE.merMod(wn60.c4), r.squaredGLMM(wn60.c4))
+wn30.c4.modelSelect <- data.frame(day = 30, var = "wn", AICc = AICc(wn30.c4), 
+                               RMSE = RMSE.merMod(wn30.c4), r.squaredGLMM(wn30.c4))
+wn20.c4.modelSelect <- data.frame(day = 20, var = "wn", AICc = AICc(wn20.c4), 
+                               RMSE = RMSE.merMod(wn20.c4), r.squaredGLMM(wn20.c4))
+wn15.c4.modelSelect <- data.frame(day = 15, var = "wn", AICc = AICc(wn15.c4), 
+                               RMSE = RMSE.merMod(wn15.c4), r.squaredGLMM(wn15.c4))
+wn10.c4.modelSelect <- data.frame(day = 10, var = "wn", AICc = AICc(wn10.c4), 
+                               RMSE = RMSE.merMod(wn10.c4), r.squaredGLMM(wn10.c4))
+wn9.c4.modelSelect <- data.frame(day = 9, var = "wn", AICc = AICc(wn9.c4), 
+                              RMSE = RMSE.merMod(wn9.c4), r.squaredGLMM(wn9.c4))
+wn8.c4.modelSelect <- data.frame(day = 8, var = "wn", AICc = AICc(wn8.c4), 
+                              RMSE = RMSE.merMod(wn8.c4), r.squaredGLMM(wn8.c4))
+wn7.c4.modelSelect <- data.frame(day = 7, var = "wn", AICc = AICc(wn7.c4), 
+                              RMSE = RMSE.merMod(wn7.c4), r.squaredGLMM(wn7.c4))
+wn6.c4.modelSelect <- data.frame(day = 6, var = "wn", AICc = AICc(wn6.c4), 
+                              RMSE = RMSE.merMod(wn6.c4), r.squaredGLMM(wn6.c4))
+wn5.c4.modelSelect <- data.frame(day = 5, var = "wn", AICc = AICc(wn5.c4), 
+                              RMSE = RMSE.merMod(wn5.c4), r.squaredGLMM(wn5.c4))
+wn4.c4.modelSelect <- data.frame(day = 4, var = "wn", AICc = AICc(wn4.c4), 
+                              RMSE = RMSE.merMod(wn4.c4), r.squaredGLMM(wn4.c4))
+wn3.c4.modelSelect <- data.frame(day = 3, var = "wn", AICc = AICc(wn3.c4), 
+                              RMSE = RMSE.merMod(wn3.c4), r.squaredGLMM(wn3.c4))
+wn2.c4.modelSelect <- data.frame(day = 2, var = "wn", AICc = AICc(wn2.c4), 
+                              RMSE = RMSE.merMod(wn2.c4), r.squaredGLMM(wn2.c4))
+wn1.c4.modelSelect <- data.frame(day = 1, var = "wn", AICc = AICc(wn1.c4), 
+                              RMSE = RMSE.merMod(wn1.c4), r.squaredGLMM(wn1.c4))
 
-aicc.results.vpd <- vpd30.modelSelect %>% 
-  full_join(vpd90.modelSelect) %>% full_join(vpd60.modelSelect) %>% 
-  full_join(vpd20.modelSelect) %>%  full_join(vpd15.modelSelect) %>% 
-  full_join(vpd10.modelSelect) %>% full_join(vpd9.modelSelect) %>% 
-  full_join(vpd8.modelSelect) %>% full_join(vpd7.modelSelect) %>%
-  full_join(vpd6.modelSelect) %>% full_join(vpd5.modelSelect) %>% 
-  full_join(vpd4.modelSelect) %>% full_join(vpd3.modelSelect) %>% 
-  full_join(vpd2.modelSelect) %>% full_join(vpd1.modelSelect) %>%
+aicc.results.wn_c4 <- wn30.c4.modelSelect %>% 
+  full_join(wn60.c4.modelSelect) %>% full_join(wn90.c4.modelSelect) %>%
+  full_join(wn20.c4.modelSelect) %>% full_join(wn15.c4.modelSelect) %>% 
+  full_join(wn10.c4.modelSelect) %>% full_join(wn9.c4.modelSelect) %>% 
+  full_join(wn8.c4.modelSelect) %>% full_join(wn7.c4.modelSelect) %>%
+  full_join(wn6.c4.modelSelect) %>% full_join(wn5.c4.modelSelect) %>% 
+  full_join(wn4.c4.modelSelect) %>% full_join(wn3.c4.modelSelect) %>% 
+  full_join(wn2.c4.modelSelect) %>% full_join(wn1.c4.modelSelect) %>%
+  arrange(day) %>%
+  dplyr::select(day, aicc.wn = AICc, rmse.wn = RMSE) %>%
+  mutate(photo = "c4")
+# 90-day soil moisture is best model
+
+plot(aicc.results.wn_c4$day, aicc.results.wn_c4$aicc.wn)
+
+###############################################################################
+# Iterative models for mean VPD and chi - C3
+###############################################################################
+vpd90_c3 <- lmer(chi ~ vpd90 + (1 | NCRS.code), 
+                 data = subset(df.nolegume, photo == "c3"))
+vpd60_c3 <- lmer(chi ~ vpd60 + (1 | NCRS.code), 
+                 data = subset(df.nolegume, photo == "c3"))
+vpd30_c3 <- lmer(chi ~ vpd30 + (1 | NCRS.code), 
+                 data = subset(df.nolegume, photo == "c3"))
+vpd20_c3 <- lmer(chi ~ vpd20 + (1 | NCRS.code), 
+                 data = subset(df.nolegume, photo == "c3"))
+vpd15_c3 <- lmer(chi ~ vpd15 + (1 | NCRS.code), 
+                 data = subset(df.nolegume, photo == "c3"))
+vpd10_c3 <- lmer(chi ~ vpd10 + (1 | NCRS.code), 
+                 data = subset(df.nolegume, photo == "c3"))
+vpd9_c3 <- lmer(chi ~ vpd09 + (1 | NCRS.code), 
+                data = subset(df.nolegume, photo == "c3"))
+vpd8_c3 <- lmer(chi ~ vpd08 + (1 | NCRS.code), 
+                data = subset(df.nolegume, photo == "c3"))
+vpd7_c3 <- lmer(chi ~ vpd07 + (1 | NCRS.code), 
+                data = subset(df.nolegume, photo == "c3"))
+vpd6_c3 <- lmer(chi ~ vpd06 + (1 | NCRS.code), 
+                data = subset(df.nolegume, photo == "c3"))
+vpd5_c3 <- lmer(chi ~ vpd05 + (1 | NCRS.code), 
+                data = subset(df.nolegume, photo == "c3"))
+vpd4_c3 <- lmer(chi ~ vpd04 + (1 | NCRS.code), 
+                data = subset(df.nolegume, photo == "c3"))
+vpd3_c3 <- lmer(chi ~ vpd03 + (1 | NCRS.code), 
+                data = subset(df.nolegume, photo == "c3"))
+vpd2_c3 <- lmer(chi ~ vpd02 + (1 | NCRS.code), 
+                data = subset(df.nolegume, photo == "c3"))
+vpd1_c3 <- lmer(chi ~ vpd01 + (1 | NCRS.code), 
+                data = subset(df.nolegume, photo == "c3"))
+
+# Model selection across timescales
+vpd90_c3.modelSelect <- data.frame(day = 90, var = "vpd", AICc = AICc(vpd90_c3), 
+                                RMSE = RMSE.merMod(vpd90_c3), r.squaredGLMM(vpd90_c3))
+vpd60_c3.modelSelect <- data.frame(day = 60, var = "vpd", AICc = AICc(vpd60_c3), 
+                                RMSE = RMSE.merMod(vpd60_c3), r.squaredGLMM(vpd60_c3))
+vpd30_c3.modelSelect <- data.frame(day = 30, var = "vpd", AICc = AICc(vpd30_c3), 
+                                RMSE = RMSE.merMod(vpd30_c3), r.squaredGLMM(vpd30_c3))
+vpd20_c3.modelSelect <- data.frame(day = 20, var = "vpd", AICc = AICc(vpd20_c3), 
+                                RMSE = RMSE.merMod(vpd20_c3), r.squaredGLMM(vpd20_c3))
+vpd15_c3.modelSelect <- data.frame(day = 15, var = "vpd", AICc = AICc(vpd15_c3), 
+                                RMSE = RMSE.merMod(vpd15_c3), r.squaredGLMM(vpd15_c3))
+vpd10_c3.modelSelect <- data.frame(day = 10, var = "vpd", AICc = AICc(vpd10_c3), 
+                                RMSE = RMSE.merMod(vpd10_c3), r.squaredGLMM(vpd10_c3))
+vpd9_c3.modelSelect <- data.frame(day = 9, var = "vpd", AICc = AICc(vpd9_c3), 
+                               RMSE = RMSE.merMod(vpd9_c3), r.squaredGLMM(vpd9_c3))
+vpd8_c3.modelSelect <- data.frame(day = 8, var = "vpd", AICc = AICc(vpd8_c3), 
+                               RMSE = RMSE.merMod(vpd8_c3), r.squaredGLMM(vpd8_c3))
+vpd7_c3.modelSelect <- data.frame(day = 7, var = "vpd", AICc = AICc(vpd7_c3), 
+                               RMSE = RMSE.merMod(vpd7_c3), r.squaredGLMM(vpd7_c3))
+vpd6_c3.modelSelect <- data.frame(day = 6, var = "vpd", AICc = AICc(vpd6_c3), 
+                               RMSE = RMSE.merMod(vpd6_c3), r.squaredGLMM(vpd6_c3))
+vpd5_c3.modelSelect <- data.frame(day = 5, var = "vpd", AICc = AICc(vpd5_c3), 
+                               RMSE = RMSE.merMod(vpd5_c3), r.squaredGLMM(vpd5_c3))
+vpd4_c3.modelSelect <- data.frame(day = 4, var = "vpd", AICc = AICc(vpd4_c3), 
+                               RMSE = RMSE.merMod(vpd4_c3), r.squaredGLMM(vpd4_c3))
+vpd3_c3.modelSelect <- data.frame(day = 3, var = "vpd", AICc = AICc(vpd3_c3), 
+                               RMSE = RMSE.merMod(vpd3_c3), r.squaredGLMM(vpd3_c3))
+vpd2_c3.modelSelect <- data.frame(day = 2, var = "vpd", AICc = AICc(vpd2_c3), 
+                               RMSE = RMSE.merMod(vpd2_c3), r.squaredGLMM(vpd2_c3))
+vpd1_c3.modelSelect <- data.frame(day = 1, var = "vpd", AICc = AICc(vpd1_c3), 
+                               RMSE = RMSE.merMod(vpd1_c3), r.squaredGLMM(vpd1_c3))
+
+aicc.results.vpd_c3 <- vpd30_c3.modelSelect %>% 
+  full_join(vpd90_c3.modelSelect) %>% full_join(vpd60_c3.modelSelect) %>% 
+  full_join(vpd20_c3.modelSelect) %>%  full_join(vpd15_c3.modelSelect) %>% 
+  full_join(vpd10_c3.modelSelect) %>% full_join(vpd9_c3.modelSelect) %>% 
+  full_join(vpd8_c3.modelSelect) %>% full_join(vpd7_c3.modelSelect) %>%
+  full_join(vpd6_c3.modelSelect) %>% full_join(vpd5_c3.modelSelect) %>% 
+  full_join(vpd4_c3.modelSelect) %>% full_join(vpd3_c3.modelSelect) %>% 
+  full_join(vpd2_c3.modelSelect) %>% full_join(vpd1_c3.modelSelect) %>%
   mutate(concat.select = AICc + RMSE) %>%
   arrange(day) %>%
-  dplyr::select(day, aicc.vpd = AICc, rmse.vpd = RMSE)
+  dplyr::select(day, aicc.vpd = AICc, rmse.vpd = RMSE) %>%
+  mutate(photo = "c3")
 ## 90-day VPD is best model
 
-plot(aicc.results.vpd$day, aicc.results.vpd$aicc.vpd)
+plot(aicc.results.vpd_c3$day, aicc.results.vpd_c3$aicc.vpd)
+
+
+###############################################################################
+# Iterative models for mean VPD and chi - C3
+###############################################################################
+vpd90_c4 <- lmer(chi ~ vpd90 + (1 | NCRS.code), 
+                 data = subset(df.nolegume, photo == "c4"))
+vpd60_c4 <- lmer(chi ~ vpd60 + (1 | NCRS.code), 
+                 data = subset(df.nolegume, photo == "c4"))
+vpd30_c4 <- lmer(chi ~ vpd30 + (1 | NCRS.code), 
+                 data = subset(df.nolegume, photo == "c4"))
+vpd20_c4 <- lmer(chi ~ vpd20 + (1 | NCRS.code), 
+                 data = subset(df.nolegume, photo == "c4"))
+vpd15_c4 <- lmer(chi ~ vpd15 + (1 | NCRS.code), 
+                 data = subset(df.nolegume, photo == "c4"))
+vpd10_c4 <- lmer(chi ~ vpd10 + (1 | NCRS.code), 
+                 data = subset(df.nolegume, photo == "c4"))
+vpd9_c4 <- lmer(chi ~ vpd09 + (1 | NCRS.code), 
+                data = subset(df.nolegume, photo == "c4"))
+vpd8_c4 <- lmer(chi ~ vpd08 + (1 | NCRS.code), 
+                data = subset(df.nolegume, photo == "c4"))
+vpd7_c4 <- lmer(chi ~ vpd07 + (1 | NCRS.code), 
+                data = subset(df.nolegume, photo == "c4"))
+vpd6_c4 <- lmer(chi ~ vpd06 + (1 | NCRS.code), 
+                data = subset(df.nolegume, photo == "c4"))
+vpd5_c4 <- lmer(chi ~ vpd05 + (1 | NCRS.code), 
+                data = subset(df.nolegume, photo == "c4"))
+vpd4_c4 <- lmer(chi ~ vpd04 + (1 | NCRS.code), 
+                data = subset(df.nolegume, photo == "c4"))
+vpd3_c4 <- lmer(chi ~ vpd03 + (1 | NCRS.code), 
+                data = subset(df.nolegume, photo == "c4"))
+vpd2_c4 <- lmer(chi ~ vpd02 + (1 | NCRS.code), 
+                data = subset(df.nolegume, photo == "c4"))
+vpd1_c4 <- lmer(chi ~ vpd01 + (1 | NCRS.code), 
+                data = subset(df.nolegume, photo == "c4"))
+
+# Model selection across timescales
+vpd90_c4.modelSelect <- data.frame(day = 90, var = "vpd", AICc = AICc(vpd90_c4), 
+                                   RMSE = RMSE.merMod(vpd90_c4), r.squaredGLMM(vpd90_c4))
+vpd60_c4.modelSelect <- data.frame(day = 60, var = "vpd", AICc = AICc(vpd60_c4), 
+                                   RMSE = RMSE.merMod(vpd60_c4), r.squaredGLMM(vpd60_c4))
+vpd30_c4.modelSelect <- data.frame(day = 30, var = "vpd", AICc = AICc(vpd30_c4), 
+                                   RMSE = RMSE.merMod(vpd30_c4), r.squaredGLMM(vpd30_c4))
+vpd20_c4.modelSelect <- data.frame(day = 20, var = "vpd", AICc = AICc(vpd20_c4), 
+                                   RMSE = RMSE.merMod(vpd20_c4), r.squaredGLMM(vpd20_c4))
+vpd15_c4.modelSelect <- data.frame(day = 15, var = "vpd", AICc = AICc(vpd15_c4), 
+                                   RMSE = RMSE.merMod(vpd15_c4), r.squaredGLMM(vpd15_c4))
+vpd10_c4.modelSelect <- data.frame(day = 10, var = "vpd", AICc = AICc(vpd10_c4), 
+                                   RMSE = RMSE.merMod(vpd10_c4), r.squaredGLMM(vpd10_c4))
+vpd9_c4.modelSelect <- data.frame(day = 9, var = "vpd", AICc = AICc(vpd9_c4), 
+                                  RMSE = RMSE.merMod(vpd9_c4), r.squaredGLMM(vpd9_c4))
+vpd8_c4.modelSelect <- data.frame(day = 8, var = "vpd", AICc = AICc(vpd8_c4), 
+                                  RMSE = RMSE.merMod(vpd8_c4), r.squaredGLMM(vpd8_c4))
+vpd7_c4.modelSelect <- data.frame(day = 7, var = "vpd", AICc = AICc(vpd7_c4), 
+                                  RMSE = RMSE.merMod(vpd7_c4), r.squaredGLMM(vpd7_c4))
+vpd6_c4.modelSelect <- data.frame(day = 6, var = "vpd", AICc = AICc(vpd6_c4), 
+                                  RMSE = RMSE.merMod(vpd6_c4), r.squaredGLMM(vpd6_c4))
+vpd5_c4.modelSelect <- data.frame(day = 5, var = "vpd", AICc = AICc(vpd5_c4), 
+                                  RMSE = RMSE.merMod(vpd5_c4), r.squaredGLMM(vpd5_c4))
+vpd4_c4.modelSelect <- data.frame(day = 4, var = "vpd", AICc = AICc(vpd4_c3), 
+                                  RMSE = RMSE.merMod(vpd4_c4), r.squaredGLMM(vpd4_c4))
+vpd3_c4.modelSelect <- data.frame(day = 3, var = "vpd", AICc = AICc(vpd3_c4), 
+                                  RMSE = RMSE.merMod(vpd3_c4), r.squaredGLMM(vpd3_c4))
+vpd2_c4.modelSelect <- data.frame(day = 2, var = "vpd", AICc = AICc(vpd2_c4), 
+                                  RMSE = RMSE.merMod(vpd2_c4), r.squaredGLMM(vpd2_c4))
+vpd1_c4.modelSelect <- data.frame(day = 1, var = "vpd", AICc = AICc(vpd1_c4), 
+                                  RMSE = RMSE.merMod(vpd1_c4), r.squaredGLMM(vpd1_c4))
+
+aicc.results.vpd_c4 <- vpd30_c4.modelSelect %>% 
+  full_join(vpd90_c4.modelSelect) %>% full_join(vpd60_c4.modelSelect) %>% 
+  full_join(vpd20_c4.modelSelect) %>%  full_join(vpd15_c4.modelSelect) %>% 
+  full_join(vpd10_c4.modelSelect) %>% full_join(vpd9_c4.modelSelect) %>% 
+  full_join(vpd8_c4.modelSelect) %>% full_join(vpd7_c4.modelSelect) %>%
+  full_join(vpd6_c4.modelSelect) %>% full_join(vpd5_c4.modelSelect) %>% 
+  full_join(vpd4_c4.modelSelect) %>% full_join(vpd3_c4.modelSelect) %>% 
+  full_join(vpd2_c4.modelSelect) %>% full_join(vpd1_c4.modelSelect) %>%
+  mutate(concat.select = AICc + RMSE) %>%
+  arrange(day) %>%
+  dplyr::select(day, aicc.vpd = AICc, rmse.vpd = RMSE) %>%
+  mutate(photo = "c4")
+## 60-day VPD is best model (ignoring day 4 because it seems spurious)
+
+plot(aicc.results.vpd_c4$day, aicc.results.vpd_c4$aicc.vpd)
+
 
 ###############################################################################
 # Merge model selection results
 ###############################################################################
-aicc.results <- aicc.results.wn %>%
-  full_join(aicc.results.vpd) %>%
+aicc.results_c3 <- aicc.results.wn_c3 %>%
+  full_join(aicc.results.wn_c4)
+  
+aicc.results_c4 <- aicc.results.vpd_c3 %>%
+  full_join(aicc.results.vpd_c4)
+
+aicc.results_total <- aicc.results_c3 %>%
+  full_join(aicc.results_c4) %>%
   mutate(aicc.wn = round(aicc.wn, digits = 2),
          rmse.wn = round(rmse.wn, digits = 4),
          aicc.vpd = round(aicc.vpd, digits = 2),
@@ -181,40 +385,83 @@ write.csv(aicc.results,
 ###############################################################################
 # Create plots for AICc values across timescales
 ###############################################################################
-wn.beta <- ggplot(data = aicc.results, aes(x = day, y = aicc.wn)) +
+# Make soil moisture plot for C3
+wn.beta_c3 <- ggplot(data = subset(aicc.results_total, photo == "c3"), 
+                     aes(x = day, y = aicc.wn)) +
   geom_point(size = 3, alpha = 0.75) +
-  geom_point(data = subset(aicc.results, day == 90), 
+  geom_point(data = subset(aicc.results_total, day == 90 & photo == "c3"), 
              fill = "red", shape = 21, size = 3, alpha = 0.75) +
   geom_line() +
   scale_x_continuous(limits = c(0, 90), breaks = seq(0, 90, 30)) +
-  scale_y_continuous(limits = c(2733, 2745), breaks = seq(2733, 2745, 3)) +
+  scale_y_continuous(limits = c(5718, 5730), breaks = seq(5718, 5730, 4)) +
   labs(x = "Days prior to measurement", y = expression(bold("AIC"["c"])),
-       title = expression(bold("Soil moisture (% WHC)"))) +
+       title = expression(bold("Soil moisture (% WHC, C"["3"]*" species)"))) +
   theme_bw(base_size = 18) +
   theme(panel.grid.minor = element_blank(),
         axis.title = element_text(face = "bold"),
         plot.title = element_text(face = "bold"),
         panel.border = element_rect(linewidth = 1.25))
-wn.beta
+wn.beta_c3
 
-vpd.chi <- ggplot(data = aicc.results, aes(x = day, y = aicc.vpd)) +
+# Make soil moisture plot for C4
+wn.beta_c4 <- ggplot(data = subset(aicc.results_total, photo == "c4"), 
+                     aes(x = day, y = aicc.wn)) +
   geom_point(size = 3, alpha = 0.75) +
-  geom_point(data = subset(aicc.results, day == 90), 
+  geom_point(data = subset(aicc.results_total, day == 90 & photo == "c4"), 
              fill = "red", shape = 21, size = 3, alpha = 0.75) +
   geom_line() +
   scale_x_continuous(limits = c(0, 90), breaks = seq(0, 90, 30)) +
-  scale_y_continuous(limits = c(-785, -770), breaks = seq(-785, -770, 3)) +
-  labs(x = "Days prior to measurement", y = NULL,
-       title = "VPD (kPa)") +
+  scale_y_continuous(limits = c(1038, 1044), breaks = seq(1038, 1044, 2)) +
+  labs(x = "Days prior to measurement", y = expression(bold("AIC"["c"])),
+       title = expression(bold("Soil moisture (% WHC, C"["4"]*" species)"))) +
   theme_bw(base_size = 18) +
   theme(panel.grid.minor = element_blank(),
         axis.title = element_text(face = "bold"),
         plot.title = element_text(face = "bold"),
         panel.border = element_rect(linewidth = 1.25))
-vpd.chi
+wn.beta_c4
 
+# Make vpd timescale plot for c3
+vpd.chi_c3 <- ggplot(data = subset(aicc.results_total, photo == "c3"),
+                     aes(x = day, y = aicc.vpd)) +
+  geom_point(size = 3, alpha = 0.75) +
+  geom_point(data = subset(aicc.results_total, day == 90 & photo == "c3"), 
+             fill = "red", shape = 21, size = 3, alpha = 0.75) +
+  geom_line() +
+  scale_x_continuous(limits = c(0, 90), breaks = seq(0, 90, 30)) +
+  scale_y_continuous(limits = c(-1020, -940), breaks = seq(-1020, -940, 20)) +
+  labs(x = "Days prior to measurement", y = expression(bold("AIC"["c"])),
+       title = expression(bold("VPD (kPa, C"["3"]*" species)"))) +
+  theme_bw(base_size = 18) +
+  theme(panel.grid.minor = element_blank(),
+        axis.title = element_text(face = "bold"),
+        plot.title = element_text(face = "bold"),
+        panel.border = element_rect(linewidth = 1.25))
+vpd.chi_c3
+
+# Make vpd timescale plot for c4
+vpd.chi_c4 <- ggplot(data = subset(aicc.results_total, photo == "c4" & day != 4),
+                     aes(x = day, y = aicc.vpd)) +
+  geom_point(size = 3, alpha = 0.75) +
+  geom_point(data = subset(aicc.results_total, day == 60 & photo == "c4"), 
+             fill = "red", shape = 21, size = 3, alpha = 0.75) +
+  geom_line() +
+  scale_x_continuous(limits = c(0, 90), breaks = seq(0, 90, 30)) +
+  scale_y_continuous(limits = c(-110, -80), breaks = seq(-110, -80, 10)) +
+  labs(x = "Days prior to measurement", y = expression(bold("AIC"["c"])),
+       title = expression(bold("VPD (kPa, C"["4"]*" species)"))) +
+  theme_bw(base_size = 18) +
+  theme(panel.grid.minor = element_blank(),
+        axis.title = element_text(face = "bold"),
+        plot.title = element_text(face = "bold"),
+        panel.border = element_rect(linewidth = 1.25))
+vpd.chi_c4
+
+# Write plot
 png(filename = "../../TX_ecolab_leafNitrogen/working_drafts/figs/TXeco_figS1_aicc_results.png",
-    width = 10, height = 4.5, units = 'in', res = 600)
-ggarrange(wn.beta, vpd.chi, ncol = 2, align = "hv")
+    width = 12.5, height = 9, units = 'in', res = 600)
+ggarrange(wn.beta_c3, wn.beta_c4, vpd.chi_c3, vpd.chi_c4,
+          nrow = 2, ncol = 2, align = "hv", 
+          labels = c("(a)", "(b)", "(c)", "(d)"), font.label = list(size = 18))
 dev.off()
 
