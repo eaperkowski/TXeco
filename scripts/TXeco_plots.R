@@ -171,7 +171,7 @@ narea_chi_c3 <- data.frame(emmeans(narea_c3, ~1, "chi",
                                      at = list(chi = seq(0, 1, 0.01))))
 
 narea_chi_c3_plot <- ggplot(data = subset(df, pft == "c3_nonlegume"),
-                    aes(x = chi, y = log(narea))) +
+                            aes(x = chi, y = log(narea))) +
   geom_point(size = 3, alpha = 0.6, shape = 21, fill = "#446455") +
   geom_ribbon(data = narea_chi_c3, 
               aes(x = chi, y = emmean, ymin = lower.CL, 
@@ -191,299 +191,203 @@ narea_chi_c3_plot
 ##########################################################################
 ## Narea - soil N
 ##########################################################################
-Anova(narea)
-test(emtrends(narea, ~pft, "soil.no3n"))
+Anova(narea_c3)
 
-narea.no3n.ind <- data.frame(emmeans(narea, ~1, "soil.no3n",
-                                     at = list(soil.no3n = seq(0, 80, 1))))
+narea_no3n_c3 <- data.frame(emmeans(narea_c3, ~wn90_perc, "soil.no3n",
+                                     at = list(wn90_perc = c(0.2, 0.4, 0.6),
+                                               soil.no3n = seq(0, 80, 1))))
 
-narea.no3n <- ggplot(data = subset(df, !is.na(pft)), 
+narea_no3n_c3_plot <- ggplot(data = subset(df, pft == "c3_nonlegume"),
                      aes(x = soil.no3n, y = log(narea))) +
-  geom_point(aes (fill = photo, shape = photo), size = 3, alpha = 0.75) +
-  geom_ribbon(data = narea.no3n.ind, 
-              aes(x = soil.no3n, y = emmean, ymin = lower.CL, ymax = upper.CL), 
-              alpha = 0.5, fill = "black") +
-  geom_line(data = narea.no3n.ind,
-            aes(x = soil.no3n, y = emmean),
-            size = 2, color = "black") +
-  scale_fill_manual(values = c(cbbPalette3), 
-                    labels = c(expression("C"[3]), 
-                               expression("C"[4]))) +
-  scale_shape_manual(values = c(21, 22),
-                     labels = c(expression("C"[3]), 
-                                expression("C"[4]))) +
-  scale_x_continuous(limits = c(-1, 80), breaks = seq(0, 80, 20)) +
+  geom_point(size = 3, alpha = 0.6, shape = 21, fill = "#446455") +
+  scale_x_continuous(limits = c(0, 80), breaks = seq(0, 80, 20)) +
   scale_y_continuous(limits = c(-1, 3), breaks = seq(-1, 3, 1)) +
-  labs(x = expression(bold("N availability (ppm NO"[3]*"-N)")),
-       y = expression(bold(ln*" N"["area"]*" (gN m"^"-2"*")")),
-       fill = expression(bold("Photosynthetic pathway"))) +
+  labs(x = expression(bold("Leaf C"["i"]*" : C"["a"]*" (unitless)")),
+       y = expression(bold(ln*" N"["area"]*" (gN m"^"-2"*")"))) +
   theme_bw(base_size = 18) +
   theme(legend.text.align = 0,
         panel.border = element_rect(size = 1.25),
-        panel.grid.minor.y = element_blank()) +
-  guides(fill = guide_legend(override.aes = list(shape = c(21, 22),
-                                                 size = 6, alpha = 1)),
-         shape = "none", color = "none")
-narea.no3n
+        panel.grid.minor.y = element_blank())
+narea_no3n_c3_plot
 
 ##########################################################################
 ## Narea - soil moisture
 ##########################################################################
-Anova(narea)
-test(emtrends(narea, ~pft, "wn90_perc"))
+Anova(narea_c3)
+test(emtrends(narea_c3, ~pft, "wn90_perc"))
 
-narea.sm.ind <- data.frame(emmeans(narea, ~1, "wn90_perc",
-                                     at = list(wn90_perc = seq(0.15, 0.75, 0.01))))
+narea_wn90_c3 <- data.frame(emmeans(narea_c3, ~1, "wn90_perc",
+                                    at = list(wn90_perc = seq(0.15, 0.75, 0.01))))
 
-narea.sm <- ggplot(data = subset(df, !is.na(pft)), 
-                   aes(x = wn90_perc, y = log(narea))) +
-  geom_point(aes(fill = photo, shape = photo), size = 3, alpha = 0.75) +
-  geom_ribbon(data = narea.sm.ind, 
+narea_wn90_c3_plot <- ggplot(data = subset(df, pft == "c3_nonlegume"),
+                             aes(x = wn90_perc, y = log(narea))) +
+  geom_point(size = 3, alpha = 0.6, shape = 21, fill = "#446455") +
+  geom_ribbon(data = narea_wn90_c3, 
               aes(x = wn90_perc, y = emmean, ymin = lower.CL, ymax = upper.CL), 
-              alpha = 0.5, fill = "black") +
-  geom_line(data = narea.sm.ind,
+              alpha = 0.5, fill = "#446455") +
+  geom_line(data = narea_wn90_c3, 
             aes(x = wn90_perc, y = emmean),
-            size = 2, color = "black") +
-  scale_fill_manual(values = c(cbbPalette3), 
-                    labels = c(expression("C"[3]), 
-                               expression("C"[4]))) +
-  scale_shape_manual(values = c(21, 22),
-                     labels = c(expression("C"[3]), 
-                                expression("C"[4]))) +
+            size = 2, color = "#446455") +
   scale_x_continuous(limits = c(0.125, 0.775), breaks = seq(0.15, 0.75, 0.15),
                      labels = seq(15, 75, 15)) +
   scale_y_continuous(limits = c(-1, 3), breaks = seq(-1, 3, 1)) +
   labs(x = expression(bold("Soil moisture (% WHC)")),
-       y = expression(bold(ln*" N"["area"]*" (gN m"^"-2"*")")),
-       fill = expression(bold("Photosynthetic pathway"))) +
+       y = expression(bold(ln*" N"["area"]*" (gN m"^"-2"*")"))) +
   theme_bw(base_size = 18) +
   theme(legend.text.align = 0,
         panel.border = element_rect(size = 1.25),
-        panel.grid.minor.y = element_blank()) +
-  guides(fill = guide_legend(override.aes = list(shape = c(21, 22),
-                                                 size = 6, alpha = 1)),
-         shape = "none", color = "none")
-narea.sm
+        panel.grid.minor.y = element_blank())
+narea_wn90_c3_plot
 
 ##########################################################################
 ## Nmass - chi
 ##########################################################################
-Anova(nmass)
+Anova(nmass_c3)
 
-nmass.chi <- ggplot(data = subset(df, !is.na(pft)), 
-                         aes(x = chi, y = log(n.leaf))) +
-  geom_point(aes(fill = photo, shape = photo), size = 3, alpha = 0.75) +
-  scale_fill_manual(values = c(cbbPalette3), 
-                    labels = c(expression("C"[3]), 
-                               expression("C"[4]))) +
-  scale_shape_manual(values = c(21, 22),
-                     labels = c(expression("C"[3]), 
-                                expression("C"[4]))) +
-  scale_x_continuous(limits = c(0, 1), breaks = seq(0, 1, 0.25)) +
+nmass_chi_c3_plot <- ggplot(data = subset(df, pft == "c3_nonlegume"),
+                            aes(x = chi, y = log(n.leaf))) +
+  geom_point(size = 3, alpha = 0.6, shape = 21, fill = "#446455") +
+  scale_x_continuous(limits = c(0.6, 1), breaks = seq(0.6, 1, 0.1)) +
   scale_y_continuous(limits = c(-1, 2), breaks = seq(-1, 2, 1)) +
   labs(x = expression(bold("Leaf C"["i"]*" : C"["a"]*" (unitless)")),
-       y = expression(bold(ln*" N"["mass"]*" (gN g"^"-1"*")")),
-       fill = expression(bold("Photosynthetic pathway")),
-       color = expression(bold("Photosynthetic pathway"))) +
+       y = expression(bold(ln*" N"["mass"]*" (gN g"^"-1"*")"))) +
   theme_bw(base_size = 18) +
   theme(legend.text.align = 0,
         panel.border = element_rect(size = 1.25),
-        panel.grid.minor.y = element_blank()) +
-  guides(fill = guide_legend(override.aes = list(shape = c(21, 22),
-                                                 size = 6, alpha = 1)),
-         shape = "none", color = "none")
-nmass.chi
+        panel.grid.minor.y = element_blank())
+nmass_chi_c3_plot
 
 ##########################################################################
 ## Nmass - soil N
 ##########################################################################
-Anova(nmass)
+Anova(nmass_c3)
 
-nmass.no3n.ind <- data.frame(emmeans(nmass, ~1, "soil.no3n",
-                                 at = list(soil.no3n = seq(0, 80, 1))))
+nmass_no3n_c3 <- data.frame(emmeans(nmass_c3, ~1, "soil.no3n",
+                                    at = list(soil.no3n = seq(0, 80, 1))))
 
-nmass.no3n <- ggplot(data = subset(df, !is.na(pft)), 
-                         aes(x = soil.no3n, y = log(n.leaf))) +
-  geom_point(aes(fill = photo, shape = photo), size = 3, alpha = 0.75) +
-  geom_ribbon(data = nmass.no3n.ind,
-              aes(x = soil.no3n, y = emmean, 
-                  ymin = lower.CL, ymax = upper.CL), 
-              alpha = 0.5) +
-  geom_line(data = nmass.no3n.ind,
+nmass_no3n_c3_plot <- ggplot(data = subset(df, pft == "c3_nonlegume"),
+                             aes(x = soil.no3n, y = log(n.leaf))) +
+  geom_point(size = 3, alpha = 0.6, shape = 21, fill = "#446455") +
+  geom_ribbon(data = nmass_no3n_c3, 
+              aes(x = soil.no3n, y = emmean, ymin = lower.CL, ymax = upper.CL), 
+              alpha = 0.5, fill = "#446455") +
+  geom_line(data = nmass_no3n_c3, 
             aes(x = soil.no3n, y = emmean),
-            size = 2, color = "black") +
-  scale_fill_manual(values = c(cbbPalette3), 
-                    labels = c(expression("C"[3]), 
-                               expression("C"[4]))) +
-  scale_shape_manual(values = c(21, 22),
-                     labels = c(expression("C"[3]), 
-                                expression("C"[4]))) +
+            size = 2, color = "#446455") +
   scale_x_continuous(limits = c(-1, 80), breaks = seq(0, 80, 20)) +
   scale_y_continuous(limits = c(-1, 2), breaks = seq(-1, 2, 1)) +
   labs(x = expression(bold("N availability (ppm NO"[3]*"-N)")),
-       y = expression(bold(ln*" N"["mass"]*" (gN g"^"-1"*")")),
-       fill = expression(bold("Photosynthetic pathway"))) +
+       y = expression(bold(ln*" N"["mass"]*" (gN g"^"-1"*")"))) +
   theme_bw(base_size = 18) +
   theme(legend.text.align = 0,
         panel.border = element_rect(size = 1.25),
-        panel.grid.minor.y = element_blank()) +
-  guides(fill = guide_legend(override.aes = list(shape = c(21, 22),
-                                                 size = 6, alpha = 1)),
-         shape = "none", color = "none")
-nmass.no3n
+        panel.grid.minor.y = element_blank())
+nmass_no3n_c3_plot
 
 ##########################################################################
 ## Nmass - soil moisture
 ##########################################################################
-Anova(nmass)
+Anova(nmass_c3)
 
-test(emtrends(nmass, ~soil.no3n, "wn90_perc", at = list(soil.no3n = c(0, 40, 80))))
-
-nmass.sm.ind <- data.frame(emmeans(nmass, ~1, "wn90_perc",
-                                   at = list(wn90_perc = seq(0.1, 1, 0.01))))
-
-nmass.sm <- ggplot(data = subset(df, !is.na(pft)), 
-                     aes(x = wn90_perc, y = log(n.leaf))) +
-  geom_point(aes(fill = photo, shape = photo), size = 3, alpha = 0.75) +
-  scale_fill_manual(values = c(cbbPalette3), 
-                    labels = c(expression("C"[3]), 
-                               expression("C"[4]))) +
-  scale_shape_manual(values = c(21, 22),
-                     labels = c(expression("C"[3]), 
-                                expression("C"[4]))) +
+nmass_wn90_c3_plot <- ggplot(data = subset(df, pft == "c3_nonlegume"),
+                             aes(x = wn90_perc, y = log(n.leaf))) +
+  geom_point(size = 3, alpha = 0.6, shape = 21, fill = "#446455") +
   scale_x_continuous(limits = c(0.125, 0.775), breaks = seq(0.15, 0.75, 0.15),
                      labels = seq(15, 75, 15)) +
   scale_y_continuous(limits = c(-1, 2), breaks = seq(-1, 2, 1)) +
   labs(x = expression(bold("Soil moisture (% WHC)")),
-       y = expression(bold(ln*" N"["mass"]*" (gN g"^"-1"*")")),
-       fill = expression(bold("Photosynthetic pathway"))) +
+       y = expression(bold(ln*" N"["mass"]*" (gN g"^"-1"*")"))) +
   theme_bw(base_size = 18) +
   theme(legend.text.align = 0,
         panel.border = element_rect(size = 1.25),
-        panel.grid.minor.y = element_blank()) +
-  guides(fill = guide_legend(override.aes = list(shape = c(21, 22),
-                                                 size = 6, alpha = 1)),
-         shape = "none", color = "none")
-nmass.sm
+        panel.grid.minor.y = element_blank())
+nmass_wn90_c3_plot
 
 ##########################################################################
 ## Marea - chi
 ##########################################################################
-Anova(marea)
-test(emtrends(marea, ~photo, "chi"))
+Anova(marea_c3)
 
-marea.chi.pft <- data.frame(emmeans(marea, ~photo, "chi",
-                                    at = list(chi = seq(0, 1, 0.01)))) %>%
-  filter(photo == "c3" & chi > 0.55)
+marea_chi_c3 <- data.frame(emmeans(marea_c3, ~1, "chi",
+                                   at = list(chi = seq(0, 1, 0.01))))
 
-marea.chi <- ggplot(data = subset(df, !is.na(pft)), 
-                         aes(x = chi, y = log(marea))) +
-  geom_point(aes(fill = photo, shape = photo), 
-             size = 3, alpha = 0.75) +
-  geom_ribbon(data = marea.chi.pft,
-              aes(x = chi, y = emmean, 
-                  ymin = lower.CL, ymax = upper.CL), 
-              alpha = 0.5, fill = "#1965B0") +
-  geom_line(data = marea.chi.pft,
+marea_chi_c3_plot <- ggplot(data = subset(df, pft == "c3_nonlegume"), 
+                    aes(x = chi, y = log(marea))) +
+  geom_point(size = 3, alpha = 0.6, shape = 21, fill = "#446455") +
+  geom_ribbon(data = marea_chi_c3, 
+              aes(x = chi, y = emmean, ymin = lower.CL, ymax = upper.CL), 
+              alpha = 0.5, fill = "#446455") +
+  geom_line(data = marea_chi_c3, 
             aes(x = chi, y = emmean),
-            size = 2, color = "#1965B0") +
-  scale_fill_manual(values = c(cbbPalette3), 
-                    labels = c(expression("C"[3]), 
-                               expression("C"[4]))) +
-  scale_shape_manual(values = c(21, 22),
-                     labels = c(expression("C"[3]), 
-                                expression("C"[4]))) +
-  scale_linetype_manual(values = c("dashed", "solid")) +
-  scale_x_continuous(limits = c(0, 1), breaks = seq(0, 1, 0.25)) +
-  scale_y_continuous(limits = c(3, 7), breaks = seq(3, 7, 1)) +
+            size = 2, color = "#446455") +
+  scale_x_continuous(limits = c(0.6, 1), breaks = seq(0.6, 1, 0.1)) +
+  scale_y_continuous(limits = c(3, 6), breaks = seq(3, 6, 1)) +
   labs(x = expression(bold("Leaf C"["i"]*" : C"["a"]*" (unitless)")),
-       y = expression(bold(ln*" M"["area"]*" (g m"^"-2"*")")),
-       fill = expression(bold("Photosynthetic pathway"))) +
+       y = expression(bold(ln*" M"["area"]*" (g m"^"-2"*")"))) +
   theme_bw(base_size = 18) +
   theme(legend.text.align = 0,
         panel.border = element_rect(size = 1.25),
-        panel.grid.minor.y = element_blank()) +
-  guides(fill = guide_legend(override.aes = list(shape = c(21, 22),
-                                                 size = 6, alpha = 1)),
-         shape = "none", color = "none")
-marea.chi
+        panel.grid.minor.y = element_blank())
+marea_chi_c3_plot
 
 ##########################################################################
 ## Marea - soil N
 ##########################################################################
-Anova(marea)
+Anova(marea_c3)
 
-marea.no3n.ind <- data.frame(emmeans(marea, ~1, "soil.no3n",
-                                     at = list(soil.no3n = seq(0, 80, 1))))
+marea_no3n_c3 <- data.frame(emmeans(marea_c3, ~1, "soil.no3n",
+                                    at = list(soil.no3n = seq(0, 80, 1))))
 
-marea.no3n <- ggplot(data = subset(df, !is.na(pft)), 
-                     aes(x = soil.no3n, y = log(marea))) +
-  geom_point(aes(fill = photo, shape = photo), size = 3, alpha = 0.75) +
-  geom_ribbon(data = marea.no3n.ind,
+marea_no3n_c3_plot <- ggplot(data = subset(df, !is.na(pft)), 
+                             aes(x = soil.no3n, y = log(marea))) +
+  geom_point(size = 3, alpha = 0.6, shape = 21, fill = "#446455") +
+  geom_ribbon(data = marea_no3n_c3, 
               aes(x = soil.no3n, y = emmean, ymin = lower.CL, ymax = upper.CL), 
-              alpha = 0.5, fill = "black") +
-  geom_line(data = marea.no3n.ind,
+              alpha = 0.5, fill = "#446455") +
+  geom_line(data = marea_no3n_c3, 
             aes(x = soil.no3n, y = emmean),
-            size = 2, color = "black") +
-  scale_fill_manual(values = c(cbbPalette3), 
-                    labels = c(expression("C"[3]), 
-                               expression("C"[4]))) +
-  scale_shape_manual(values = c(21, 22),
-                     labels = c(expression("C"[3]), 
-                                expression("C"[4]))) +
+            size = 2, color = "#446455") +
   scale_x_continuous(limits = c(-1, 80), breaks = seq(0, 80, 20)) +
-  scale_y_continuous(limits = c(3, 7), breaks = seq(3, 7, 1)) +
+  scale_y_continuous(limits = c(3, 6), breaks = seq(3, 6, 1)) +
   labs(x = expression(bold("N availability (ppm NO"[3]*"-N)")),
-       y = expression(bold(ln*" M"["area"]*" (g m"^"-2"*")")),
-       fill = expression(bold("Photosynthetic pathway"))) +
+       y = expression(bold(ln*" M"["area"]*" (g m"^"-2"*")"))) +
   theme_bw(base_size = 18) +
   theme(legend.text.align = 0,
         panel.border = element_rect(size = 1.25),
-        panel.grid.minor.y = element_blank()) +
-  guides(fill = guide_legend(override.aes = list(shape = c(21, 22), 
-                                                 size = 6, alpha = 1)),
-         shape = "none", color = "none")
-marea.no3n
+        panel.grid.minor.y = element_blank())
+marea_no3n_c3_plot
 
 ##########################################################################
 ## Marea - soil moisture
 ##########################################################################
-Anova(marea)
+Anova(marea_c3)
 
-marea.sm <- ggplot(data = subset(df, !is.na(pft)), 
-                     aes(x = wn90_perc, y = log(marea))) +
-  geom_point(aes(fill = photo, shape = photo), size = 3, alpha = 0.75) +
-  scale_fill_manual(values = c(cbbPalette3), 
-                    labels = c(expression("C"[3]), 
-                               expression("C"[4]))) +
-  scale_shape_manual(values = c(21, 22),
-                     labels = c(expression("C"[3]), 
-                                expression("C"[4]))) +
+marea_wn90_c3_plot <- ggplot(data = subset(df, !is.na(pft)), 
+                          aes(x = wn90_perc, y = log(marea))) +
+  geom_point(size = 3, alpha = 0.6, shape = 21, fill = "#446455") +
   scale_x_continuous(limits = c(0.125, 0.775), breaks = seq(0.15, 0.75, 0.15)) +
-  scale_y_continuous(limits = c(3, 7), breaks = seq(3, 7, 1)) +
+  scale_y_continuous(limits = c(3, 6), breaks = seq(3, 6, 1)) +
   labs(x = expression(bold("Soil moisture (% WHC)")),
-       y = expression(bold(ln*" M"["area"]*" (g m"^"-2"*")")),
-       fill = expression(bold("Photosynthetic pathway")),
-       color = expression(bold("Photosynthetic pathway"))) +
+       y = expression(bold(ln*" M"["area"]*" (g m"^"-2"*")"))) +
   theme_bw(base_size = 18) +
   theme(legend.text.align = 0,
         panel.border = element_rect(size = 1.25),
-        panel.grid.minor.y = element_blank()) +
-  guides(fill = guide_legend(override.aes = list(shape = c(21, 22),
-                                                 size = 6, alpha = 1)),
-         shape = "none", color = "none")
-marea.sm
+        panel.grid.minor.y = element_blank())
+marea_wn90_c3_plot
 
 ##########################################################################
 ## Create Narea plots
 ##########################################################################
-jpeg("../plots/TXeco_fig5_narea.jpg",
-    height = 13, width = 14, units = 'in', res = 600)
-ggarrange(narea.chi, narea.no3n, narea.sm, nmass.chi, nmass.no3n, nmass.sm,
-          marea.chi, marea.no3n, marea.sm, ncol = 3, nrow = 3, 
-          common.legend = TRUE, legend = "bottom", align = "hv", 
-          labels = c("(a)", "(b)", "(c)", "(d)", "(e)", 
-                     "(f)", "(g)", "(h)", "(i)"), 
+jpeg("../plots/TXeco_figXX_c3_traits.jpg",
+    height = 16, width = 14, units = 'in', res = 600)
+ggarrange(beta_no3n_c3_plot, beta_wn_c3_plot, chi_vpd_c3_plot,
+          narea_chi_c3_plot, narea_no3n_c3_plot, narea_wn90_c3_plot,
+          nmass_chi_c3_plot, nmass_no3n_c3_plot, nmass_wn90_c3_plot,
+          marea_chi_c3_plot, marea_no3n_c3_plot, marea_wn90_c3_plot,
+          ncol = 3, nrow = 4, common.legend = TRUE, legend = "bottom", 
+          align = "hv", labels = c("(a)", "(b)", "(c)", "(d)", "(e)",
+                                   "(f)", "(g)", "(h)", "(i)", "(j)",
+                                   "(k)", "(l)"), 
           font.label = list(size = 18))
 dev.off()
 
