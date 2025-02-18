@@ -336,7 +336,7 @@ vpd6_c4.modelSelect <- data.frame(day = 6, var = "vpd", AICc = AICc(vpd6_c4),
                                   RMSE = RMSE.merMod(vpd6_c4), r.squaredGLMM(vpd6_c4))
 vpd5_c4.modelSelect <- data.frame(day = 5, var = "vpd", AICc = AICc(vpd5_c4), 
                                   RMSE = RMSE.merMod(vpd5_c4), r.squaredGLMM(vpd5_c4))
-vpd4_c4.modelSelect <- data.frame(day = 4, var = "vpd", AICc = AICc(vpd4_c3), 
+vpd4_c4.modelSelect <- data.frame(day = 4, var = "vpd", AICc = AICc(vpd4_c4), 
                                   RMSE = RMSE.merMod(vpd4_c4), r.squaredGLMM(vpd4_c4))
 vpd3_c4.modelSelect <- data.frame(day = 3, var = "vpd", AICc = AICc(vpd3_c4), 
                                   RMSE = RMSE.merMod(vpd3_c4), r.squaredGLMM(vpd3_c4))
@@ -378,7 +378,7 @@ aicc.results_total <- aicc.results_c3 %>%
          aicc.vpd = round(aicc.vpd, digits = 2),
          rmse.vpd = round(rmse.vpd, digits = 4))
 
-write.csv(aicc.results,
+write.csv(aicc.results_total,
           "../../TX_ecolab_leafNitrogen/working_drafts/tables/TXeco_TableS2_modelselection.csv",
           row.names = FALSE)
 
@@ -459,7 +459,7 @@ vpd.chi_c4
 
 # Write plot
 png(filename = "../../TX_ecolab_leafNitrogen/working_drafts/figs/TXeco_figS1_aicc_results.png",
-    width = 12.5, height = 9, units = 'in', res = 600)
+    width = 12, height = 9, units = 'in', res = 600)
 ggarrange(wn.beta_c3, wn.beta_c4, vpd.chi_c3, vpd.chi_c4,
           nrow = 2, ncol = 2, align = "hv", 
           labels = c("(a)", "(b)", "(c)", "(d)"), font.label = list(size = 18))
