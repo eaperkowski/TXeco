@@ -87,8 +87,8 @@ Anova(beta_c3)
 r.squaredGLMM(beta_c3)
 
 # Individual effects
-test(emtrends(beta, ~1, "soil.no3n"))
-test(emtrends(beta, ~1, "wn90_perc"))
+test(emtrends(beta_c3, ~1, "soil.no3n"))
+test(emtrends(beta_c3, ~1, "wn90_perc"))
 
 ##########################################################################
 ## Beta - C4
@@ -358,8 +358,8 @@ narea_psem_c3 <- psem(
               data = df.psem.c3),
 
   ## Correlated errors
-  soil.no3n %~~% vpd90,
-  nmass %~~% vpd90,
+  #soil.no3n %~~% vpd90,
+  #nmass %~~% vpd90,
   beta %~~% vpd90)
 
 summary(narea_psem_c3)
@@ -425,6 +425,58 @@ df %>% filter(pft != "c3_legume") %>%
             med.beta = median(beta, na.rm = TRUE),
             sd.beta = sd(beta, na.rm = TRUE)) %>%
   data.frame()
+
+##########################################################################
+## N-fixation effect on Narea (for supplement)
+##########################################################################
+narea_c3_nfix <- lmer(log(narea) ~ (chi + (wn90_perc * soil.no3n)) + n.fixer + (1 | NCRS.code),
+                      data = subset(df, photo == "c3"))
+
+# Model output
+summary(narea_c3_nfix)
+Anova(narea_c3_nfix)
+r.squaredGLMM(narea_c3_nfix)
+
+## Post hoc comparisons
+emmeans(narea_c3_nfix, pairwise~n.fixer, type = "response")
+
+# Percent change
+(3.85 - 1.99) / 1.99 * 100
+
+##########################################################################
+## N-fixation effect on Nmass (for supplement)
+##########################################################################
+nmass_c3_nfix <- lmer(log(n.leaf) ~ (chi + (wn90_perc * soil.no3n)) + n.fixer + (1 | NCRS.code),
+                      data = subset(df, photo == "c3"))
+
+# Model output
+summary(nmass_c3_nfix)
+Anova(nmass_c3_nfix)
+r.squaredGLMM(nmass_c3_nfix)
+
+## Post hoc comparisons
+emmeans(nmass_c3_nfix, pairwise~n.fixer, type = "response")
+
+# Percent change
+(3.137 - 2.138) / 2.138 * 100
+
+##########################################################################
+## N-fixation effect on Marea (for supplement)
+##########################################################################
+marea_c3_nfix <- lmer(log(marea) ~ (chi + (wn90_perc * soil.no3n)) + n.fixer + (1 | NCRS.code),
+                      data = subset(df, photo == "c3"))
+
+# Model output
+summary(marea_c3_nfix)
+Anova(marea_c3_nfix)
+r.squaredGLMM(marea_c3_nfix)
+
+## Post hoc comparisons
+emmeans(marea_c3_nfix, pairwise~n.fixer, type = "response")
+
+# Percent change
+(3.85 - 1.99) / 1.99 * 100
+
 
 ##########################################################################
 ## Tables

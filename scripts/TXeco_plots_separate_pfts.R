@@ -34,7 +34,8 @@ df <- read.csv("../../TXeco/data/TXeco_data.csv",
          photo = factor(photo, levels = c("c3", "c4")))
 
 ## Add colorblind friendly palette and facet labels
-cbbPalette3 <- c("#446455", "#FDD262")
+cbbPalette3 <- c("#446455", "#695B24")
+cbbPalette_wa <- c("#343c24", "#c4aa23")
 
 
 pft_labels <- c("C[3]", "C[4]")
@@ -422,12 +423,12 @@ beta_no3n_c4 <- data.frame(emmeans(beta_c4, ~1, "soil.no3n",
 # Plot
 beta_no3n_c4_plot <- ggplot(data = subset(df, pft == "c4_nonlegume"), 
                             aes(x = soil.no3n, y = log(beta))) +
-  geom_point(size = 3, alpha = 0.6, shape = 21, fill = "#FDD262") +
+  geom_point(size = 3, alpha = 0.6, shape = 21, fill = "#695B24") +
   geom_ribbon(data = beta_no3n_c4, 
               aes(x = soil.no3n, y = emmean, ymin = lower.CL, 
-                  ymax = upper.CL), fill = "#FDD262", alpha = 0.5) +
+                  ymax = upper.CL), fill = "#695B24", alpha = 0.5) +
   geom_line(data = beta_no3n_c4, aes(x = soil.no3n, y = emmean), 
-            linewidth = 2, color = "#FDD262") +
+            linewidth = 2, color = "#695B24") +
   scale_x_continuous(limits = c(-1, 80), breaks = seq(0, 80, 20)) +
   scale_y_continuous(limits = c(-8, 8), breaks = seq(-8, 8, 4)) +
   labs(x = expression(bold("N availability (ppm NO"[3]*"-N)")),
@@ -451,12 +452,12 @@ beta_wn90_c4 <- data.frame(emmeans(beta_c4, ~1, "wn90_perc",
 # Plot
 beta_wn90_c4_plot <- ggplot(data = subset(df, pft == "c4_nonlegume"), 
                           aes(x = wn90_perc, y = log(beta))) +
-  geom_point(size = 3, alpha = 0.6, shape = 21, fill = "#FDD262") +
+  geom_point(size = 3, alpha = 0.6, shape = 21, fill = "#695B24") +
   geom_ribbon(data = beta_wn90_c4, 
               aes(x = wn90_perc, y = emmean, ymin = lower.CL, 
-                  ymax = upper.CL), fill = "#FDD262", alpha = 0.5) +
+                  ymax = upper.CL), fill = "#695B24", alpha = 0.5) +
   geom_line(data = beta_wn90_c4, aes(x = wn90_perc, y = emmean), 
-            linewidth = 2, color = "#FDD262") +
+            linewidth = 2, color = "#695B24") +
   scale_x_continuous(limits = c(0.125, 0.775), breaks = seq(0.15, 0.75, 0.15),
                      labels = seq(15, 75, 15)) +
   scale_y_continuous(limits = c(-8, 8), breaks = seq(-8, 8, 4)) +
@@ -466,7 +467,7 @@ beta_wn90_c4_plot <- ggplot(data = subset(df, pft == "c4_nonlegume"),
   theme(legend.text.align = 0,
         panel.border = element_rect(linewidth = 1.25),
         legend.title = element_text(face = "bold"))
-beta_wn_c4_plot
+beta_wn90_c4_plot
 
 ##########################################################################
 ## Chi - VPD60 (C4)
@@ -481,12 +482,12 @@ chi_vpd60_c4 <- data.frame(emmeans(chi_c4, ~1, "vpd60",
 # Plot
 chi_vpd60_c4_plot <- ggplot(data = subset(df, pft == "c4_nonlegume"), 
                           aes(x = vpd60, y = chi)) +
-  geom_point(size = 3, alpha = 0.6, shape = 21, fill = "#FDD262") +
+  geom_point(size = 3, alpha = 0.6, shape = 21, fill = "#695B24") +
   geom_ribbon(data = chi_vpd60_c4, 
               aes(x = vpd60, y = emmean, ymin = lower.CL, 
-                  ymax = upper.CL), fill = "#FDD262", alpha = 0.5) +
+                  ymax = upper.CL), fill = "#695B24", alpha = 0.5) +
   geom_line(data = chi_vpd60_c4, aes(x = vpd60, y = emmean), 
-            linewidth = 2, color = "#FDD262") +
+            linewidth = 2, color = "#695B24") +
   scale_x_continuous(limits = c(0.7, 1.9), breaks = seq(0.7, 1.9, 0.3)) +
   scale_y_continuous(limits = c(0, 0.9), breaks = seq(0, 0.9, 0.3)) +
   labs(x = expression(bold("Vapor pressure deficit (kPa)")),
@@ -506,7 +507,7 @@ Anova(narea_c4)
 # Plot
 narea_chi_c4_plot <- ggplot(data = subset(df, pft == "c4_nonlegume"),
                             aes(x = chi, y = log(narea))) +
-  geom_point(size = 3, alpha = 0.6, shape = 21, fill = "#FDD262") +
+  geom_point(size = 3, alpha = 0.6, shape = 21, fill = "#695B24") +
   scale_x_continuous(limits = c(0, 0.9), breaks = seq(0, 0.9, 0.3)) +
   scale_y_continuous(limits = c(-1, 1), breaks = seq(-1, 1, 0.5)) +
   labs(x = expression(bold("Leaf C"["i"]*" : C"["a"]*" (unitless)")),
@@ -526,7 +527,7 @@ Anova(narea_c4)
 # Plot
 narea_no3n_c4_plot <- ggplot(data = subset(df, pft == "c4_nonlegume"),
                              aes(x = soil.no3n, y = log(narea))) +
-  geom_point(size = 3, alpha = 0.6, shape = 21, fill = "#FDD262") +
+  geom_point(size = 3, alpha = 0.6, shape = 21, fill = "#695B24") +
   scale_x_continuous(limits = c(0, 80), breaks = seq(0, 80, 20)) +
   scale_y_continuous(limits = c(-1, 1), breaks = seq(-1, 1, 0.5)) +
   labs(x = expression(bold("N availability (ppm NO"["3"]*"-N)")),
@@ -546,7 +547,7 @@ Anova(narea_c4)
 # Plot
 narea_wn90_c4_plot <- ggplot(data = subset(df, pft == "c4_nonlegume"),
                              aes(x = wn90_perc, y = log(narea))) +
-  geom_point(size = 3, alpha = 0.6, shape = 21, fill = "#FDD262") +
+  geom_point(size = 3, alpha = 0.6, shape = 21, fill = "#695B24") +
   scale_x_continuous(limits = c(0.125, 0.775), breaks = seq(0.15, 0.75, 0.15),
                      labels = seq(15, 75, 15)) +
   scale_y_continuous(limits = c(-1, 1), breaks = seq(-1, 1, 0.5)) +
@@ -567,7 +568,7 @@ Anova(nmass_c4)
 # Plot
 nmass_chi_c4_plot <- ggplot(data = subset(df, pft == "c4_nonlegume"),
                             aes(x = chi, y = log(n.leaf))) +
-  geom_point(size = 3, alpha = 0.6, shape = 21, fill = "#FDD262") +
+  geom_point(size = 3, alpha = 0.6, shape = 21, fill = "#695B24") +
   scale_x_continuous(limits = c(0, 0.9), breaks = seq(0, 0.9, 0.3)) +
   scale_y_continuous(limits = c(-1, 1), breaks = seq(-1, 1, 0.5)) +
   labs(x = expression(bold("Leaf C"["i"]*" : C"["a"]*" (unitless)")),
@@ -591,13 +592,13 @@ nmass_no3n_c4 <- data.frame(emmeans(nmass_c4, ~1, "soil.no3n",
 # Plot
 nmass_no3n_c4_plot <- ggplot(data = subset(df, pft == "c4_nonlegume"),
                              aes(x = soil.no3n, y = log(n.leaf))) +
-  geom_point(size = 3, alpha = 0.6, shape = 21, fill = "#FDD262") +
+  geom_point(size = 3, alpha = 0.6, shape = 21, fill = "#695B24") +
   geom_ribbon(data = nmass_no3n_c4, 
               aes(x = soil.no3n, y = emmean, ymin = lower.CL, ymax = upper.CL), 
-              alpha = 0.5, fill = "#FDD262") +
+              alpha = 0.5, fill = "#695B24") +
   geom_line(data = nmass_no3n_c4, 
             aes(x = soil.no3n, y = emmean),
-            size = 2, color = "#FDD262") +
+            size = 2, color = "#695B24") +
   scale_x_continuous(limits = c(-1, 80), breaks = seq(0, 80, 20)) +
   scale_y_continuous(limits = c(-1, 1), breaks = seq(-1, 1, 0.5)) +
   labs(x = expression(bold("N availability (ppm NO"[3]*"-N)")),
@@ -617,7 +618,7 @@ Anova(nmass_c4)
 # Plot
 nmass_wn90_c4_plot <- ggplot(data = subset(df, pft == "c4_nonlegume"),
                              aes(x = wn90_perc, y = log(n.leaf))) +
-  geom_point(size = 3, alpha = 0.6, shape = 21, fill = "#FDD262") +
+  geom_point(size = 3, alpha = 0.6, shape = 21, fill = "#695B24") +
   scale_x_continuous(limits = c(0.125, 0.775), breaks = seq(0.15, 0.75, 0.15),
                      labels = seq(15, 75, 15)) +
   scale_y_continuous(limits = c(-1, 1), breaks = seq(-1, 1, 0.5)) +
@@ -638,7 +639,7 @@ Anova(marea_c4)
 # Plot
 marea_chi_c4_plot <- ggplot(data = subset(df, pft == "c4_nonlegume"), 
                             aes(x = chi, y = log(marea))) +
-  geom_point(size = 3, alpha = 0.6, shape = 21, fill = "#FDD262") +
+  geom_point(size = 3, alpha = 0.6, shape = 21, fill = "#695B24") +
   scale_x_continuous(limits = c(0, 0.9), breaks = seq(0, 0.9, 0.3)) +
   scale_y_continuous(limits = c(3, 6), breaks = seq(3, 6, 1)) +
   labs(x = expression(bold("Leaf C"["i"]*" : C"["a"]*" (unitless)")),
@@ -662,13 +663,13 @@ marea_no3n_c4 <- data.frame(emmeans(marea_c4, ~1, "soil.no3n",
 # Plot
 marea_no3n_c4_plot <- ggplot(data = subset(df, pft == "c4_nonlegume"), 
                              aes(x = soil.no3n, y = log(marea))) +
-  geom_point(size = 3, alpha = 0.6, shape = 21, fill = "#FDD262") +
+  geom_point(size = 3, alpha = 0.6, shape = 21, fill = "#695B24") +
   geom_ribbon(data = marea_no3n_c4, 
               aes(x = soil.no3n, y = emmean, ymin = lower.CL, ymax = upper.CL), 
-              alpha = 0.5, fill = "#FDD262") +
+              alpha = 0.5, fill = "#695B24") +
   geom_line(data = marea_no3n_c4, 
             aes(x = soil.no3n, y = emmean),
-            size = 2, color = "#FDD262") +
+            size = 2, color = "#695B24") +
   scale_x_continuous(limits = c(-1, 80), breaks = seq(0, 80, 20)) +
   scale_y_continuous(limits = c(3, 6), breaks = seq(3, 6, 1)) +
   labs(x = expression(bold("N availability (ppm NO"[3]*"-N)")),
@@ -688,7 +689,7 @@ Anova(marea_c4)
 # Plot
 marea_wn90_c4_plot <- ggplot(data = subset(df, pft == "c4_nonlegume"), 
                              aes(x = wn90_perc, y = log(marea))) +
-  geom_point(size = 3, alpha = 0.6, shape = 21, fill = "#FDD262") +
+  geom_point(size = 3, alpha = 0.6, shape = 21, fill = "#695B24") +
   scale_x_continuous(limits = c(0.125, 0.775), breaks = seq(0.15, 0.75, 0.15)) +
   scale_y_continuous(limits = c(3, 6), breaks = seq(3, 6, 1)) +
   labs(x = expression(bold("Soil moisture (% WHC)")),
@@ -702,7 +703,7 @@ marea_wn90_c4_plot
 ##########################################################################
 ## Create plot for C3 spp traits
 ##########################################################################
-jpeg("../plots/TXeco_figXX_c3_traits.jpg",
+jpeg("../plots/TXeco_fig4_c3_traits.jpg",
     height = 16, width = 14, units = 'in', res = 600)
 ggarrange(beta_no3n_c3_plot, beta_wn_c3_plot, chi_vpd_c3_plot,
           narea_chi_c3_plot, narea_no3n_c3_plot, narea_wn90_c3_plot,
@@ -718,7 +719,7 @@ dev.off()
 ##########################################################################
 ## Create plot for C3 spp traits
 ##########################################################################
-jpeg("../plots/TXeco_figXX_c4_traits.jpg",
+jpeg("../plots/TXeco_fig5_c4_traits.jpg",
      height = 16, width = 14, units = 'in', res = 600)
 ggarrange(beta_no3n_c4_plot, beta_wn90_c4_plot, chi_vpd60_c4_plot,
           narea_chi_c4_plot, narea_no3n_c4_plot, narea_wn90_c4_plot,
