@@ -189,6 +189,9 @@ test(emtrends(narea_c3, ~1, "wn90_perc", type = "response"))
 test(emtrends(narea_c3, ~wn90_perc, "soil.no3n", type = "response", 
               at = list(wn90_perc = seq(0.2, 0.7, 0.01))))
 
+test(emtrends(narea_c3, ~soil.no3n, "wn90_perc", type = "response", 
+              at = list(soil.no3n = seq(0, 80, 1))))
+
 
 ##########################################################################
 ## Narea - C4
@@ -238,6 +241,7 @@ r.squaredGLMM(nmass_c3)
 
 # Post hoc tests
 test(emtrends(nmass_c3, ~1, "soil.no3n"))
+
 
 ##########################################################################
 ## Nmass - C4
