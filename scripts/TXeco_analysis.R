@@ -330,7 +330,7 @@ df.psem <- subset(df, pft!= "c3_legume")
 df.psem$beta.trans <- log(df.psem$beta)
 df.psem$narea.trans <- log(df.psem$narea)
 df.psem$nmass.trans <- log(df.psem$n.leaf)
-df.psem$nmass <- df.psem$n.leaf
+df.psem$nmass <- log(df.psem$n.leaf)
 df.psem$marea.trans <- log(df.psem$marea)
 
 df.psem.c3 <- subset(df.psem, photo == "c3")
@@ -343,36 +343,38 @@ narea_psem_c3 <- psem(
   
   ## Narea model
   narea = lmer(narea ~ marea + nmass + (1 | NCRS.code),
-               data = df.psem.c3),
+               data = df.psem.c3, na.action = na.exclude),
   
   ## Nmass model
   nmass = lmer(nmass ~ chi + marea + soil.no3n + wn90_perc + (1 | NCRS.code),
-               data = df.psem.c3),
+               data = df.psem.c3, na.action = na.exclude),
   
   ## Marea model
   marea = lmer(marea ~ chi + soil.no3n + wn90_perc + (1 | NCRS.code),
-              data = df.psem.c3),
+              data = df.psem.c3, na.action = na.exclude),
   
   ## Chi model
   chi = lmer(chi ~ vpd90 + beta + soil.no3n + wn90_perc + (1 | NCRS.code),
-             data = df.psem.c3),
+             data = df.psem.c3, na.action = na.exclude),
   
   ## Beta model
   beta = lmer(beta ~ soil.no3n + wn90_perc + (1 | NCRS.code),
-              data = df.psem.c3),
-
+              data = df.psem.c3, na.action = na.exclude),
+  
   ## Correlated errors
-  #soil.no3n %~~% vpd90,
-  #nmass %~~% vpd90,
-  beta %~~% vpd90)
+  narea %~~% soil.no3n,
+  beta %~~% vpd90,
+  beta %~~% narea,
+  beta %~~% marea,
+  marea %~~% vpd90)
+
 
 summary(narea_psem_c3)
 
-
 line.thick.c3 <- data.frame(
-  summary(narea_psem_opt_c3)$coefficients,
+  summary(narea_psem_c3)$coefficients,
   line.thickness = abs(summary(
-    narea_psem_opt_c3)$coefficients$Std.Estimate) * 16.67) %>%
+    narea_psem_c3)$coefficients$Std.Estimate) * 16.67) %>%
   mutate(line.thickness = round(line.thickness, digits = 2)) %>%
   dplyr::select(-Var.9)
 line.thick.c3
@@ -384,36 +386,35 @@ narea_psem_c4 <- psem(
   
   ## Narea model
   narea = lmer(narea ~ marea + nmass + (1 | NCRS.code),
-               data = df.psem.c4),
+               data = df.psem.c4, na.action = na.exclude),
   
   ## Nmass model
   nmass = lmer(nmass ~ chi + marea + soil.no3n + wn90_perc + (1 | NCRS.code),
-               data = df.psem.c4),
+               data = df.psem.c4, na.action = na.exclude),
   
   ## Marea model
   marea = lmer(marea ~ chi + soil.no3n + wn90_perc + (1 | NCRS.code),
-               data = df.psem.c4),
+               data = df.psem.c4, na.action = na.exclude),
   
   ## Chi model
   chi = lmer(chi ~ vpd60 + beta + soil.no3n + wn90_perc + (1 | NCRS.code),
-             data = df.psem.c4),
+             data = df.psem.c4, na.action = na.exclude),
   
   ## Beta model
   beta = lmer(beta ~ soil.no3n + wn90_perc + (1 | NCRS.code),
-              data = df.psem.c4),
+              data = df.psem.c4, na.action = na.exclude),
   
   ## Correlated errors
-  ## Correlated errors
-  soil.no3n %~~% vpd60,
+  narea %~~% vpd60,
   nmass %~~% vpd60,
   beta %~~% vpd60)
 summary(narea_psem_c4)
 
 
 line.thick.c4 <- data.frame(
-  summary(narea_psem_opt_c4)$coefficients,
+  summary(narea_psem_c4)$coefficients,
   line.thickness = abs(summary(
-    narea_psem_opt_c4)$coefficients$Std.Estimate) * 16.67) %>%
+    narea_psem_c4)$coefficients$Std.Estimate) * 16.67) %>%
   mutate(line.thickness = round(line.thickness, digits = 2)) %>%
   dplyr::select(-Var.9)
 line.thick.c4

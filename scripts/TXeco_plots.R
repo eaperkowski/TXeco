@@ -136,7 +136,6 @@ beta_wn_c3_plot <- ggplot(data = subset(df, pft == "c3_nonlegume"),
         legend.title = element_text(face = "bold"))
 beta_wn_c3_plot
 
-
 ##########################################################################
 ## Chi - VPD
 ##########################################################################
@@ -403,7 +402,7 @@ beta_stats <- df %>% group_by(photo) %>%
   data.frame()
 
 
-beta.var <- ggplot(data = df, aes(x = photo, y = sqrt(beta))) +
+beta.var <- ggplot(data = df, aes(x = photo, y = log(beta))) +
   geom_violin(aes(fill = photo)) +
   geom_boxplot(width = 0.05) +
   scale_fill_manual(values = c(cbbPalette3), 
@@ -411,9 +410,9 @@ beta.var <- ggplot(data = df, aes(x = photo, y = sqrt(beta))) +
                                expression("C"[4]))) +
   scale_x_discrete(labels = c(expression("C"[3]), 
                               expression("C"[4]))) +
-  scale_y_continuous(limits = c(0, 45), breaks = seq(0, 45, 15)) +
+  scale_y_continuous(limits = c(-8, 8), breaks = seq(-8, 8, 4)) +
   labs(x = "Photosynthetic pathway",
-       y = expression(sqrt(beta))) +  
+       y = expression(ln(beta))) +  
   theme_bw(base_size = 18) +
   theme(legend.text.align = 0,
         panel.border = element_rect(size = 1.25),

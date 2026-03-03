@@ -193,7 +193,7 @@ narea_chi_c3_plot <- ggplot(data = subset(df, pft == "c3_nonlegume"),
   labs(x = expression(bold("Leaf C"["i"]*" : C"["a"]*" (unitless)")),
        y = expression(bold(ln*" N"["area"]*" (gN m"^"-2"*")"))) +
   theme_bw(base_size = 18) +
-  theme(legend.text.align = 0,
+  theme(hjust = 0,
         panel.border = element_rect(size = 1.25),
         panel.grid.minor.y = element_blank())
 narea_chi_c3_plot
@@ -705,10 +705,10 @@ marea_wn90_c4_plot
 ##########################################################################
 jpeg("../plots/TXeco_fig4_c3_traits.jpg",
     height = 16, width = 14, units = 'in', res = 600)
-ggarrange(beta_no3n_c3_plot, beta_wn_c3_plot, chi_vpd_c3_plot,
-          narea_chi_c3_plot, narea_no3n_c3_plot, narea_wn90_c3_plot,
+ggarrange(narea_chi_c3_plot, narea_no3n_c3_plot, narea_wn90_c3_plot,
           nmass_chi_c3_plot, nmass_no3n_c3_plot, nmass_wn90_c3_plot,
           marea_chi_c3_plot, marea_no3n_c3_plot, marea_wn90_c3_plot,
+          chi_vpd_c3_plot, beta_no3n_c3_plot, beta_wn_c3_plot,
           ncol = 3, nrow = 4, common.legend = TRUE, legend = "bottom", 
           align = "hv", labels = c("(a)", "(b)", "(c)", "(d)", "(e)",
                                    "(f)", "(g)", "(h)", "(i)", "(j)",
@@ -721,10 +721,10 @@ dev.off()
 ##########################################################################
 jpeg("../plots/TXeco_fig5_c4_traits.jpg",
      height = 16, width = 14, units = 'in', res = 600)
-ggarrange(beta_no3n_c4_plot, beta_wn90_c4_plot, chi_vpd60_c4_plot,
-          narea_chi_c4_plot, narea_no3n_c4_plot, narea_wn90_c4_plot,
+ggarrange(narea_chi_c4_plot, narea_no3n_c4_plot, narea_wn90_c4_plot,
           nmass_chi_c4_plot, nmass_no3n_c4_plot, nmass_wn90_c4_plot,
           marea_chi_c4_plot, marea_no3n_c4_plot, marea_wn90_c4_plot,
+          chi_vpd60_c4_plot, beta_no3n_c4_plot, beta_wn90_c4_plot,
           ncol = 3, nrow = 4, common.legend = TRUE, legend = "bottom", 
           align = "hv", labels = c("(a)", "(b)", "(c)", "(d)", "(e)",
                                    "(f)", "(g)", "(h)", "(i)", "(j)",
@@ -732,8 +732,16 @@ ggarrange(beta_no3n_c4_plot, beta_wn90_c4_plot, chi_vpd60_c4_plot,
           font.label = list(size = 18))
 dev.off()
 
-
-
+##########################################################################
+## Create plot for C3/C4 Ci:Ca-Narea tradeoffs
+##########################################################################
+jpeg("../plots/TXeco_figXX_narea_chi_tradeoffs.jpg",
+     height = 10, width = 8, units = 'in', res = 600)
+ggarrange(narea_chi_c3_plot, narea_chi_c4_plot,
+          nmass_chi_c3_plot, nmass_chi_c4_plot,
+          marea_chi_c3_plot, marea_chi_c4_plot,
+          nrow = 3, ncol = 2)
+dev.off()
 
 ##########################################################################
 ## Create density plot explaining variance in beta
