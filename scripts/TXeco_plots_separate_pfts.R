@@ -170,6 +170,43 @@ chi_vpd_c3_plot <- ggplot(data = subset(df, pft == "c3_nonlegume"),
 chi_vpd_c3_plot
 
 ##########################################################################
+## Chi - soil N (C3)
+##########################################################################
+
+# Plot
+chi_no3n_c3_plot <- ggplot(data = subset(df, pft == "c3_nonlegume"),
+                          aes(x = soil.no3n, y = chi)) +
+  geom_point(size = 3, alpha = 0.6, shape = 21, fill = "#446455") +
+  scale_x_continuous(limits = c(-1, 80), breaks = seq(0, 80, 20)) +
+  scale_y_continuous(limits = c(0.6, 1), breaks = seq(0.6, 1, 0.1)) +
+  labs(x = expression(bold("N availability (ppm NO"[3]*"-N)")),
+       y = expression(bold("Leaf C"["i"]*" : C"["a"]*" (unitless)"))) +
+  theme_bw(base_size = 18) +
+  theme(legend.text.align = 0,
+        panel.border = element_rect(size = 1.25))
+chi_no3n_c3_plot
+
+##########################################################################
+## Chi - soil moisture (C3)
+##########################################################################
+Anova(chi_c3)
+
+
+# Plot
+chi_wn90_c3_plot <- ggplot(data = subset(df, pft == "c3_nonlegume"),
+                           aes(x = wn90_perc, y = chi)) +
+  geom_point(size = 3, alpha = 0.6, shape = 21, fill = "#446455") +
+  scale_x_continuous(limits = c(0.125, 0.775), breaks = seq(0.15, 0.75, 0.15),
+                     labels = seq(15, 75, 15)) +
+  scale_y_continuous(limits = c(0.6, 1), breaks = seq(0.6, 1, 0.1)) +
+  labs(x = expression(bold("Soil moisture (% WHC)")),
+       y = expression(bold("Leaf C"["i"]*" : C"["a"]*" (unitless)"))) +
+  theme_bw(base_size = 18) +
+  theme(legend.text.align = 0,
+        panel.border = element_rect(size = 1.25))
+chi_wn90_c3_plot
+
+##########################################################################
 ## Narea - chi (C3)
 ##########################################################################
 # Check model result
@@ -499,6 +536,43 @@ chi_vpd60_c4_plot <- ggplot(data = subset(df, pft == "c4_nonlegume"),
 chi_vpd60_c4_plot
 
 ##########################################################################
+## Chi - soil N (C4)
+##########################################################################
+
+# Plot
+chi_no3n_c4_plot <- ggplot(data = subset(df, pft == "c4_nonlegume"),
+                           aes(x = soil.no3n, y = chi)) +
+  geom_point(size = 3, alpha = 0.6, shape = 21, fill = "#695B24") +
+  scale_x_continuous(limits = c(-1, 80), breaks = seq(0, 80, 20)) +
+  scale_y_continuous(limits = c(0, 0.9), breaks = seq(0, 0.9, 0.3)) +
+  labs(x = expression(bold("N availability (ppm NO"[3]*"-N)")),
+       y = expression(bold("Leaf C"["i"]*" : C"["a"]*" (unitless)"))) +
+  theme_bw(base_size = 18) +
+  theme(legend.text.align = 0,
+        panel.border = element_rect(size = 1.25))
+chi_no3n_c4_plot
+
+##########################################################################
+## Chi - soil moisture (C3)
+##########################################################################
+Anova(chi_c4)
+
+
+# Plot
+chi_wn90_c4_plot <- ggplot(data = subset(df, pft == "c4_nonlegume"),
+                         aes(x = wn90_perc, y = chi)) +
+  geom_point(size = 3, alpha = 0.6, shape = 21, fill = "#695B24") +
+  scale_x_continuous(limits = c(0.125, 0.775), breaks = seq(0.15, 0.75, 0.15),
+                     labels = seq(15, 75, 15)) +
+  scale_y_continuous(limits = c(0, 0.9), breaks = seq(0, 0.9, 0.3)) +
+  labs(x = expression(bold("Soil moisture (% WHC)")),
+       y = expression(bold("Leaf C"["i"]*" : C"["a"]*" (unitless)"))) +
+  theme_bw(base_size = 18) +
+  theme(legend.text.align = 0,
+        panel.border = element_rect(size = 1.25))
+chi_wn90_c4_plot
+
+##########################################################################
 ## Narea - chi (C4)
 ##########################################################################
 # Check model result
@@ -708,7 +782,7 @@ jpeg("../plots/TXeco_fig4_c3_traits.jpg",
 ggarrange(narea_chi_c3_plot, narea_no3n_c3_plot, narea_wn90_c3_plot,
           nmass_chi_c3_plot, nmass_no3n_c3_plot, nmass_wn90_c3_plot,
           marea_chi_c3_plot, marea_no3n_c3_plot, marea_wn90_c3_plot,
-          chi_vpd_c3_plot, beta_no3n_c3_plot, beta_wn_c3_plot,
+          chi_vpd_c3_plot, chi_no3n_c3_plot, chi_wn90_c3_plot,
           ncol = 3, nrow = 4, common.legend = TRUE, legend = "bottom", 
           align = "hv", labels = c("(a)", "(b)", "(c)", "(d)", "(e)",
                                    "(f)", "(g)", "(h)", "(i)", "(j)",
@@ -724,7 +798,7 @@ jpeg("../plots/TXeco_fig5_c4_traits.jpg",
 ggarrange(narea_chi_c4_plot, narea_no3n_c4_plot, narea_wn90_c4_plot,
           nmass_chi_c4_plot, nmass_no3n_c4_plot, nmass_wn90_c4_plot,
           marea_chi_c4_plot, marea_no3n_c4_plot, marea_wn90_c4_plot,
-          chi_vpd60_c4_plot, beta_no3n_c4_plot, beta_wn90_c4_plot,
+          chi_vpd60_c4_plot, chi_no3n_c4_plot, chi_wn90_c4_plot,
           ncol = 3, nrow = 4, common.legend = TRUE, legend = "bottom", 
           align = "hv", labels = c("(a)", "(b)", "(c)", "(d)", "(e)",
                                    "(f)", "(g)", "(h)", "(i)", "(j)",

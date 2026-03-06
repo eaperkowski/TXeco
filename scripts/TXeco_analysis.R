@@ -118,7 +118,7 @@ test(emtrends(beta_c4, ~1, "soil.no3n"))
 ##########################################################################
 df$chi[404] <- NA
 
-chi_c3 <- lmer(chi ~ (vpd90 + (wn90_perc * soil.no3n)) + (1 | NCRS.code), 
+chi_c3 <- lmer(chi ~ (vpd90 + (wn90_perc * soil.no3n)) + vpd90:soil.no3n + (1 | NCRS.code), 
               data = subset(df, pft != "c3_legume" & photo == "c3"))
 
 # Check model assumptions
@@ -137,10 +137,13 @@ r.squaredGLMM(chi_c3)
 ## Post-hoc comparisons 
 test(emtrends(chi_c3, ~1, "vpd90"))
 
+test(emtrends(chi_c3, ~soil.no3n, "vpd90", at = list(soil.no3n = seq(0,80,20))))
+test(emtrends(chi_c3, ~soil.no3n, "wn90_perc", at = list(soil.no3n = seq(0,80,20))))
+
 ##########################################################################
 ## Chi - C4
 ##########################################################################
-chi_c4 <- lmer(chi ~ (vpd60 + (wn90_perc * soil.no3n)) + (1 | NCRS.code), 
+chi_c4 <- lmer(chi ~ (vpd60 + (wn90_perc * soil.no3n)) + vpd90:soil.no3n  + (1 | NCRS.code), 
                data = subset(df, pft != "c3_legume" & photo == "c4"))
 
 # Check model assumptions
@@ -354,19 +357,12 @@ narea_psem_c3 <- psem(
               data = df.psem.c3, na.action = na.exclude),
   
   ## Chi model
-  chi = lmer(chi ~ vpd90 + beta + soil.no3n + wn90_perc + (1 | NCRS.code),
+  chi = lmer(chi ~ vpd90 + soil.no3n + wn90_perc + (1 | NCRS.code),
              data = df.psem.c3, na.action = na.exclude),
-  
-  ## Beta model
-  beta = lmer(beta ~ soil.no3n + wn90_perc + (1 | NCRS.code),
-              data = df.psem.c3, na.action = na.exclude),
   
   ## Correlated errors
   narea %~~% soil.no3n,
-  beta %~~% vpd90,
-  beta %~~% narea,
-  beta %~~% marea,
-  marea %~~% vpd90)
+  chi %~~% narea)
 
 
 summary(narea_psem_c3)
@@ -397,17 +393,12 @@ narea_psem_c4 <- psem(
                data = df.psem.c4, na.action = na.exclude),
   
   ## Chi model
-  chi = lmer(chi ~ vpd60 + beta + soil.no3n + wn90_perc + (1 | NCRS.code),
+  chi = lmer(chi ~ vpd60 + soil.no3n + wn90_perc + (1 | NCRS.code),
              data = df.psem.c4, na.action = na.exclude),
-  
-  ## Beta model
-  beta = lmer(beta ~ soil.no3n + wn90_perc + (1 | NCRS.code),
-              data = df.psem.c4, na.action = na.exclude),
   
   ## Correlated errors
   narea %~~% vpd60,
-  nmass %~~% vpd60,
-  beta %~~% vpd60)
+  nmass %~~% vpd60)
 summary(narea_psem_c4)
 
 
@@ -701,8 +692,7 @@ table5.c4 <- summary(narea_psem_c4)$R2 %>%
 table5_merged <- table5.c3 %>% full_join(table5.c4) %>%
   mutate(resp = factor(resp, 
                        levels = c("narea", "nmass", "marea",
-                                  "chi", "beta",
-                                  "~~nmass", "~~chi", "~~beta"))) %>%
+                                  "chi", "~~narea", "~~nmass", "~~chi"))) %>%
   group_by(resp) %>%
   arrange(-abs(std_est_c3), .by_group = TRUE)
 

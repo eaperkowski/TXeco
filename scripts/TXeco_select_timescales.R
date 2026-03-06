@@ -37,36 +37,36 @@ df.nolegume <- subset(df, pft != "c3_legume")
 ###############################################################################
 # Iterative models for soil moisture and beta (C4)
 ###############################################################################
-wn90.c3 <- lmer(beta ~ wn90_perc + (1 | NCRS.code), 
-                data = subset(df.nolegume, photo = "c3"))
-wn60.c3 <- lmer(beta ~ wn60_perc + (1 | NCRS.code), 
-                data = subset(df.nolegume, photo = "c3"))
-wn30.c3 <- lmer(beta ~ wn30_perc + (1 | NCRS.code), 
-                data = subset(df.nolegume, photo = "c3"))
-wn20.c3 <- lmer(beta ~ wn20_perc + (1 | NCRS.code), 
-                data = subset(df.nolegume, photo = "c3"))
-wn15.c3 <- lmer(beta ~ wn15_perc + (1 | NCRS.code), 
-                data = subset(df.nolegume, photo = "c3"))
-wn10.c3 <- lmer(beta ~ wn10_perc + (1 | NCRS.code), 
-                data = subset(df.nolegume, photo = "c3"))
-wn9.c3 <- lmer(beta ~ wn09_perc + (1 | NCRS.code), 
-               data = subset(df.nolegume, photo = "c3"))
-wn8.c3 <- lmer(beta ~ wn08_perc + (1 | NCRS.code), 
-               data = subset(df.nolegume, photo = "c3"))
-wn7.c3 <- lmer(beta ~ wn07_perc + (1 | NCRS.code), 
-               data = subset(df.nolegume, photo = "c3"))
-wn6.c3 <- lmer(beta ~ wn06_perc + (1 | NCRS.code), 
-               data = subset(df.nolegume, photo = "c3"))
-wn5.c3 <- lmer(beta ~ wn05_perc + (1 | NCRS.code), 
-               data = subset(df.nolegume, photo = "c3"))
-wn4.c3 <- lmer(beta ~ wn04_perc + (1 | NCRS.code), 
-               data = subset(df.nolegume, photo = "c3"))
-wn3.c3 <- lmer(beta ~ wn03_perc + (1 | NCRS.code), 
-               data = subset(df.nolegume, photo = "c3"))
-wn2.c3 <- lmer(beta ~ wn02_perc + (1 | NCRS.code), 
-               data = subset(df.nolegume, photo = "c3"))
-wn1.c3 <- lmer(beta ~ wn01_perc + (1 | NCRS.code), 
-               data = subset(df.nolegume, photo = "c3"))
+wn90.c3 <- lmer(chi ~ wn90_perc + (1 | NCRS.code), 
+                data = subset(df.nolegume, photo == "c3"))
+wn60.c3 <- lmer(chi ~ wn60_perc + (1 | NCRS.code), 
+                data = subset(df.nolegume, photo == "c3"))
+wn30.c3 <- lmer(chi ~ wn30_perc + (1 | NCRS.code), 
+                data = subset(df.nolegume, photo == "c3"))
+wn20.c3 <- lmer(chi ~ wn20_perc + (1 | NCRS.code), 
+                data = subset(df.nolegume, photo == "c3"))
+wn15.c3 <- lmer(chi ~ wn15_perc + (1 | NCRS.code), 
+                data = subset(df.nolegume, photo == "c3"))
+wn10.c3 <- lmer(chi ~ wn10_perc + (1 | NCRS.code), 
+                data = subset(df.nolegume, photo == "c3"))
+wn9.c3 <- lmer(chi ~ wn09_perc + (1 | NCRS.code), 
+               data = subset(df.nolegume, photo == "c3"))
+wn8.c3 <- lmer(chi ~ wn08_perc + (1 | NCRS.code), 
+               data = subset(df.nolegume, photo == "c3"))
+wn7.c3 <- lmer(chi ~ wn07_perc + (1 | NCRS.code), 
+               data = subset(df.nolegume, photo == "c3"))
+wn6.c3 <- lmer(chi ~ wn06_perc + (1 | NCRS.code), 
+               data = subset(df.nolegume, photo == "c3"))
+wn5.c3 <- lmer(chi ~ wn05_perc + (1 | NCRS.code), 
+               data = subset(df.nolegume, photo == "c3"))
+wn4.c3 <- lmer(chi ~ wn04_perc + (1 | NCRS.code), 
+               data = subset(df.nolegume, photo == "c3"))
+wn3.c3 <- lmer(chi ~ wn03_perc + (1 | NCRS.code), 
+               data = subset(df.nolegume, photo == "c3"))
+wn2.c3 <- lmer(chi ~ wn02_perc + (1 | NCRS.code), 
+               data = subset(df.nolegume, photo == "c3"))
+wn1.c3 <- lmer(chi ~ wn01_perc + (1 | NCRS.code), 
+               data = subset(df.nolegume, photo == "c3"))
 
 # Model selection across timescales
 wn90.c3.modelSelect <- data.frame(day = 90, var = "wn", AICc = AICc(wn90.c3), 
@@ -118,35 +118,35 @@ plot(aicc.results.wn_c3$day, aicc.results.wn_c3$aicc.wn)
 ###############################################################################
 # Iterative models for soil moisture and beta (C4)
 ###############################################################################
-wn90.c4 <- lmer(beta ~ wn90_perc + (1 | NCRS.code), 
+wn90.c4 <- lmer(chi ~ wn90_perc + (1 | NCRS.code), 
                 data = subset(df.nolegume, photo == "c4"))
-wn60.c4 <- lmer(beta ~ wn60_perc + (1 | NCRS.code), 
+wn60.c4 <- lmer(chi ~ wn60_perc + (1 | NCRS.code), 
                 data = subset(df.nolegume, photo == "c4"))
-wn30.c4 <- lmer(beta ~ wn30_perc + (1 | NCRS.code), 
+wn30.c4 <- lmer(chi ~ wn30_perc + (1 | NCRS.code), 
                 data = subset(df.nolegume, photo == "c4"))
-wn20.c4 <- lmer(beta ~ wn20_perc + (1 | NCRS.code), 
+wn20.c4 <- lmer(chi ~ wn20_perc + (1 | NCRS.code), 
                 data = subset(df.nolegume, photo == "c4"))
-wn15.c4 <- lmer(beta ~ wn15_perc + (1 | NCRS.code), 
+wn15.c4 <- lmer(chi ~ wn15_perc + (1 | NCRS.code), 
                 data = subset(df.nolegume, photo == "c4"))
-wn10.c4 <- lmer(beta ~ wn10_perc + (1 | NCRS.code), 
+wn10.c4 <- lmer(chi ~ wn10_perc + (1 | NCRS.code), 
                 data = subset(df.nolegume, photo == "c4"))
-wn9.c4 <- lmer(beta ~ wn09_perc + (1 | NCRS.code), 
+wn9.c4 <- lmer(chi ~ wn09_perc + (1 | NCRS.code), 
                data = subset(df.nolegume, photo == "c4"))
-wn8.c4 <- lmer(beta ~ wn08_perc + (1 | NCRS.code), 
+wn8.c4 <- lmer(chi ~ wn08_perc + (1 | NCRS.code), 
                data = subset(df.nolegume, photo == "c4"))
-wn7.c4 <- lmer(beta ~ wn07_perc + (1 | NCRS.code), 
+wn7.c4 <- lmer(chi ~ wn07_perc + (1 | NCRS.code), 
                data = subset(df.nolegume, photo == "c4"))
-wn6.c4 <- lmer(beta ~ wn06_perc + (1 | NCRS.code), 
+wn6.c4 <- lmer(chi ~ wn06_perc + (1 | NCRS.code), 
                data = subset(df.nolegume, photo == "c4"))
-wn5.c4 <- lmer(beta ~ wn05_perc + (1 | NCRS.code), 
+wn5.c4 <- lmer(chi ~ wn05_perc + (1 | NCRS.code), 
                data = subset(df.nolegume, photo == "c4"))
-wn4.c4 <- lmer(beta ~ wn04_perc + (1 | NCRS.code), 
+wn4.c4 <- lmer(chi ~ wn04_perc + (1 | NCRS.code), 
                data = subset(df.nolegume, photo == "c4"))
-wn3.c4 <- lmer(beta ~ wn03_perc + (1 | NCRS.code), 
+wn3.c4 <- lmer(chi ~ wn03_perc + (1 | NCRS.code), 
                data = subset(df.nolegume, photo == "c4"))
-wn2.c4 <- lmer(beta ~ wn02_perc + (1 | NCRS.code), 
+wn2.c4 <- lmer(chi ~ wn02_perc + (1 | NCRS.code), 
                data = subset(df.nolegume, photo == "c4"))
-wn1.c4 <- lmer(beta ~ wn01_perc + (1 | NCRS.code), 
+wn1.c4 <- lmer(chi ~ wn01_perc + (1 | NCRS.code), 
                data = subset(df.nolegume, photo == "c4"))
 
 # Model selection across timescales
@@ -361,7 +361,6 @@ aicc.results.vpd_c4 <- vpd30_c4.modelSelect %>%
 
 plot(aicc.results.vpd_c4$day, aicc.results.vpd_c4$aicc.vpd)
 
-
 ###############################################################################
 # Merge model selection results
 ###############################################################################
@@ -379,21 +378,20 @@ aicc.results_total <- aicc.results_c3 %>%
          rmse.vpd = round(rmse.vpd, digits = 4))
 
 write.csv(aicc.results_total,
-          "../../TX_ecolab_leafNitrogen/working_drafts/tables/TXeco_TableS2_modelselection.csv",
-          row.names = FALSE)
+          "../tables/TXeco_TableS2_modelselection.csv", row.names = FALSE)
 
 ###############################################################################
 # Create plots for AICc values across timescales
 ###############################################################################
 # Make soil moisture plot for C3
-wn.beta_c3 <- ggplot(data = subset(aicc.results_total, photo == "c3"), 
+wn.chi_c3 <- ggplot(data = subset(aicc.results_total, photo == "c3"), 
                      aes(x = day, y = aicc.wn)) +
   geom_point(size = 3, alpha = 0.75) +
   geom_point(data = subset(aicc.results_total, day == 90 & photo == "c3"), 
              fill = "red", shape = 21, size = 3, alpha = 0.75) +
   geom_line() +
   scale_x_continuous(limits = c(0, 90), breaks = seq(0, 90, 30)) +
-  scale_y_continuous(limits = c(5718, 5730), breaks = seq(5718, 5730, 4)) +
+  scale_y_continuous(limits = c(-980, -960), breaks = seq(-980, -960, 5)) +
   labs(x = "Days prior to measurement", y = expression(bold("AIC"["c"])),
        title = expression(bold("Soil moisture (% WHC, C"["3"]*" species)"))) +
   theme_bw(base_size = 18) +
@@ -401,17 +399,17 @@ wn.beta_c3 <- ggplot(data = subset(aicc.results_total, photo == "c3"),
         axis.title = element_text(face = "bold"),
         plot.title = element_text(face = "bold"),
         panel.border = element_rect(linewidth = 1.25))
-wn.beta_c3
+wn.chi_c3
 
 # Make soil moisture plot for C4
-wn.beta_c4 <- ggplot(data = subset(aicc.results_total, photo == "c4"), 
+wn.chi_c4 <- ggplot(data = subset(aicc.results_total, photo == "c4"), 
                      aes(x = day, y = aicc.wn)) +
   geom_point(size = 3, alpha = 0.75) +
   geom_point(data = subset(aicc.results_total, day == 90 & photo == "c4"), 
              fill = "red", shape = 21, size = 3, alpha = 0.75) +
   geom_line() +
   scale_x_continuous(limits = c(0, 90), breaks = seq(0, 90, 30)) +
-  scale_y_continuous(limits = c(1038, 1044), breaks = seq(1038, 1044, 2)) +
+  scale_y_continuous(limits = c(-88, -82), breaks = seq(-88, -82, 2)) +
   labs(x = "Days prior to measurement", y = expression(bold("AIC"["c"])),
        title = expression(bold("Soil moisture (% WHC, C"["4"]*" species)"))) +
   theme_bw(base_size = 18) +
@@ -419,7 +417,7 @@ wn.beta_c4 <- ggplot(data = subset(aicc.results_total, photo == "c4"),
         axis.title = element_text(face = "bold"),
         plot.title = element_text(face = "bold"),
         panel.border = element_rect(linewidth = 1.25))
-wn.beta_c4
+wn.chi_c4
 
 # Make vpd timescale plot for c3
 vpd.chi_c3 <- ggplot(data = subset(aicc.results_total, photo == "c3"),
@@ -458,9 +456,9 @@ vpd.chi_c4 <- ggplot(data = subset(aicc.results_total, photo == "c4" & day != 4)
 vpd.chi_c4
 
 # Write plot
-png(filename = "../../TX_ecolab_leafNitrogen/working_drafts/figs/TXeco_figS1_aicc_results.png",
+png(filename = "../plots/TXeco_figS1_aicc_results.png",
     width = 12, height = 9, units = 'in', res = 600)
-ggarrange(wn.beta_c3, wn.beta_c4, vpd.chi_c3, vpd.chi_c4,
+ggarrange(wn.chi_c3, wn.chi_c4, vpd.chi_c3, vpd.chi_c4,
           nrow = 2, ncol = 2, align = "hv", 
           labels = c("(a)", "(b)", "(c)", "(d)"), font.label = list(size = 18))
 dev.off()
