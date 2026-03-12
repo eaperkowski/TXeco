@@ -118,7 +118,7 @@ test(emtrends(beta_c4, ~1, "soil.no3n"))
 ##########################################################################
 df$chi[404] <- NA
 
-chi_c3 <- lmer(chi ~ (vpd90 + (wn90_perc * soil.no3n)) + vpd90:soil.no3n + (1 | NCRS.code), 
+chi_c3 <- lmer(chi ~ (vpd90 + (wn90_perc * soil.no3n)) +  (1 | NCRS.code), 
               data = subset(df, pft != "c3_legume" & photo == "c3"))
 
 # Check model assumptions
@@ -136,14 +136,15 @@ r.squaredGLMM(chi_c3)
 
 ## Post-hoc comparisons 
 test(emtrends(chi_c3, ~1, "vpd90"))
+test(emtrends(chi_c3, ~soil.no3n, "vpd90", at = list(soil.no3n = seq(0,80,1))))
+test(emtrends(chi_c3, ~soil.no3n, "wn90_perc", at = list(soil.no3n = seq(0,80,1))))
 
-test(emtrends(chi_c3, ~soil.no3n, "vpd90", at = list(soil.no3n = seq(0,80,20))))
-test(emtrends(chi_c3, ~soil.no3n, "wn90_perc", at = list(soil.no3n = seq(0,80,20))))
+test(emtrends(chi_c3, ~wn90_perc, "soil.no3n", at = list(wn90_perc = seq(0.2,0.8,0.01))))
 
 ##########################################################################
 ## Chi - C4
 ##########################################################################
-chi_c4 <- lmer(chi ~ (vpd60 + (wn90_perc * soil.no3n)) + vpd90:soil.no3n  + (1 | NCRS.code), 
+chi_c4 <- lmer(chi ~ (vpd60 + (wn90_perc * soil.no3n)) +  (1 | NCRS.code),
                data = subset(df, pft != "c3_legume" & photo == "c4"))
 
 # Check model assumptions
