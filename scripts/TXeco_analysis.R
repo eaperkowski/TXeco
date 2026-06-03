@@ -32,6 +32,9 @@ df <- read.csv("../../TXeco/data/TXeco_data.csv",
          beta = ifelse(pft == "c4_nonlegume" & beta > 400, NA, beta),
          beta = ifelse(pft == "c3_legume" & beta > 1000, NA, beta),
          marea = ifelse(marea > 1000, NA, marea),
+         narea_chi = narea / chi,
+         marea_chi = marea / chi,
+         nmass_chi = n.leaf / chi,
          pft = factor(pft, 
                       levels = c("c3_legume", "c4_nonlegume", "c3_nonlegume")),
          photo = factor(photo, levels = c("c3", "c4"))) 
@@ -64,6 +67,16 @@ df %>% filter(is.na(chi)) %>%
 df %>%
   group_by(NCRS.code) %>%
   summarize(n.spp = length(NCRS.code))
+
+## Any major outliers with Narea:chi, Marea:chi, or Nmass:chi?
+hist(df$narea_chi)
+hist(df$marea_chi)
+hist(df$nmass_chi)
+
+## Remove Narea:chi, Marea:chi, and Nmass:chi outliers
+df <- df %>% mutate(narea_chi = ifelse(narea_chi > 10, NA, narea_chi),
+                    marea_chi = ifelse(marea_chi > 1000, NA, marea_chi),
+                    nmass_chi = ifelse(nmass_chi > 10, NA, nmass_chi))
 
 ##########################################################################
 ## Beta - C3
@@ -327,6 +340,153 @@ r.squaredGLMM(marea_c4)
 test(emtrends(marea_c4, ~1, "soil.no3n"))
 
 ##########################################################################
+## Narea:chi - C3
+##########################################################################
+narea_chi_c3 <- lmer(log(narea_chi) ~ vpd90 + (wn90_perc * soil.no3n) + (1 | NCRS.code),
+                     data = subset(df, pft != "c3_legume" & photo == "c3"))
+
+# Check model assumptions
+plot(narea_chi_c3)
+qqnorm(residuals(narea_chi_c3))
+qqline(residuals(narea_chi_c3))
+hist(residuals(narea_chi_c3))
+densityPlot(residuals(narea_chi_c3))
+shapiro.test(residuals(narea_chi_c3))
+outlierTest(narea_chi_c3)
+
+# Model output
+round(summary(narea_chi_c3)$coefficients, digits = 3)
+Anova(narea_chi_c3)
+r.squaredGLMM(narea_chi_c3)
+
+# Pairwise comparisons
+test(emtrends(narea_chi_c3, ~1, "vpd90")) # Increases with VPD
+test(emtrends(narea_chi_c3, ~1, "wn90_perc")) # Increases with soil moisture
+test(emtrends(narea_chi_c3, ~wn90_perc, "soil.no3n", at = list(wn90_perc = seq(0.2, 0.8, 0.2))))
+
+##########################################################################
+## Narea:chi - C4
+##########################################################################
+narea_chi_c4 <- lmer(log(narea_chi) ~ vpd60 + (wn90_perc * soil.no3n) + (1 | NCRS.code),
+                     data = subset(df, pft != "c3_legume" & photo == "c4"))
+
+# Check model assumptions
+plot(narea_chi_c4)
+qqnorm(residuals(narea_chi_c4))
+qqline(residuals(narea_chi_c4))
+hist(residuals(narea_chi_c4))
+densityPlot(residuals(narea_chi_c4))
+shapiro.test(residuals(narea_chi_c4))
+outlierTest(narea_chi_c4)
+
+# Model output
+round(summary(narea_chi_c4)$coefficients, digits = 3)
+Anova(narea_chi_c4)
+r.squaredGLMM(narea_chi_c4)
+
+# Pairwise comparisons
+test(emtrends(narea_chi_c4, ~1, "wn90_perc")) # Increases with vpd60
+
+##########################################################################
+## Marea:chi - C3
+##########################################################################
+df$marea_chi[c(19, 20, 21)] <- NA
+
+marea_chi_c3 <- lmer(log(marea_chi) ~ vpd90 + (wn90_perc * soil.no3n) + (1 | NCRS.code),
+                     data = subset(df, pft != "c3_legume" & photo == "c3"))
+
+# Check model assumptions
+plot(marea_chi_c3)
+qqnorm(residuals(marea_chi_c3))
+qqline(residuals(marea_chi_c3))
+hist(residuals(marea_chi_c3))
+densityPlot(residuals(marea_chi_c3))
+shapiro.test(residuals(marea_chi_c3))
+outlierTest(marea_chi_c3)
+
+# Model output
+round(summary(marea_chi_c3)$coefficients, digits = 3)
+Anova(marea_chi_c3)
+r.squaredGLMM(marea_chi_c3)
+
+# Pairwise comparisons
+test(emtrends(marea_chi_c3, ~1, "vpd90")) # Increases with VPD
+test(emtrends(marea_chi_c3, ~1, "soil.no3n")) # Decreases with soil N
+
+##########################################################################
+## Marea:chi - C4
+##########################################################################
+marea_chi_c4 <- lmer(log(marea_chi) ~ vpd60 + (wn90_perc * soil.no3n) + (1 | NCRS.code),
+                     data = subset(df, pft != "c3_legume" & photo == "c4"))
+
+# Check model assumptions
+plot(marea_chi_c4)
+qqnorm(residuals(marea_chi_c4))
+qqline(residuals(marea_chi_c4))
+hist(residuals(marea_chi_c4))
+densityPlot(residuals(marea_chi_c4))
+shapiro.test(residuals(marea_chi_c4))
+outlierTest(marea_chi_c4)
+
+# Model output
+round(summary(marea_chi_c4)$coefficients, digits = 3)
+Anova(marea_chi_c4)
+r.squaredGLMM(marea_chi_c4)
+
+# Pairwise comparisons
+test(emtrends(marea_chi_c4, ~1, "wn90_perc")) # Increases with soil moisture
+
+##########################################################################
+## Nmass:chi - C3
+##########################################################################
+df$nmass_chi[c(454)] <- NA
+
+nmass_chi_c3 <- lmer(log(nmass_chi) ~ vpd90 + (wn90_perc * soil.no3n) + (1 | NCRS.code),
+                     data = subset(df, pft != "c3_legume" & photo == "c3"))
+
+# Check model assumptions
+plot(nmass_chi_c3)
+qqnorm(residuals(nmass_chi_c3))
+qqline(residuals(nmass_chi_c3))
+hist(residuals(nmass_chi_c3))
+densityPlot(residuals(nmass_chi_c3))
+shapiro.test(residuals(nmass_chi_c3))
+outlierTest(nmass_chi_c3)
+
+# Model output
+round(summary(nmass_chi_c3)$coefficients, digits = 3)
+Anova(nmass_chi_c3)
+r.squaredGLMM(nmass_chi_c3)
+
+# Pairwise comparisons
+test(emtrends(nmass_chi_c3, ~1, "soil.no3n")) # Increases with VPD
+test(emtrends(nmass_chi_c3, ~wn90_perc, "soil.no3n",
+              at = list(wn90_perc = seq(0.2, 0.8, 0.2)))) # Increases with soil N
+
+##########################################################################
+## Nmass:chi - C4
+##########################################################################
+nmass_chi_c4 <- lmer(log(nmass_chi) ~ vpd60 + (wn90_perc * soil.no3n) + (1 | NCRS.code),
+                     data = subset(df, pft != "c3_legume" & photo == "c4"))
+
+# Check model assumptions
+plot(nmass_chi_c4)
+qqnorm(residuals(nmass_chi_c4))
+qqline(residuals(nmass_chi_c4))
+hist(residuals(nmass_chi_c4))
+densityPlot(residuals(nmass_chi_c4))
+shapiro.test(residuals(nmass_chi_c4))
+outlierTest(nmass_chi_c4)
+
+# Model output
+round(summary(nmass_chi_c4)$coefficients, digits = 3)
+Anova(nmass_chi_c4)
+r.squaredGLMM(nmass_chi_c4)
+
+# Pairwise comparisons
+test(emtrends(nmass_chi_c4, ~1, "vpd60")) # Decreases with VPD
+
+##########################################################################
 ## Structural equation model - all photosynthetic pathways
 ##########################################################################
 df.psem <- subset(df, pft!= "c3_legume")
@@ -336,6 +496,8 @@ df.psem$narea.trans <- log(df.psem$narea)
 df.psem$nmass.trans <- log(df.psem$n.leaf)
 df.psem$nmass <- log(df.psem$n.leaf)
 df.psem$marea.trans <- log(df.psem$marea)
+df.psem$nareachi.trans <- log(df.psem$narea_chi)
+
 
 df.psem.c3 <- subset(df.psem, photo == "c3")
 df.psem.c4 <- subset(df.psem, photo == "c4")
@@ -343,6 +505,7 @@ df.psem.c4 <- subset(df.psem, photo == "c4")
 ##########################################################################
 ## Structural equation model - C3 only
 ##########################################################################
+
 narea_psem_c3 <- psem(
   
   ## Narea model
