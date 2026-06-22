@@ -174,7 +174,7 @@ Anova(chi_c4)
 r.squaredGLMM(chi_c4)
 
 ## Post-hoc comparisons 
-test(emtrends(chi_c3, ~1, "vpd90"))
+test(emtrends(chi_c4, ~1, "vpd60"))
 
 ##########################################################################
 ## Narea - C3
@@ -182,7 +182,7 @@ test(emtrends(chi_c3, ~1, "vpd90"))
 df$narea[df$narea > 10] <- NA
 
 # Fit model
-narea_c3 <- lmer(log(narea) ~ (chi + (wn90_perc * soil.no3n)) + (1 | NCRS.code),
+narea_c3 <- lmer(log(narea) ~ (chi + vpd90 + (wn90_perc * soil.no3n)) + (1 | NCRS.code),
               data = subset(df, pft != "c3_legume" & photo == "c3"))
 
 # Check model assumptions
@@ -216,7 +216,7 @@ test(emtrends(narea_c3, ~soil.no3n, "wn90_perc", type = "response",
 df$narea[c(252, 254)] <- NA
 
 # Fit model
-narea_c4 <- lmer(log(narea) ~ (chi + (wn90_perc * soil.no3n)) + (1 | NCRS.code),
+narea_c4 <- lmer(log(narea) ~ (chi + vpd60 + (wn90_perc * soil.no3n)) + (1 | NCRS.code),
                  data = subset(df, pft != "c3_legume" & photo == "c4"))
 
 # Check model assumptions
@@ -239,7 +239,7 @@ r.squaredGLMM(narea_c4)
 df$n.leaf[454] <- NA
 
 # Fit model
-nmass_c3 <- lmer(log(n.leaf) ~ (chi + (wn90_perc * soil.no3n)) + (1 | NCRS.code),
+nmass_c3 <- lmer(log(n.leaf) ~ (chi + vpd90 + (wn90_perc * soil.no3n)) + (1 | NCRS.code),
               data = subset(df, pft != "c3_legume" & photo == "c3"))
 
 # Check model assumptions
@@ -257,14 +257,17 @@ Anova(nmass_c3)
 r.squaredGLMM(nmass_c3)
 
 # Post hoc tests
-test(emtrends(nmass_c3, ~1, "soil.no3n"))
+test(emtrends(nmass_c3, ~soil.no3n, "wn90_perc", type = "response", 
+              at = list(soil.no3n = seq(0, 80, 1))))
 
 
 ##########################################################################
 ## Nmass - C4
 ##########################################################################
+df$n.leaf[c(257, 327)] <- NA
+
 # Fit model
-nmass_c4 <- lmer(log(n.leaf) ~ (chi + (wn90_perc * soil.no3n)) + (1 | NCRS.code),
+nmass_c4 <- lmer(log(n.leaf) ~ (chi + vpd60 + (wn90_perc * soil.no3n)) + (1 | NCRS.code),
                  data = subset(df, pft != "c3_legume" & photo == "c4"))
 
 # Check model assumptions
@@ -282,8 +285,9 @@ Anova(nmass_c4)
 r.squaredGLMM(nmass_c4)
 
 # Post hoc tests
-test(emtrends(nmass_c4, ~1, "soil.no3n"))
-
+test(emtrends(nmass_c4, ~1, "chi"))
+test(emtrends(nmass_c4, ~1, "vpd60"))
+test(emtrends(nmass_c4, ~1, "wn90_perc"))
 
 ##########################################################################
 ## Marea - C3
@@ -291,7 +295,7 @@ test(emtrends(nmass_c4, ~1, "soil.no3n"))
 df$marea[c(20, 21)] <- NA
 
 # Fit model
-marea_c3 <- lmer(log(marea) ~ (chi + (wn90_perc * soil.no3n)) + (1 | NCRS.code),
+marea_c3 <- lmer(log(marea) ~ (chi + vpd90 + (wn90_perc * soil.no3n)) + (1 | NCRS.code),
               data = subset(df, pft != "c3_legume" & photo == "c3"))
 
 # Check model assumptions
@@ -314,12 +318,12 @@ test(emtrends(marea_c3, ~1, "soil.no3n"))
 
 
 ##########################################################################
-## Marea - C3
+## Marea - C4
 ##########################################################################
-df$marea[c(252, 254)] <- NA
+df$marea[c(216, 252, 254, 351, 353)] <- NA
 
 # Fit model
-marea_c4 <- lmer(log(marea) ~ (chi + (wn90_perc * soil.no3n)) + (1 | NCRS.code),
+marea_c4 <- lmer(log(marea) ~ (chi + vpd60 + (wn90_perc * soil.no3n)) + (1 | NCRS.code),
                  data = subset(df, pft != "c3_legume" & photo == "c4"))
 
 # Check model assumptions
@@ -337,7 +341,7 @@ Anova(marea_c4)
 r.squaredGLMM(marea_c4)
 
 # Post-hoc comparisons
-test(emtrends(marea_c4, ~1, "soil.no3n"))
+test(emtrends(marea_c4, ~1, "wn90_perc"))
 
 ##########################################################################
 ## Narea:chi - C3
@@ -362,7 +366,7 @@ r.squaredGLMM(narea_chi_c3)
 # Pairwise comparisons
 test(emtrends(narea_chi_c3, ~1, "vpd90")) # Increases with VPD
 test(emtrends(narea_chi_c3, ~1, "wn90_perc")) # Increases with soil moisture
-test(emtrends(narea_chi_c3, ~wn90_perc, "soil.no3n", at = list(wn90_perc = seq(0.2, 0.8, 0.2))))
+test(emtrends(narea_chi_c3, ~wn90_perc, "soil.no3n", at = list(wn90_perc = seq(0.2, 0.8, 0.01))))
 
 ##########################################################################
 ## Narea:chi - C4
