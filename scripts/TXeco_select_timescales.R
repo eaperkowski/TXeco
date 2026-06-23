@@ -5,6 +5,7 @@ library(tidyverse)
 library(lme4)
 library(MuMIn)
 library(performance)
+library(ggpubr)
 
 ###############################################################################
 # Load compiled data file
@@ -97,8 +98,34 @@ full_results <- results %>%
   arrange(photo, AICc)
 full_results
 
+# Subset C3 species
 full_results_c3 <- subset(full_results, photo == "c3")
+
+tableS4_deltaaicc <- full_results_c3 %>%
+  dplyr::select(sm_days, vpd_days, deltaAICc) %>%
+  arrange(sm_days, vpd_days) %>%
+  pivot_wider(names_from = vpd_days, 
+              names_glue = "vpd_{vpd_days}", 
+              values_from = deltaAICc) %>%
+  mutate(stat = "delta_aicc") %>%
+  dplyr::select(sm_days, stat, vpd_1:vpd_90)
+
+## write.csv(full_results_c3, "../tables/TXeco_tableS4_c3ModelSelection.csv", row.names = F)
+
+# Subset C4 species
 full_results_c4 <- subset(full_results, photo == "c4")
+## write.csv(full_results_c4, "../tables/TXeco_tableS5_c4ModelSelection.csv", row.names = F)
+
+full_results_c4 %>%
+  dplyr::select(sm_days, vpd_days, deltaAICc) %>%
+  arrange(sm_days, vpd_days) %>%
+  pivot_wider(names_from = vpd_days, 
+              names_glue = "vpd_{vpd_days}", 
+              values_from = deltaAICc) %>%
+  mutate(stat = "delta_aicc") %>%
+  dplyr::select(sm_days, stat, vpd_1:vpd_90) # %>%
+#  write.csv("../tables/TXeco_tableS5_c4ModelSelection.csv", row.names = F)
+
 
 # Visualize C3 timescale plot
 c3_timescale_plot <- full_results_c3 %>%
@@ -108,6 +135,8 @@ c3_timescale_plot <- full_results_c3 %>%
   geom_tile(color = "white", linewidth = 0.5) +
   geom_tile(data = subset(full_results_c3, deltaAICc < 0.1),
             color = "red", linewidth = 2) +
+  geom_text(aes(label = sprintf("%0.1f", round(deltaAICc, digits = 2))),
+            color = "white", size = 5) +
   scale_fill_gradient2(low = "#FDE725",
                        mid = "#21908C",
                        high = "#440154",
@@ -117,12 +146,12 @@ c3_timescale_plot <- full_results_c3 %>%
                        breaks = c(0, 5, 10)) +
   #scale_x_continuous(breaks = c(1,5,10,30,60,90)) +
   #scale_y_continuous(breaks = c(1,5,10,30,60,90)) +
-  labs(title = expression(bold("VPD and soil moisture timescales (C"["3"]*")")),
+  labs(title = "",
        x = "",
        y = "Soil moisture timescale (days)") +
+  guides(fill = "none") +
   theme_classic(base_size = 22) +
-  theme(panel.grid = element_blank(),
-        axis.title = element_text(face = "bold"),
+  theme(axis.title = element_text(face = "bold"),
         axis.text = element_text(color = "black"))
 c3_timescale_plot
 
@@ -134,6 +163,8 @@ c4_timescale_plot <- full_results_c4 %>%
   geom_tile(color = "white", linewidth = 0.5) +
   geom_tile(data = subset(full_results_c4, deltaAICc < 0.001),
             color = "red", linewidth = 2) +
+  geom_text(aes(label = sprintf("%0.2f", round(deltaAICc, digits = 2))),
+            color = "white", size = 5) +
   scale_fill_gradient2(low = "#FDE725",
                        mid = "#21908C",
                        high = "#440154",
@@ -142,16 +173,75 @@ c4_timescale_plot <- full_results_c4 %>%
                        transform = "sqrt",
                        name = expression(Delta*"AICc"),
                        breaks = c(0, 0.25, 1, 2)) +
-  labs(title = expression(bold("VPD and soil moisture timescales (C"["4"]*")")),
+  labs(title = "",
        x = "VPD timescale (days)",
        y = "Soil moisture timescale (days)") +
+  guides(fill = "none") +
   theme_classic(base_size = 22) +
-  theme(panel.grid = element_blank(),
-        axis.title = element_text(face = "bold"),
+  theme(axis.title = element_text(face = "bold"),
         axis.text = element_text(color = "black"))
 c4_timescale_plot
 
 # Make plots
-# png("../plots/TXeco_figXX_timescale.png", width = 8, height = 12, units = "in", res = 600)
-ggarrange(c3_timescale_plot, c4_timescale_plot, nrow = 2)
-# dev.off()
+png("../plots/TXeco_figS1_c3timescale.png", width = 12, height = 6, units = "in", res = 600)
+c3_timescale_plot
+dev.off()
+
+png("../plots/TXeco_figS1_timescale.png", width = 9, height = 12, units = "in", res = 600)
+ggarrange(c3_timescale_plot, c4_timescale_plot, align = "hv",
+          ncol = 1, nrow = 2, 
+          labels = c("(a) \u0394AICc results for C3 species", 
+                     "(b) \u0394AICc results for C4 species"), 
+          font.label = list(size = 22), hjust = 0)
+dev.off()
+
+
+site_climate_data <- df %>%
+  dplyr::select(site, sampling.date, prcp01:vpd90, wn01_perc:wn90_perc) %>%
+  distinct() %>%
+  mutate(unique_visit = str_c(site, sampling.date))
+
+site_vpd <- site_climate_data %>%
+  dplyr::select(site, unique_visit, vpd01:vpd90, -vpd09.1) %>%
+  pivot_longer(cols = vpd01:vpd90, names_to = "ts", names_prefix = "vpd", values_to = "vpd")
+
+ggplot(data = site_vpd,
+       aes(x = ts, y = vpd, color = unique_visit)) +
+  geom_point(size = 4, alpha = 0.7) +
+  geom_line(aes(group = unique_visit), linewidth = 1) +
+  labs(x = "Days before measurement",
+       y = "VPD (kPa)") +
+  theme_classic(base_size = 22) +
+  guides(color = "none")
+
+
+
+site_temp <- site_climate_data %>%
+  dplyr::select(site, unique_visit, tavg01:tavg90) %>%
+  pivot_longer(cols = tavg01:tavg90, names_to = "ts", names_prefix = "tavg", values_to = "tavg")
+
+ggplot(data = site_temp,
+       aes(x = ts, y = tavg, color = unique_visit)) +
+  geom_point(size = 4, alpha = 0.7) +
+  geom_line(aes(group = unique_visit), linewidth = 1) +
+  labs(x = "Days before measurement",
+       y = "Temperature (degC)") +
+  theme_classic(base_size = 22) +
+  guides(color = "none")
+
+site_wn <- site_climate_data %>%
+  dplyr::select(site, unique_visit, wn01_perc:wn90_perc) %>%
+  pivot_longer(cols = wn01_perc:wn90_perc, names_to = "ts", 
+               names_prefix = "wn", values_to = "wn") %>%
+  mutate(ts = gsub("_perc", "", ts))
+
+ggplot(data = site_wn,
+       aes(x = ts, y = wn, color = unique_visit)) +
+  geom_point(size = 4, alpha = 0.7) +
+  geom_line(aes(group = unique_visit), linewidth = 1) +
+  labs(x = "Days before measurement",
+       y = "Soil moisture (% WHC)") +
+  theme_classic(base_size = 22) +
+  guides(color = "none")
+
+
