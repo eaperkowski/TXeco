@@ -6,6 +6,7 @@ library(lme4)
 library(MuMIn)
 library(performance)
 library(ggpubr)
+library(forcats)
 
 ###############################################################################
 # Load compiled data file
@@ -35,7 +36,7 @@ df.nolegume <- subset(df, pft != "c3_legume")
 df.nolegume$chi[404] <- NA
 
 ###############################################################################
-# Let's figure out the best timescale combination for C3 species
+# Let's figure out the best timescale combination
 ###############################################################################
 
 # Set up data frame with all possible timescale combinations
@@ -48,7 +49,7 @@ full_grid <- expand.grid(photo = c("c3", "c4"),
          vpd_var = paste0("vpd", sprintf("%02d", vpd_ts)),
          sm_var  = paste0("wn", sprintf("%02d", sm_ts), "_perc"))
 
-
+# Iterate for-loop for all possible model combinations
 results <- map_df(seq_len(nrow(full_grid)), function(i) {
   
   # Subset data row
@@ -101,31 +102,12 @@ full_results
 # Subset C3 species
 full_results_c3 <- subset(full_results, photo == "c3")
 
-tableS4_deltaaicc <- full_results_c3 %>%
-  dplyr::select(sm_days, vpd_days, deltaAICc) %>%
-  arrange(sm_days, vpd_days) %>%
-  pivot_wider(names_from = vpd_days, 
-              names_glue = "vpd_{vpd_days}", 
-              values_from = deltaAICc) %>%
-  mutate(stat = "delta_aicc") %>%
-  dplyr::select(sm_days, stat, vpd_1:vpd_90)
-
-## write.csv(full_results_c3, "../tables/TXeco_tableS4_c3ModelSelection.csv", row.names = F)
-
 # Subset C4 species
 full_results_c4 <- subset(full_results, photo == "c4")
-## write.csv(full_results_c4, "../tables/TXeco_tableS5_c4ModelSelection.csv", row.names = F)
 
-full_results_c4 %>%
-  dplyr::select(sm_days, vpd_days, deltaAICc) %>%
-  arrange(sm_days, vpd_days) %>%
-  pivot_wider(names_from = vpd_days, 
-              names_glue = "vpd_{vpd_days}", 
-              values_from = deltaAICc) %>%
-  mutate(stat = "delta_aicc") %>%
-  dplyr::select(sm_days, stat, vpd_1:vpd_90) # %>%
-#  write.csv("../tables/TXeco_tableS5_c4ModelSelection.csv", row.names = F)
-
+###############################################################################
+# Let's put together some model selection plots
+###############################################################################
 
 # Visualize C3 timescale plot
 c3_timescale_plot <- full_results_c3 %>%
@@ -195,53 +177,149 @@ ggarrange(c3_timescale_plot, c4_timescale_plot, align = "hv",
           font.label = list(size = 22), hjust = 0)
 dev.off()
 
+###############################################################################
+# We now need to show climate more strongly varied across sites than within
+# any given timescale
+###############################################################################
 
+# Create data frame with distinct climate data for each site, hard-code
+# multiple site visits so it appears as different colors
 site_climate_data <- df %>%
   dplyr::select(site, sampling.date, prcp01:vpd90, wn01_perc:wn90_perc) %>%
   distinct() %>%
-  mutate(unique_visit = str_c(site, sampling.date))
+  arrange(site, sampling.date) %>%
+  mutate(property = str_c(str_extract(site, "^[^_]+"), str_extract(site, "[^_]+$")),
+         year = year(sampling.date)) %>%
+  group_by(site, year) %>%
+  mutate(visit = row_number(),
+         site_visit = str_c(property, "_", visit),
+         year_site_visit = str_c(year, "_", property, "_", visit)) %>%
+  ungroup()
 
+# Subset VPD and convert to long-format
 site_vpd <- site_climate_data %>%
-  dplyr::select(site, unique_visit, vpd01:vpd90, -vpd09.1) %>%
-  pivot_longer(cols = vpd01:vpd90, names_to = "ts", names_prefix = "vpd", values_to = "vpd")
+  dplyr::select(site, site_visit, year_site_visit, vpd01:vpd90, -vpd09.1) %>%
+  pivot_longer(cols = vpd01:vpd90, 
+               names_to = "ts", 
+               names_prefix = "vpd", 
+               values_to = "vpd") %>%
+  group_by(year_site_visit) %>%
+  mutate(mean_vpd = mean(vpd, na.rm = TRUE)) %>%
+  ungroup() %>%
+  mutate(year_site_visit = fct_reorder(year_site_visit, mean_vpd, .desc = TRUE))
 
-ggplot(data = site_vpd,
-       aes(x = ts, y = vpd, color = unique_visit)) +
+# VPD-by-site-plot
+vpd_by_site_plot <- ggplot(data = site_vpd,
+                           aes(x = as.numeric(ts), 
+                               y = vpd, 
+                               color = mean_vpd)) +
   geom_point(size = 4, alpha = 0.7) +
-  geom_line(aes(group = unique_visit), linewidth = 1) +
+  geom_line(aes(group = year_site_visit), linewidth = 1) +
+  scale_color_viridis_c() +
   labs(x = "Days before measurement",
-       y = "VPD (kPa)") +
-  theme_classic(base_size = 22) +
-  guides(color = "none")
+       y = "VPD (kPa)",
+       color = "Mean VPD (kPa)") +
+  facet_wrap(~year_site_visit) +
+  theme_bw(base_size = 22) +
+  scale_x_continuous(limits = c(0, 90), breaks = seq(0, 90, 30)) +
+  scale_y_continuous(limits = c(0, 3), breaks = seq(0, 3, 1)) +
+  theme(axis.title = element_text(face = "bold", size = 40),
+        legend.title = element_text(face = "bold", size = 30),
+        strip.background = element_blank(),
+        strip.text = element_text(face = "bold"),
+        panel.border = element_rect(linewidth = 2))
+vpd_by_site_plot
 
-
-
-site_temp <- site_climate_data %>%
-  dplyr::select(site, unique_visit, tavg01:tavg90) %>%
-  pivot_longer(cols = tavg01:tavg90, names_to = "ts", names_prefix = "tavg", values_to = "tavg")
-
-ggplot(data = site_temp,
-       aes(x = ts, y = tavg, color = unique_visit)) +
+vpd_merged_plot <- ggplot(data = site_vpd,
+                          aes(x = as.numeric(ts), 
+                              y = vpd, 
+                              color = mean_vpd)) +
+  geom_line(aes(group = year_site_visit), linewidth = 1) +
   geom_point(size = 4, alpha = 0.7) +
-  geom_line(aes(group = unique_visit), linewidth = 1) +
-  labs(x = "Days before measurement",
-       y = "Temperature (degC)") +
-  theme_classic(base_size = 22) +
-  guides(color = "none")
+  scale_color_viridis_c(limits = c(0, 2.25),
+                        breaks = seq(0, 2, 1)) +
+  labs(x = "",
+       y = "VPD (kPa)",
+       color = "Mean VPD (kPa)") +
+  theme_bw(base_size = 26) +
+  scale_x_continuous(limits = c(0, 90), breaks = seq(0, 90, 30)) +
+  scale_y_continuous(limits = c(0, 3), breaks = seq(0, 3, 1)) +
+  theme(axis.title = element_text(face = "bold"),
+        legend.title = element_text(face = "bold"),
+        strip.background = element_blank(),
+        strip.text = element_text(face = "bold"),
+        panel.border = element_rect(linewidth = 2))
+vpd_merged_plot
 
+# Subset soil moisture and convert to long-format
 site_wn <- site_climate_data %>%
-  dplyr::select(site, unique_visit, wn01_perc:wn90_perc) %>%
-  pivot_longer(cols = wn01_perc:wn90_perc, names_to = "ts", 
-               names_prefix = "wn", values_to = "wn") %>%
-  mutate(ts = gsub("_perc", "", ts))
+  dplyr::select(site, site_visit, year_site_visit, wn01_perc:wn90_perc) %>%
+  pivot_longer(cols = wn01_perc:wn90_perc, 
+               names_to = "ts", 
+               names_prefix = "wn", 
+               values_to = "wn_perc") %>%
+  group_by(year_site_visit) %>%
+  mutate(mean_wn = mean(wn_perc, na.rm = TRUE)) %>%
+  ungroup() %>%
+  mutate(year_site_visit = fct_reorder(year_site_visit, mean_wn, .desc = TRUE),
+         ts = gsub("_perc", "", ts))
 
-ggplot(data = site_wn,
-       aes(x = ts, y = wn, color = unique_visit)) +
+# Soil moisture-by-site-plot
+wn_by_site_plot <- ggplot(data = site_wn,
+                            aes(x = as.numeric(ts), 
+                                y = wn_perc, 
+                                color = mean_wn)) +
   geom_point(size = 4, alpha = 0.7) +
-  geom_line(aes(group = unique_visit), linewidth = 1) +
+  geom_line(aes(group = year_site_visit), linewidth = 1) +
+  scale_color_viridis_c() +
   labs(x = "Days before measurement",
-       y = "Soil moisture (% WHC)") +
-  theme_classic(base_size = 22) +
-  guides(color = "none")
+       y = "Soil moisture (% WHC)",
+       color = "Soil moisture (% WHC)") +
+  facet_wrap(~year_site_visit) +
+  theme_bw(base_size = 22) +
+  scale_x_continuous(limits = c(0, 90), breaks = seq(0, 90, 30)) +
+  scale_y_continuous(limits = c(0, 1), breaks = c(0, 0.33, 0.67, 1)) +
+  theme(axis.title = element_text(face = "bold", size = 40),
+        legend.title = element_text(face = "bold", size = 30),
+        strip.background = element_blank(),
+        strip.text = element_text(face = "bold"),
+        panel.border = element_rect(linewidth = 2))
+wn_by_site_plot
+
+# Soil moisture plot single panel
+wn_merged_plot <- ggplot(data = site_wn,
+                          aes(x = as.numeric(ts), 
+                              y = wn_perc, 
+                              color = mean_wn)) +
+  geom_line(aes(group = year_site_visit), linewidth = 1) +
+  geom_point(size = 4, alpha = 0.7) +
+  scale_color_viridis_c(limits = c(0, 1),
+                        breaks = c(0, 0.5, 1)) +
+  labs(x = "Days before measurement",
+       y = "Soil moisture (% WHC)",
+       color = "Mean SM\n(% WHC)") +
+  theme_bw(base_size = 26) +
+  scale_x_continuous(limits = c(0, 90), breaks = seq(0, 90, 30)) +
+  scale_y_continuous(limits = c(0, 1), breaks = c(0, 0.5, 1)) +
+  theme(axis.title = element_text(face = "bold"),
+        legend.title = element_text(face = "bold"),
+        strip.background = element_blank(),
+        strip.text = element_text(face = "bold"),
+        panel.border = element_rect(linewidth = 2))
+wn_merged_plot
+
+png("../plots/TXeco_figSX_climate_timescale.png", width = 10, height = 12, units = "in", res = 600)
+ggarrange(vpd_merged_plot, wn_merged_plot, nrow = 2, ncol = 1,
+          labels = c("(a)", "(b)"), align = "hv",
+          font.label = list(size = 26, face = "bold"),
+          hjust = 0, vjust = 1)
+dev.off()
+
+
+library(patchwork)
+
+vpd_merged_plot / wn_merged_plot & plot_layout(guides = "collect")
+
+
 
 
