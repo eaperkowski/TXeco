@@ -80,54 +80,6 @@ df <- df %>% mutate(narea_chi = ifelse(narea_chi > 10, NA, narea_chi),
                     nmass_chi = ifelse(nmass_chi > 10, NA, nmass_chi))
 
 ##########################################################################
-## Beta - C3
-##########################################################################
-df$beta[404] <- NA
-
-beta_c3 <- lmer(log(beta) ~ wn20_perc * soil.no3n + (1 | NCRS.code),
-             data = subset(df, pft != "c3_legume" & photo == "c3"))
-
-# Check model assumptions
-plot(beta_c3)
-qqnorm(residuals(beta_c3))
-qqline(residuals(beta_c3))
-densityPlot(residuals(beta_c3))
-shapiro.test(residuals(beta_c3))
-outlierTest(beta_c3)
-
-# Model output
-summary(beta_c3)
-Anova(beta_c3)
-r.squaredGLMM(beta_c3)
-
-# Individual effects
-test(emtrends(beta_c3, ~1, "soil.no3n"))
-test(emtrends(beta_c3, ~1, "wn20_perc"))
-
-##########################################################################
-## Beta - C4
-##########################################################################
-beta_c4 <- lmer(log(beta) ~ wn07_perc * soil.no3n + (1 | NCRS.code), 
-             data = subset(df, pft != "c3_legume" & photo == "c4"))
-
-# Check model assumptions
-plot(beta_c4)
-qqnorm(residuals(beta_c4))
-qqline(residuals(beta_c4))
-densityPlot(residuals(beta_c4))
-shapiro.test(residuals(beta_c4))
-outlierTest(beta_c4)
-
-# Model output
-summary(beta_c4)
-Anova(beta_c4)
-r.squaredGLMM(beta_c4)
-
-# Post-hoc comparisons
-test(emtrends(beta_c4, ~1, "wn07_perc"))
-test(emtrends(beta_c4, ~1, "soil.no3n"))
-
-##########################################################################
 ## Chi - C3
 ##########################################################################
 df$chi[404] <- NA
@@ -150,6 +102,8 @@ performance(chi_c3)
 
 ## Post-hoc comparisons 
 test(emtrends(chi_c3, ~1, "vpd90"))
+test(emtrends(chi_c3, ~1, "wn20_perc"))
+
 test(emtrends(chi_c3, ~soil.no3n, "vpd90", at = list(soil.no3n = seq(0,80,1))))
 test(emtrends(chi_c3, ~soil.no3n, "wn20_perc", at = list(soil.no3n = seq(0,80,1))))
 
@@ -234,6 +188,9 @@ summary(narea_c4)
 Anova(narea_c4)
 performance(narea_c4)
 
+# Post-hoc comparisons
+test(emtrends(narea_c4, ~1, "vpd60"))
+
 ##########################################################################
 ## Nmass - C3
 ##########################################################################
@@ -258,8 +215,8 @@ Anova(nmass_c3)
 performance(nmass_c3)
 
 # Post hoc tests
-test(emtrends(nmass_c3, ~soil.no3n, "wn20_perc", type = "response", 
-              at = list(soil.no3n = seq(0, 80, 1))))
+test(emtrends(nmass_c3, ~wn20_perc, "soil.no3n", type = "response", 
+              at = list(wn20_perc = seq(0, 1, 0.01))))
 
 
 ##########################################################################
@@ -309,7 +266,7 @@ shapiro.test(residuals(marea_c3))
 outlierTest(marea_c3)
 
 # Model output
-round(summary(marea_c3)$coefficients, digits = 3)
+summary(marea_c3)
 Anova(marea_c3)
 r.squaredGLMM(marea_c3)
 
@@ -317,6 +274,7 @@ r.squaredGLMM(marea_c3)
 test(emtrends(marea_c3, ~1, "chi"))
 test(emtrends(marea_c3, ~1, "soil.no3n"))
 
+test(emtrends(marea_c3, ~wn20_perc, "soil.no3n", at = list(wn20_perc = seq(0, 1, 0.01))))
 
 ##########################################################################
 ## Marea - C4
@@ -343,12 +301,13 @@ r.squaredGLMM(marea_c4)
 
 # Post-hoc comparisons
 test(emtrends(marea_c4, ~1, "wn07_perc"))
+test(emtrends(marea_c4, ~1, "soil.no3n"))
+
+test(emtrends(marea_c4, ~wn07_perc, "soil.no3n", at = list(wn07_perc = seq(0, 1, 0.01))))
 
 ##########################################################################
 ## Narea:chi - C3
 ##########################################################################
-df$narea_chi[454] <- NA
-
 narea_chi_c3 <- lmer(log(narea_chi) ~ vpd90 + (wn20_perc * soil.no3n) + (1 | NCRS.code),
                      data = subset(df, pft != "c3_legume" & photo == "c3"))
 
@@ -392,12 +351,12 @@ Anova(narea_chi_c4)
 r.squaredGLMM(narea_chi_c4)
 
 # Pairwise comparisons
-test(emtrends(narea_chi_c4, ~1, "wn07_perc")) # Increases with vpd60
+test(emtrends(narea_chi_c4, ~1, "vpd60")) # Increases with vpd60
 
 ##########################################################################
 ## Marea:chi - C3
 ##########################################################################
-df$marea_chi[c(19, 20, 21)] <- NA
+df$marea_chi[c(20, 21)] <- NA
 
 marea_chi_c3 <- lmer(log(marea_chi) ~ vpd90 + (wn20_perc * soil.no3n) + (1 | NCRS.code),
                      data = subset(df, pft != "c3_legume" & photo == "c3"))
@@ -441,7 +400,7 @@ Anova(marea_chi_c4)
 r.squaredGLMM(marea_chi_c4)
 
 # Pairwise comparisons
-test(emtrends(marea_chi_c4, ~1, "wn90_perc")) # Increases with soil moisture
+test(emtrends(marea_chi_c4, ~1, "wn07_perc")) # Increases with soil moisture
 
 ##########################################################################
 ## Nmass:chi - C3
@@ -467,8 +426,8 @@ r.squaredGLMM(nmass_chi_c3)
 
 # Pairwise comparisons
 test(emtrends(nmass_chi_c3, ~1, "soil.no3n")) # Increases with VPD
-test(emtrends(nmass_chi_c3, ~wn90_perc, "soil.no3n",
-              at = list(wn90_perc = seq(0.2, 0.8, 0.2)))) # Increases with soil N
+test(emtrends(nmass_chi_c3, ~wn20_perc, "soil.no3n",
+              at = list(wn20_perc = seq(0.2, 0.8, 0.2)))) # Increases with soil N
 
 ##########################################################################
 ## Nmass:chi - C4
@@ -496,18 +455,27 @@ test(emtrends(nmass_chi_c4, ~1, "vpd60")) # Decreases with VPD
 ##########################################################################
 ## Structural equation model - all photosynthetic pathways
 ##########################################################################
-df.psem <- subset(df, pft!= "c3_legume")
-
-df.psem$beta.trans <- log(df.psem$beta)
+df.psem <- subset(df, pft!= "c3_legume") %>%
+  dplyr::select(site:leaf.area, nmass = n.leaf, cmass = c.leaf, everything())
 df.psem$narea.trans <- log(df.psem$narea)
-df.psem$nmass.trans <- log(df.psem$n.leaf)
-df.psem$nmass <- log(df.psem$n.leaf)
+df.psem$nmass.trans <- log(df.psem$nmass)
 df.psem$marea.trans <- log(df.psem$marea)
-df.psem$nareachi.trans <- log(df.psem$narea_chi)
 
+# Create C3 pSEM dataset
+sem_vars_c3 <- c("NCRS.code", "narea.trans", "narea", "nmass.trans", "nmass", 
+                 "marea.trans", "marea", "chi", "vpd90", "wn20_perc", 
+                 "soil.no3n")
+df.psem.c3 <- subset(df.psem, photo == "c3") %>%
+  dplyr::select(all_of(sem_vars_c3)) %>%
+  na.omit()
 
-df.psem.c3 <- subset(df.psem, photo == "c3")
-df.psem.c4 <- subset(df.psem, photo == "c4")
+# Create C4 pSEM dataset
+sem_vars_c4 <- c("NCRS.code", "narea.trans", "narea", "nmass.trans", "nmass", 
+                 "marea.trans", "marea", "chi", "vpd60", "wn07_perc", 
+                 "soil.no3n")
+df.psem.c4 <- subset(df.psem, photo == "c4") %>%
+  dplyr::select(all_of(sem_vars_c4)) %>%
+  na.omit()
 
 ##########################################################################
 ## Structural equation model - C3 only
@@ -516,26 +484,20 @@ df.psem.c4 <- subset(df.psem, photo == "c4")
 narea_psem_c3 <- psem(
   
   ## Narea model
-  narea = lmer(narea ~ marea + nmass + (1 | NCRS.code),
-               data = df.psem.c3, na.action = na.exclude),
+  narea.trans = lmer(narea.trans ~ marea.trans + nmass.trans + (1 | NCRS.code),
+                     data = df.psem.c3, na.action = na.exclude),
   
   ## Nmass model
-  nmass = lmer(nmass ~ chi + marea + soil.no3n + wn20_perc + (1 | NCRS.code),
-               data = df.psem.c3, na.action = na.exclude),
+  nmass.trans = lmer(nmass.trans ~ marea.trans + chi + vpd90 + (soil.no3n * wn20_perc) + (1 | NCRS.code),
+                     data = df.psem.c3, na.action = na.exclude),
   
   ## Marea model
-  marea = lmer(marea ~ chi + soil.no3n + wn20_perc + (1 | NCRS.code),
-              data = df.psem.c3, na.action = na.exclude),
+  marea.trans = lmer(marea.trans ~ chi + vpd90 + (soil.no3n * wn20_perc)  + (1 | NCRS.code),
+                     data = df.psem.c3, na.action = na.exclude),
   
   ## Chi model
-  chi = lmer(chi ~ vpd90 + soil.no3n + wn20_perc + (1 | NCRS.code),
-             data = df.psem.c3, na.action = na.exclude),
-  
-  ## Correlated errors
-  narea %~~% soil.no3n,
-  chi %~~% narea)
-
-
+  chi = lmer(chi ~ vpd90 + (soil.no3n * wn20_perc) + (1 | NCRS.code),
+             data = df.psem.c3, na.action = na.exclude))
 summary(narea_psem_c3)
 
 line.thick.c3 <- data.frame(
@@ -552,24 +514,21 @@ line.thick.c3
 narea_psem_c4 <- psem(
   
   ## Narea model
-  narea = lmer(narea ~ marea + nmass + (1 | NCRS.code),
-               data = df.psem.c4, na.action = na.exclude),
+  narea.trans = lmer(narea.trans ~ marea.trans + nmass.trans + (1 | NCRS.code),
+                     data = df.psem.c4, na.action = na.exclude),
   
   ## Nmass model
-  nmass = lmer(nmass ~ chi + marea + soil.no3n + wn07_perc + (1 | NCRS.code),
-               data = df.psem.c4, na.action = na.exclude),
+  nmass.trans = lmer(nmass.trans ~ marea.trans + chi + vpd60 + 
+                       (soil.no3n * wn07_perc) + (1 | NCRS.code),
+                     data = df.psem.c4, na.action = na.exclude),
   
   ## Marea model
-  marea = lmer(marea ~ chi + soil.no3n + wn07_perc + (1 | NCRS.code),
-               data = df.psem.c4, na.action = na.exclude),
+  marea.trans = lmer(marea.trans ~ chi + vpd60 + (soil.no3n * wn07_perc) + (1 | NCRS.code),
+                     data = df.psem.c4, na.action = na.exclude),
   
   ## Chi model
-  chi = lmer(chi ~ vpd60 + soil.no3n + wn07_perc + (1 | NCRS.code),
-             data = df.psem.c4, na.action = na.exclude),
-  
-  ## Correlated errors
-  narea %~~% vpd60,
-  nmass %~~% vpd60)
+  chi = lmer(chi ~ vpd60 + (soil.no3n * wn07_perc) + (1 | NCRS.code),
+             data = df.psem.c4, na.action = na.exclude))
 summary(narea_psem_c4)
 
 
@@ -639,7 +598,7 @@ r.squaredGLMM(narea_c3_nfix)
 emmeans(narea_c3_nfix, pairwise~n.fixer, type = "response")
 
 # Percent change
-(3.85 - 1.99) / 1.99 * 100
+(4 - 2.08) / 2.08 * 100
 
 ##########################################################################
 ## N-fixation effect on Nmass (for supplement)
@@ -665,7 +624,7 @@ r.squaredGLMM(nmass_c3_nfix)
 emmeans(nmass_c3_nfix, pairwise~n.fixer, type = "response")
 
 # Percent change
-(3.137 - 2.138) / 2.138 * 100
+(3.30 - 2.27) / 2.27 * 100
 
 ##########################################################################
 ## N-fixation effect on Marea (for supplement)

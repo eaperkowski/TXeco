@@ -204,21 +204,21 @@ site_vpd <- site_climate_data %>%
                names_prefix = "vpd", 
                values_to = "vpd") %>%
   group_by(year_site_visit) %>%
-  mutate(mean_vpd = mean(vpd, na.rm = TRUE)) %>%
+  mutate(vpd90 = vpd[ts == 90]) %>%
   ungroup() %>%
-  mutate(year_site_visit = fct_reorder(year_site_visit, mean_vpd, .desc = TRUE))
+  mutate(year_site_visit = fct_reorder(year_site_visit, vpd90, .desc = TRUE))
 
 # VPD-by-site-plot
 vpd_by_site_plot <- ggplot(data = site_vpd,
                            aes(x = as.numeric(ts), 
                                y = vpd, 
-                               color = mean_vpd)) +
+                               color = vpd90)) +
   geom_point(size = 4, alpha = 0.7) +
   geom_line(aes(group = year_site_visit), linewidth = 1) +
   scale_color_viridis_c() +
   labs(x = "Days before measurement",
        y = "VPD (kPa)",
-       color = "Mean VPD (kPa)") +
+       color = expression(bold("VPD"["90"]*" (kPa)"))) +
   facet_wrap(~year_site_visit) +
   theme_bw(base_size = 22) +
   scale_x_continuous(limits = c(0, 90), breaks = seq(0, 90, 30)) +
@@ -233,14 +233,14 @@ vpd_by_site_plot
 vpd_merged_plot <- ggplot(data = site_vpd,
                           aes(x = as.numeric(ts), 
                               y = vpd, 
-                              color = mean_vpd)) +
+                              color = vpd90)) +
   geom_line(aes(group = year_site_visit), linewidth = 1) +
   geom_point(size = 4, alpha = 0.7) +
-  scale_color_viridis_c(limits = c(0, 2.25),
-                        breaks = seq(0, 2, 1)) +
+  scale_color_viridis_c(limits = c(0.9, 1.4),
+                        breaks = seq(0.9, 1.3, 0.2)) +
   labs(x = "",
        y = "VPD (kPa)",
-       color = "Mean VPD (kPa)") +
+       color = expression(bold("VPD"["90"]*" (kPa)"))) +
   theme_bw(base_size = 26) +
   scale_x_continuous(limits = c(0, 90), breaks = seq(0, 90, 30)) +
   scale_y_continuous(limits = c(0, 3), breaks = seq(0, 3, 1)) +
@@ -259,26 +259,25 @@ site_wn <- site_climate_data %>%
                names_prefix = "wn", 
                values_to = "wn_perc") %>%
   group_by(year_site_visit) %>%
-  mutate(mean_wn = mean(wn_perc, na.rm = TRUE)) %>%
-  ungroup() %>%
-  mutate(year_site_visit = fct_reorder(year_site_visit, mean_wn, .desc = TRUE),
-         ts = gsub("_perc", "", ts))
+  mutate(ts = gsub("_perc", "", ts),
+         wn90_perc = wn_perc[ts == "90"],
+         year_site_visit = fct_reorder(year_site_visit, wn90_perc, .desc = TRUE))
 
 # Soil moisture-by-site-plot
 wn_by_site_plot <- ggplot(data = site_wn,
                             aes(x = as.numeric(ts), 
                                 y = wn_perc, 
-                                color = mean_wn)) +
+                                color = wn90_perc)) +
   geom_point(size = 4, alpha = 0.7) +
   geom_line(aes(group = year_site_visit), linewidth = 1) +
   scale_color_viridis_c() +
+  scale_x_continuous(limits = c(0, 90), breaks = seq(0, 90, 30)) +
+  scale_y_continuous(limits = c(0, 1), breaks = c(0, 0.33, 0.67, 1)) +
   labs(x = "Days before measurement",
        y = "Soil moisture (% WHC)",
        color = "Soil moisture (% WHC)") +
   facet_wrap(~year_site_visit) +
   theme_bw(base_size = 22) +
-  scale_x_continuous(limits = c(0, 90), breaks = seq(0, 90, 30)) +
-  scale_y_continuous(limits = c(0, 1), breaks = c(0, 0.33, 0.67, 1)) +
   theme(axis.title = element_text(face = "bold", size = 40),
         legend.title = element_text(face = "bold", size = 30),
         strip.background = element_blank(),
@@ -290,17 +289,18 @@ wn_by_site_plot
 wn_merged_plot <- ggplot(data = site_wn,
                           aes(x = as.numeric(ts), 
                               y = wn_perc, 
-                              color = mean_wn)) +
+                              color = wn90_perc)) +
   geom_line(aes(group = year_site_visit), linewidth = 1) +
   geom_point(size = 4, alpha = 0.7) +
-  scale_color_viridis_c(limits = c(0, 1),
-                        breaks = c(0, 0.5, 1)) +
-  labs(x = "Days before measurement",
-       y = "Soil moisture (% WHC)",
-       color = "Mean SM\n(% WHC)") +
-  theme_bw(base_size = 26) +
+  scale_color_viridis_c(limits = c(0, 0.8),
+                        breaks = c(0, 0.8, 0.4)) +
+  
   scale_x_continuous(limits = c(0, 90), breaks = seq(0, 90, 30)) +
   scale_y_continuous(limits = c(0, 1), breaks = c(0, 0.5, 1)) +
+  labs(x = "Days before measurement",
+       y = "Soil moisture (% WHC)",
+       color = expression(bold("SM"["90"]*" (% WHC)"))) +
+  theme_bw(base_size = 26) +
   theme(axis.title = element_text(face = "bold"),
         legend.title = element_text(face = "bold"),
         strip.background = element_blank(),
@@ -308,18 +308,10 @@ wn_merged_plot <- ggplot(data = site_wn,
         panel.border = element_rect(linewidth = 2))
 wn_merged_plot
 
-png("../plots/TXeco_figSX_climate_timescale.png", width = 10, height = 12, units = "in", res = 600)
+png("../plots/TXeco_figSX_climate_timescale.png", width = 10, height = 12,
+    units = "in", res = 600)
 ggarrange(vpd_merged_plot, wn_merged_plot, nrow = 2, ncol = 1,
           labels = c("(a)", "(b)"), align = "hv",
           font.label = list(size = 26, face = "bold"),
           hjust = 0, vjust = 1)
 dev.off()
-
-
-library(patchwork)
-
-vpd_merged_plot / wn_merged_plot & plot_layout(guides = "collect")
-
-
-
-
