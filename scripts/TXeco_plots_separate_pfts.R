@@ -33,8 +33,8 @@ df <- read.csv("../../TXeco/data/TXeco_data.csv",
          marea_chi = marea / chi,
          nmass_chi = n.leaf / chi,
          pft = factor(pft, 
-                      levels = c("c3_legume", "c3_nonlegume",  "c4_nonlegume")),
-         photo = factor(photo, levels = c("c3", "c4")))
+                      levels = c("c3_legume", "c4_nonlegume", "c3_nonlegume")),
+         photo = factor(photo, levels = c("c3", "c4"))) 
 
 ## Remove Narea:chi, Marea:chi, and Nmass:chi outliers
 df <- df %>% mutate(narea_chi = ifelse(narea_chi > 10, NA, narea_chi),
@@ -55,49 +55,42 @@ length(df$pft[df$pft == "c3_nonlegume"])
 length(df$pft[df$pft == "c4_nonlegume"])
 
 ## Remove outliers from statistical models
-df$beta[404] <- NA
 df$chi[404] <- NA
-df$narea[df$narea > 10] <- NA
-df$narea[c(252, 254)] <- NA
-df$n.leaf[454] <- NA
+df$narea[c(252, 254, 454)] <- NA
+df$n.leaf[c(257, 327, 454)] <- NA
 df$marea[c(20, 21, 252, 254)] <- NA
 df$marea_chi[c(20, 21)] <- NA
 df$nmass_chi[c(454)] <- NA
 
 ## Add general models
-beta_c3 <- lmer(log(beta) ~ wn90_perc * soil.no3n + (1 | NCRS.code), 
-                data = subset(df, pft != "c3_legume" & photo == "c3"))
-beta_c4 <- lmer(log(beta) ~ wn90_perc * soil.no3n + (1 | NCRS.code), 
-                data = subset(df, pft != "c3_legume" & photo == "c4"))
-chi_c3 <- lmer(chi ~ (vpd90 + (wn90_perc * soil.no3n)) + (1 | NCRS.code), 
+narea_c3 <- lmer(log(narea) ~ chi + (vpd90 + (wn20_perc * soil.no3n)) + (1 | NCRS.code),
+                 data = subset(df, pft != "c3_legume" & photo == "c3"))
+narea_c4 <- lmer(log(narea) ~ chi + vpd60 + (wn07_perc * soil.no3n) + (1 | NCRS.code),
+                 data = subset(df, pft != "c3_legume" & photo == "c4"))
+nmass_c3 <- lmer(log(n.leaf) ~ chi + (vpd90 + (wn20_perc * soil.no3n)) + (1 | NCRS.code),
+                 data = subset(df, pft != "c3_legume" & photo == "c3"))
+nmass_c4 <- lmer(log(n.leaf) ~ chi + (vpd60 + (wn07_perc * soil.no3n)) + (1 | NCRS.code),
+                 data = subset(df, pft != "c3_legume" & photo == "c4"))
+marea_c3 <- lmer(log(marea) ~ chi + (vpd90 + (wn20_perc * soil.no3n)) + (1 | NCRS.code),
+                 data = subset(df, pft != "c3_legume" & photo == "c3"))
+marea_c4 <- lmer(log(marea) ~ (chi + vpd60 + (wn07_perc * soil.no3n)) + (1 | NCRS.code),
+                 data = subset(df, pft != "c3_legume" & photo == "c4"))
+chi_c3 <- lmer(chi ~ vpd90 + (wn20_perc * soil.no3n) +  (1 | NCRS.code), 
                data = subset(df, pft != "c3_legume" & photo == "c3"))
-chi_c4 <- lmer(chi ~ (vpd60 + (wn90_perc * soil.no3n)) + (1 | NCRS.code), 
+chi_c4 <- lmer(chi ~ vpd60 + (wn07_perc * soil.no3n) +  (1 | NCRS.code),
                data = subset(df, pft != "c3_legume" & photo == "c4"))
-narea_c3 <- lmer(log(narea) ~ (chi + (soil.no3n * wn90_perc)) + (1 | NCRS.code),
-                 data = subset(df, pft != "c3_legume" & photo == "c3"))
-narea_c4 <- lmer(log(narea) ~ (chi + (soil.no3n * wn90_perc)) + (1 | NCRS.code),
-                 data = subset(df, pft != "c3_legume" & photo == "c4"))
-nmass_c3 <- lmer(log(n.leaf) ~ (chi + (soil.no3n * wn90_perc)) + (1 | NCRS.code),
-                 data = subset(df, pft != "c3_legume" & photo == "c3"))
-nmass_c4 <- lmer(log(n.leaf) ~ (chi + (soil.no3n * wn90_perc)) + (1 | NCRS.code),
-                 data = subset(df, pft != "c3_legume" & photo == "c4"))
-marea_c3 <- lmer(log(marea) ~ (chi + (soil.no3n * wn90_perc)) + (1 | NCRS.code),
-                 data = subset(df, pft != "c3_legume" & photo == "c3"))
-marea_c4 <- lmer(log(marea) ~ (chi + (soil.no3n * wn90_perc)) + (1 | NCRS.code),
-                 data = subset(df, pft != "c3_legume" & photo == "c4"))
-narea_chi_c3 <- lmer(log(narea_chi) ~ vpd90 + (wn90_perc * soil.no3n) + (1 | NCRS.code),
+narea_chi_c3 <- lmer(log(narea_chi) ~ vpd90 + (wn20_perc * soil.no3n) + (1 | NCRS.code),
                      data = subset(df, pft != "c3_legume" & photo == "c3"))
-narea_chi_c4 <- lmer(log(narea_chi) ~ vpd60 + (wn90_perc * soil.no3n) + (1 | NCRS.code),
+narea_chi_c4 <- lmer(log(narea_chi) ~ vpd60 + (wn07_perc * soil.no3n) + (1 | NCRS.code),
                      data = subset(df, pft != "c3_legume" & photo == "c4"))
-marea_chi_c3 <- lmer(log(marea_chi) ~ vpd90 + (wn90_perc * soil.no3n) + (1 | NCRS.code),
+nmass_chi_c3 <- lmer(log(nmass_chi) ~ vpd90 + (wn20_perc * soil.no3n) + (1 | NCRS.code),
                      data = subset(df, pft != "c3_legume" & photo == "c3"))
-marea_chi_c4 <- lmer(log(marea_chi) ~ vpd60 + (wn90_perc * soil.no3n) + (1 | NCRS.code),
+nmass_chi_c4 <- lmer(log(nmass_chi) ~ vpd60 + (wn07_perc * soil.no3n) + (1 | NCRS.code),
                      data = subset(df, pft != "c3_legume" & photo == "c4"))
-nmass_chi_c3 <- lmer(log(nmass_chi) ~ vpd90 + (wn90_perc * soil.no3n) + (1 | NCRS.code),
+marea_chi_c3 <- lmer(log(marea_chi) ~ vpd90 + (wn20_perc * soil.no3n) + (1 | NCRS.code),
                      data = subset(df, pft != "c3_legume" & photo == "c3"))
-nmass_chi_c4 <- lmer(log(nmass_chi) ~ vpd60 + (wn90_perc * soil.no3n) + (1 | NCRS.code),
+marea_chi_c4 <- lmer(log(marea_chi) ~ vpd60 + (wn07_perc * soil.no3n) + (1 | NCRS.code),
                      data = subset(df, pft != "c3_legume" & photo == "c4"))
-
 
 ##########################################################################
 ##########################################################################
@@ -106,84 +99,15 @@ nmass_chi_c4 <- lmer(log(nmass_chi) ~ vpd60 + (wn90_perc * soil.no3n) + (1 | NCR
 ##########################################################################
 
 ##########################################################################
-## Chi - VPD (C3)
-##########################################################################
-# Check model result
-Anova(chi_c3)
-
-# Trendline prep
-chi_vpd_c3 <- data.frame(
-  emmeans(chi_c3, ~1, "vpd90", at = list(vpd90 = seq(0.9, 1.4, 0.01))))
-
-# Plot
-chi_vpd_c3_plot <- ggplot(data = subset(df, pft == "c3_nonlegume"),
-                          aes(x = vpd90, y = chi)) +
-  geom_point(size = 3, alpha = 0.6, shape = 21, fill = "#446455") +
-  geom_ribbon(data = chi_vpd_c3, 
-              aes(x = vpd90, y = emmean, ymin = lower.CL, 
-                  ymax = upper.CL), fill = "#446455", alpha = 0.5) +
-  geom_line(data = chi_vpd_c3, aes(x = vpd90, y = emmean), 
-            linewidth = 2, color = "#446455") +
-  scale_x_continuous(limits = c(0.9, 1.4), breaks = seq(0.9, 1.4, 0.1)) +
-  scale_y_continuous(limits = c(0.6, 1), breaks = seq(0.6, 1, 0.1)) +
-  labs(x = expression(bold("Vapor pressure deficit (kPa)")),
-       y = expression(bold("Leaf C"["i"]*" : C"["a"]*" (unitless)"))) +
-  theme_bw(base_size = 20) +
-  theme(legend.text.align = 0,
-        panel.border = element_rect(size = 1.25),
-        axis.title = element_text(face = "bold", size = 20),
-        axis.text = element_text(color = "black", size = 20))
-chi_vpd_c3_plot
-
-##########################################################################
-## Chi - soil N (C3)
-##########################################################################
-
-# Plot
-chi_no3n_c3_plot <- ggplot(data = subset(df, pft == "c3_nonlegume"),
-                          aes(x = soil.no3n, y = chi)) +
-  geom_point(size = 3, alpha = 0.6, shape = 21, fill = "#446455") +
-  scale_x_continuous(limits = c(-1, 80), breaks = seq(0, 80, 20)) +
-  scale_y_continuous(limits = c(0.6, 1), breaks = seq(0.6, 1, 0.1)) +
-  labs(x = expression(bold("N availability (ppm NO"[3]*"-N)")),
-       y = expression(bold("Leaf C"["i"]*" : C"["a"]*" (unitless)"))) +
-  theme_bw(base_size = 20) +
-  theme(legend.text.align = 0,
-        panel.border = element_rect(size = 1.25),
-        axis.title = element_text(face = "bold", size = 20),
-        axis.text = element_text(color = "black", size = 20))
-chi_no3n_c3_plot
-
-##########################################################################
-## Chi - soil moisture (C3)
-##########################################################################
-Anova(chi_c3)
-
-# Plot
-chi_wn90_c3_plot <- ggplot(data = subset(df, pft == "c3_nonlegume"),
-                           aes(x = wn90_perc, y = chi)) +
-  geom_point(size = 3, alpha = 0.6, shape = 21, fill = "#446455") +
-  scale_x_continuous(limits = c(0.125, 0.775), breaks = seq(0.15, 0.75, 0.15),
-                     labels = seq(15, 75, 15)) +
-  scale_y_continuous(limits = c(0.6, 1), breaks = seq(0.6, 1, 0.1)) +
-  labs(x = expression(bold("Soil moisture (% WHC)")),
-       y = expression(bold("Leaf C"["i"]*" : C"["a"]*" (unitless)"))) +
-  theme_bw(base_size = 20) +
-  theme(legend.text.align = 0,
-        panel.border = element_rect(size = 1.25),
-        axis.title = element_text(face = "bold", size = 20),
-        axis.text = element_text(color = "black", size = 20))
-chi_wn90_c3_plot
-
-##########################################################################
 ## Narea - chi (C3)
 ##########################################################################
 # Check model result
 Anova(narea_c3)
+test(emtrends(narea_c3, ~1, "chi"))
 
 # Trendline prep
 narea_chi_c3_reg <- data.frame(emmeans(narea_c3, ~1, "chi",
-                                     at = list(chi = seq(0.6, 1, 0.01))))
+                                       at = list(chi = seq(0.6, 1, 0.01))))
 
 # Plot
 narea_chi_c3_plot <- ggplot(data = subset(df, pft == "c3_nonlegume"),
@@ -197,22 +121,45 @@ narea_chi_c3_plot <- ggplot(data = subset(df, pft == "c3_nonlegume"),
   scale_x_continuous(limits = c(0.6, 1), breaks = seq(0.6, 1, 0.1)) +
   scale_y_continuous(limits = c(-0.25, 2.25), breaks = seq(-0, 2, 1)) +
   labs(x = expression(bold(chi*" (unitless)")),
+       y = expression(bold(ln)*bolditalic("  N")[bold("area")]*bold(" (gN m"^"-2"*")"))) +
+  theme_bw(base_size = 20) +
+  theme(legend.text.align = 0,
+        panel.border = element_rect(linewidth = 1.25),
+        axis.title = element_text(face = "bold", size = 20),
+        axis.text = element_text(color = "black", size = 20))
+narea_chi_c3_plot
+
+##########################################################################
+## Narea - VPD  (C3)
+##########################################################################
+# Check model result
+Anova(narea_c3)
+
+# Plot
+narea_vpd_c3_plot <- ggplot(data = subset(df, pft == "c3_nonlegume"),
+                            aes(x = vpd90, y = log(narea))) +
+  geom_point(size = 3, alpha = 0.6, shape = 21, fill = "#446455") +
+  scale_x_continuous(limits = c(0.9, 1.4), breaks = seq(1.0, 1.4, 0.2)) +
+  scale_y_continuous(limits = c(-1, 3), breaks = seq(-1, 3, 1)) +
+  labs(x = "VPD (kPa)",
        y = expression(bold(ln*" N"["area"]*" (gN m"^"-2"*")"))) +
   theme_bw(base_size = 20) +
   theme(legend.text.align = 0,
         panel.border = element_rect(size = 1.25),
         axis.title = element_text(face = "bold", size = 20),
         axis.text = element_text(color = "black", size = 20))
-narea_chi_c3_plot
+narea_vpd_c3_plot
+
 
 ##########################################################################
 ## Narea - soil N  (C3)
 ##########################################################################
 # Check model result
 Anova(narea_c3)
+test(emtrends(narea_c3, ~wn20_perc, "soil.no3n", at = list(wn20_perc = seq(0, 1, 0.25))))
 
 # Trendline prep
-narea_no3n_c3 <- data.frame(emmeans(narea_c3, ~1, "soil.no3n",
+narea_no3n_c3 <- data.frame(emmeans(narea_c3, ~, "soil.no3n",
                                     at = list(soil.no3n = seq(0, 80, 1))))
 
 # Plot
@@ -419,6 +366,76 @@ marea_wn90_c3_plot <- ggplot(data = subset(df, pft == "c3_nonlegume"),
         axis.title = element_text(face = "bold", size = 20),
         axis.text = element_text(color = "black", size = 20))
 marea_wn90_c3_plot
+
+##########################################################################
+## Chi - VPD (C3)
+##########################################################################
+# Check model result
+Anova(chi_c3)
+
+# Trendline prep
+chi_vpd_c3 <- data.frame(
+  emmeans(chi_c3, ~1, "vpd90", at = list(vpd90 = seq(0.9, 1.4, 0.01))))
+
+# Plot
+chi_vpd_c3_plot <- ggplot(data = subset(df, pft == "c3_nonlegume"),
+                          aes(x = vpd90, y = chi)) +
+  geom_point(size = 3, alpha = 0.6, shape = 21, fill = "#446455") +
+  geom_ribbon(data = chi_vpd_c3, 
+              aes(x = vpd90, y = emmean, ymin = lower.CL, 
+                  ymax = upper.CL), fill = "#446455", alpha = 0.5) +
+  geom_line(data = chi_vpd_c3, aes(x = vpd90, y = emmean), 
+            linewidth = 2, color = "#446455") +
+  scale_x_continuous(limits = c(0.9, 1.4), breaks = seq(0.9, 1.4, 0.1)) +
+  scale_y_continuous(limits = c(0.6, 1), breaks = seq(0.6, 1, 0.1)) +
+  labs(x = expression(bold("Vapor pressure deficit (kPa)")),
+       y = expression(bold("Leaf C"["i"]*" : C"["a"]*" (unitless)"))) +
+  theme_bw(base_size = 20) +
+  theme(legend.text.align = 0,
+        panel.border = element_rect(size = 1.25),
+        axis.title = element_text(face = "bold", size = 20),
+        axis.text = element_text(color = "black", size = 20))
+chi_vpd_c3_plot
+
+##########################################################################
+## Chi - soil N (C3)
+##########################################################################
+
+# Plot
+chi_no3n_c3_plot <- ggplot(data = subset(df, pft == "c3_nonlegume"),
+                           aes(x = soil.no3n, y = chi)) +
+  geom_point(size = 3, alpha = 0.6, shape = 21, fill = "#446455") +
+  scale_x_continuous(limits = c(-1, 80), breaks = seq(0, 80, 20)) +
+  scale_y_continuous(limits = c(0.6, 1), breaks = seq(0.6, 1, 0.1)) +
+  labs(x = expression(bold("N availability (ppm NO"[3]*"-N)")),
+       y = expression(bold("Leaf C"["i"]*" : C"["a"]*" (unitless)"))) +
+  theme_bw(base_size = 20) +
+  theme(legend.text.align = 0,
+        panel.border = element_rect(size = 1.25),
+        axis.title = element_text(face = "bold", size = 20),
+        axis.text = element_text(color = "black", size = 20))
+chi_no3n_c3_plot
+
+##########################################################################
+## Chi - soil moisture (C3)
+##########################################################################
+Anova(chi_c3)
+
+# Plot
+chi_wn90_c3_plot <- ggplot(data = subset(df, pft == "c3_nonlegume"),
+                           aes(x = wn90_perc, y = chi)) +
+  geom_point(size = 3, alpha = 0.6, shape = 21, fill = "#446455") +
+  scale_x_continuous(limits = c(0.125, 0.775), breaks = seq(0.15, 0.75, 0.15),
+                     labels = seq(15, 75, 15)) +
+  scale_y_continuous(limits = c(0.6, 1), breaks = seq(0.6, 1, 0.1)) +
+  labs(x = expression(bold("Soil moisture (% WHC)")),
+       y = expression(bold("Leaf C"["i"]*" : C"["a"]*" (unitless)"))) +
+  theme_bw(base_size = 20) +
+  theme(legend.text.align = 0,
+        panel.border = element_rect(size = 1.25),
+        axis.title = element_text(face = "bold", size = 20),
+        axis.text = element_text(color = "black", size = 20))
+chi_wn90_c3_plot
 
 ##########################################################################
 ## Narea:chi - VPD (C3)

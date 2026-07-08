@@ -38,7 +38,8 @@ df <- read.csv("../../TXeco/data/TXeco_data.csv",
          nmass_chi = n.leaf / chi,
          pft = factor(pft, 
                       levels = c("c3_legume", "c4_nonlegume", "c3_nonlegume")),
-         photo = factor(photo, levels = c("c3", "c4"))) 
+         photo = factor(photo, levels = c("c3", "c4")))
+df$chi[404] <- NA
 
 ## Number of species
 length(unique(df$NCRS.code))
@@ -80,58 +81,6 @@ df <- df %>% mutate(narea_chi = ifelse(narea_chi > 10, NA, narea_chi),
                     nmass_chi = ifelse(nmass_chi > 10, NA, nmass_chi))
 
 ##########################################################################
-## Chi - C3
-##########################################################################
-df$chi[404] <- NA
-
-chi_c3 <- lmer(chi ~ vpd90 + (wn20_perc * soil.no3n) +  (1 | NCRS.code), 
-              data = subset(df, pft != "c3_legume" & photo == "c3"))
-
-# Check model assumptions
-plot(chi_c3)
-qqnorm(residuals(chi_c3))
-qqline(residuals(chi_c3))
-densityPlot(residuals(chi_c3))
-shapiro.test(residuals(chi_c3))
-outlierTest(chi_c3)
-
-# Model output
-summary(chi_c3)
-Anova(chi_c3)
-performance(chi_c3)
-
-## Post-hoc comparisons 
-test(emtrends(chi_c3, ~1, "vpd90"))
-test(emtrends(chi_c3, ~1, "wn20_perc"))
-
-test(emtrends(chi_c3, ~soil.no3n, "vpd90", at = list(soil.no3n = seq(0,80,1))))
-test(emtrends(chi_c3, ~soil.no3n, "wn20_perc", at = list(soil.no3n = seq(0,80,1))))
-
-test(emtrends(chi_c3, ~wn20_perc, "soil.no3n", at = list(wn20_perc = seq(0.2,0.8,0.01))))
-
-##########################################################################
-## Chi - C4
-##########################################################################
-chi_c4 <- lmer(chi ~ vpd60 + (wn07_perc * soil.no3n) +  (1 | NCRS.code),
-               data = subset(df, pft != "c3_legume" & photo == "c4"))
-
-# Check model assumptions
-plot(chi_c4)
-qqnorm(residuals(chi_c4))
-qqline(residuals(chi_c4))
-densityPlot(residuals(chi_c4))
-shapiro.test(residuals(chi_c4))
-outlierTest(chi_c4)
-
-# Model output
-summary(chi_c4)
-Anova(chi_c4)
-performance(chi_c4)
-
-## Post-hoc comparisons 
-test(emtrends(chi_c4, ~1, "vpd60"))
-
-##########################################################################
 ## Narea - C3
 ##########################################################################
 df$narea[454] <- NA
@@ -157,10 +106,8 @@ performance(narea_c3)
 ## Post hoc comparisons
 test(emtrends(narea_c3, ~1, "chi", type = "response"))
 test(emtrends(narea_c3, ~1, "wn20_perc", type = "response"))
-
 test(emtrends(narea_c3, ~wn20_perc, "soil.no3n", type = "response", 
               at = list(wn20_perc = seq(0.2, 0.7, 0.01))))
-
 test(emtrends(narea_c3, ~soil.no3n, "wn20_perc", type = "response", 
               at = list(soil.no3n = seq(0, 80, 1))))
 
@@ -304,6 +251,56 @@ test(emtrends(marea_c4, ~1, "wn07_perc"))
 test(emtrends(marea_c4, ~1, "soil.no3n"))
 
 test(emtrends(marea_c4, ~wn07_perc, "soil.no3n", at = list(wn07_perc = seq(0, 1, 0.01))))
+
+##########################################################################
+## Chi - C3
+##########################################################################
+chi_c3 <- lmer(chi ~ vpd90 + (wn20_perc * soil.no3n) +  (1 | NCRS.code), 
+               data = subset(df, pft != "c3_legume" & photo == "c3"))
+
+# Check model assumptions
+plot(chi_c3)
+qqnorm(residuals(chi_c3))
+qqline(residuals(chi_c3))
+densityPlot(residuals(chi_c3))
+shapiro.test(residuals(chi_c3))
+outlierTest(chi_c3)
+
+# Model output
+summary(chi_c3)
+Anova(chi_c3)
+performance(chi_c3)
+
+## Post-hoc comparisons 
+test(emtrends(chi_c3, ~1, "vpd90"))
+test(emtrends(chi_c3, ~1, "wn20_perc"))
+
+test(emtrends(chi_c3, ~soil.no3n, "vpd90", at = list(soil.no3n = seq(0,80,1))))
+test(emtrends(chi_c3, ~soil.no3n, "wn20_perc", at = list(soil.no3n = seq(0,80,1))))
+
+test(emtrends(chi_c3, ~wn20_perc, "soil.no3n", at = list(wn20_perc = seq(0.2,0.8,0.01))))
+
+##########################################################################
+## Chi - C4
+##########################################################################
+chi_c4 <- lmer(chi ~ vpd60 + (wn07_perc * soil.no3n) +  (1 | NCRS.code),
+               data = subset(df, pft != "c3_legume" & photo == "c4"))
+
+# Check model assumptions
+plot(chi_c4)
+qqnorm(residuals(chi_c4))
+qqline(residuals(chi_c4))
+densityPlot(residuals(chi_c4))
+shapiro.test(residuals(chi_c4))
+outlierTest(chi_c4)
+
+# Model output
+summary(chi_c4)
+Anova(chi_c4)
+performance(chi_c4)
+
+## Post-hoc comparisons 
+test(emtrends(chi_c4, ~1, "vpd60"))
 
 ##########################################################################
 ## Narea:chi - C3
@@ -530,7 +527,6 @@ narea_psem_c4 <- psem(
   chi = lmer(chi ~ vpd60 + (soil.no3n * wn07_perc) + (1 | NCRS.code),
              data = df.psem.c4, na.action = na.exclude))
 summary(narea_psem_c4)
-
 
 line.thick.c4 <- data.frame(
   summary(narea_psem_c4)$coefficients,
