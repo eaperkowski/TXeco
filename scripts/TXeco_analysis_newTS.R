@@ -2,15 +2,13 @@
 ## Load libraries and import data
 ##########################################################################
 # Libraries
+library(tidyverse)
 library(lme4)
+library(performance)
 library(emmeans)
 library(car)
-library(tidyverse)
-library(MuMIn)
 library(multcomp)
-library(multcompView)
 library(piecewiseSEM)
-library(performance)
 
 # Turn off digit rounding in emmean args
 emm_options(opt.digits = FALSE)
@@ -39,55 +37,48 @@ df <- read.csv("../../TXeco/data/TXeco_data.csv",
          pft = factor(pft, 
                       levels = c("c3_legume", "c4_nonlegume", "c3_nonlegume")),
          photo = factor(photo, levels = c("c3", "c4")))
-df$chi[404] <- NA
+
+# Remove outliers from statistical models
+df$chi[c(402, 404)] <- NA
+df$narea[c(252, 254, 454)] <- NA
+df$n.leaf[c(257, 327, 454)] <- NA
+df$marea[c(20, 21, 252, 254)] <- NA
+df$marea_chi[c(20, 21)] <- NA
+df$nmass_chi[c(454)] <- NA
+
+# Subset dataset to include complete cases only (i.e., those that do not have any 
+# NA values across chi, Narea, Nmass, and Marea)
+model_vars <- c("narea", "n.leaf", "marea", "chi")
+df_completeCases <- df[complete.cases(df[, model_vars]), ]
 
 ## Number of species
-length(unique(df$NCRS.code))
+length(unique(subset(df_completeCases, pft != "c3_legume")$NCRS.code))
 
 ## How many samples within each pft class? (including legume classification)
-df %>% group_by(pft) %>%
-  summarize(n.pft = length(NCRS.code))
-
-## How many samples within each pft class (not including legume classification)
-df %>% group_by(photo) %>%
-  summarize(n.pft = length(NCRS.code))
-
-## How many species within each pft class? (including legume classification)
-df %>% group_by(pft) %>% distinct(NCRS.code) %>%
+df_completeCases %>% group_by(pft) %>%
   summarize(n.pft = length(NCRS.code))
 
 ## How many species within each pft class? (not including legume classification)
-df %>% group_by(pft) %>% distinct(NCRS.code) %>%
+df_completeCases %>% group_by(pft) %>% distinct(NCRS.code) %>%
   summarize(n.pft = length(NCRS.code))
 
-## How many NA values for chi (i.e., not between 0.1 and 0.95)
-df %>% filter(is.na(chi)) %>%
-  group_by(pft) %>%
-  summarize(removed.chi = length(!is.na(chi)))
-
-## How many reps per species?
-df %>%
-  group_by(NCRS.code) %>%
-  summarize(n.spp = length(NCRS.code))
-
 ## Any major outliers with Narea:chi, Marea:chi, or Nmass:chi?
-hist(df$narea_chi)
-hist(df$marea_chi)
-hist(df$nmass_chi)
+hist(df_completeCases$narea_chi)
+hist(df_completeCases$marea_chi)
+hist(df_completeCases$nmass_chi)
 
 ## Remove Narea:chi, Marea:chi, and Nmass:chi outliers
-df <- df %>% mutate(narea_chi = ifelse(narea_chi > 10, NA, narea_chi),
-                    marea_chi = ifelse(marea_chi > 1000, NA, marea_chi),
-                    nmass_chi = ifelse(nmass_chi > 10, NA, nmass_chi))
+df_completeCases <- df_completeCases %>% 
+  mutate(narea_chi = ifelse(narea_chi > 10, NA, narea_chi),
+         marea_chi = ifelse(marea_chi > 1000, NA, marea_chi),
+         nmass_chi = ifelse(nmass_chi > 10, NA, nmass_chi))
 
 ##########################################################################
 ## Narea - C3
 ##########################################################################
-df$narea[454] <- NA
-
 # Fit model
 narea_c3 <- lmer(log(narea) ~ chi + (vpd90 + (wn20_perc * soil.no3n)) + (1 | NCRS.code),
-              data = subset(df, pft != "c3_legume" & photo == "c3"))
+              data = subset(df_completeCases, pft == "c3_nonlegume"))
 
 # Check model assumptions
 plot(narea_c3)
@@ -111,15 +102,12 @@ test(emtrends(narea_c3, ~wn20_perc, "soil.no3n", type = "response",
 test(emtrends(narea_c3, ~soil.no3n, "wn20_perc", type = "response", 
               at = list(soil.no3n = seq(0, 80, 1))))
 
-
 ##########################################################################
 ## Narea - C4
 ##########################################################################
-df$narea[c(252, 254)] <- NA
-
 # Fit model
 narea_c4 <- lmer(log(narea) ~ chi + vpd60 + (wn07_perc * soil.no3n) + (1 | NCRS.code),
-                 data = subset(df, pft != "c3_legume" & photo == "c4"))
+                 data = subset(df_completeCases, pft == "c4_nonlegume"))
 
 # Check model assumptions
 plot(narea_c4)
@@ -141,11 +129,9 @@ test(emtrends(narea_c4, ~1, "vpd60"))
 ##########################################################################
 ## Nmass - C3
 ##########################################################################
-df$n.leaf[454] <- NA
-
 # Fit model
 nmass_c3 <- lmer(log(n.leaf) ~ chi + (vpd90 + (wn20_perc * soil.no3n)) + (1 | NCRS.code),
-              data = subset(df, pft != "c3_legume" & photo == "c3"))
+              data = subset(df_completeCases, pft == "c3_nonlegume"))
 
 # Check model assumptions
 plot(nmass_c3)
@@ -169,11 +155,9 @@ test(emtrends(nmass_c3, ~wn20_perc, "soil.no3n", type = "response",
 ##########################################################################
 ## Nmass - C4
 ##########################################################################
-df$n.leaf[c(257, 327)] <- NA
-
 # Fit model
 nmass_c4 <- lmer(log(n.leaf) ~ chi + (vpd60 + (wn07_perc * soil.no3n)) + (1 | NCRS.code),
-                 data = subset(df, pft != "c3_legume" & photo == "c4"))
+                 data = subset(df_completeCases, pft == "c4_nonlegume"))
 
 # Check model assumptions
 plot(nmass_c4)
@@ -187,7 +171,7 @@ outlierTest(nmass_c4)
 # Model output
 summary(nmass_c4)
 Anova(nmass_c4)
-r.squaredGLMM(nmass_c4)
+performance(nmass_c4)
 
 # Post hoc tests
 test(emtrends(nmass_c4, ~1, "chi"))
@@ -197,11 +181,9 @@ test(emtrends(nmass_c4, ~1, "soil.no3n"))
 ##########################################################################
 ## Marea - C3
 ##########################################################################
-df$marea[c(20, 21)] <- NA
-
 # Fit model
 marea_c3 <- lmer(log(marea) ~ chi + (vpd90 + (wn20_perc * soil.no3n)) + (1 | NCRS.code),
-              data = subset(df, pft != "c3_legume" & photo == "c3"))
+              data = subset(df_completeCases, pft == "c3_nonlegume"))
 
 # Check model assumptions
 plot(marea_c3)
@@ -215,7 +197,7 @@ outlierTest(marea_c3)
 # Model output
 summary(marea_c3)
 Anova(marea_c3)
-r.squaredGLMM(marea_c3)
+performance(marea_c3)
 
 # Post-hoc comparisons
 test(emtrends(marea_c3, ~1, "chi"))
@@ -226,11 +208,9 @@ test(emtrends(marea_c3, ~wn20_perc, "soil.no3n", at = list(wn20_perc = seq(0, 1,
 ##########################################################################
 ## Marea - C4
 ##########################################################################
-df$marea[c(252, 254)] <- NA
-
 # Fit model
 marea_c4 <- lmer(log(marea) ~ (chi + vpd60 + (wn07_perc * soil.no3n)) + (1 | NCRS.code),
-                 data = subset(df, pft != "c3_legume" & photo == "c4"))
+                 data = subset(df_completeCases, pft == "c4_nonlegume"))
 
 # Check model assumptions
 plot(marea_c4)
@@ -256,7 +236,7 @@ test(emtrends(marea_c4, ~wn07_perc, "soil.no3n", at = list(wn07_perc = seq(0, 1,
 ## Chi - C3
 ##########################################################################
 chi_c3 <- lmer(chi ~ vpd90 + (wn20_perc * soil.no3n) +  (1 | NCRS.code), 
-               data = subset(df, pft != "c3_legume" & photo == "c3"))
+               data = subset(df_completeCases, pft == "c3_nonlegume"))
 
 # Check model assumptions
 plot(chi_c3)
@@ -273,18 +253,14 @@ performance(chi_c3)
 
 ## Post-hoc comparisons 
 test(emtrends(chi_c3, ~1, "vpd90"))
-test(emtrends(chi_c3, ~1, "wn20_perc"))
-
 test(emtrends(chi_c3, ~soil.no3n, "vpd90", at = list(soil.no3n = seq(0,80,1))))
-test(emtrends(chi_c3, ~soil.no3n, "wn20_perc", at = list(soil.no3n = seq(0,80,1))))
-
 test(emtrends(chi_c3, ~wn20_perc, "soil.no3n", at = list(wn20_perc = seq(0.2,0.8,0.01))))
 
 ##########################################################################
 ## Chi - C4
 ##########################################################################
 chi_c4 <- lmer(chi ~ vpd60 + (wn07_perc * soil.no3n) +  (1 | NCRS.code),
-               data = subset(df, pft != "c3_legume" & photo == "c4"))
+               data = subset(df_completeCases, pft == "c4_nonlegume"))
 
 # Check model assumptions
 plot(chi_c4)
@@ -306,7 +282,7 @@ test(emtrends(chi_c4, ~1, "vpd60"))
 ## Narea:chi - C3
 ##########################################################################
 narea_chi_c3 <- lmer(log(narea_chi) ~ vpd90 + (wn20_perc * soil.no3n) + (1 | NCRS.code),
-                     data = subset(df, pft != "c3_legume" & photo == "c3"))
+                     data = subset(df_completeCases, pft == "c3_nonlegume"))
 
 # Check model assumptions
 plot(narea_chi_c3)
@@ -320,18 +296,18 @@ outlierTest(narea_chi_c3)
 # Model output
 round(summary(narea_chi_c3)$coefficients, digits = 3)
 Anova(narea_chi_c3)
-r.squaredGLMM(narea_chi_c3)
+performance(narea_chi_c3)
 
 # Pairwise comparisons
 test(emtrends(narea_chi_c3, ~1, "vpd90")) # Increases with VPD
-test(emtrends(narea_chi_c3, ~1, "wn20_perc")) # Increases with soil moisture
-test(emtrends(narea_chi_c3, ~wn20_perc, "soil.no3n", at = list(wn20_perc = seq(0.2, 0.8, 0.01))))
+test(emtrends(narea_chi_c3, ~wn20_perc, "soil.no3n", 
+              at = list(wn20_perc = c(0.2, 0.5, 0.8))))
 
 ##########################################################################
 ## Narea:chi - C4
 ##########################################################################
 narea_chi_c4 <- lmer(log(narea_chi) ~ vpd60 + (wn07_perc * soil.no3n) + (1 | NCRS.code),
-                     data = subset(df, pft != "c3_legume" & photo == "c4"))
+                     data = subset(df_completeCases, pft == "c4_nonlegume"))
 
 # Check model assumptions
 plot(narea_chi_c4)
@@ -345,7 +321,7 @@ outlierTest(narea_chi_c4)
 # Model output
 round(summary(narea_chi_c4)$coefficients, digits = 3)
 Anova(narea_chi_c4)
-r.squaredGLMM(narea_chi_c4)
+performance(narea_chi_c4)
 
 # Pairwise comparisons
 test(emtrends(narea_chi_c4, ~1, "vpd60")) # Increases with vpd60
@@ -353,10 +329,8 @@ test(emtrends(narea_chi_c4, ~1, "vpd60")) # Increases with vpd60
 ##########################################################################
 ## Marea:chi - C3
 ##########################################################################
-df$marea_chi[c(20, 21)] <- NA
-
 marea_chi_c3 <- lmer(log(marea_chi) ~ vpd90 + (wn20_perc * soil.no3n) + (1 | NCRS.code),
-                     data = subset(df, pft != "c3_legume" & photo == "c3"))
+                     data = subset(df_completeCases, pft == "c3_nonlegume"))
 
 # Check model assumptions
 plot(marea_chi_c3)
@@ -370,17 +344,19 @@ outlierTest(marea_chi_c3)
 # Model output
 round(summary(marea_chi_c3)$coefficients, digits = 3)
 Anova(marea_chi_c3)
-r.squaredGLMM(marea_chi_c3)
+performance(marea_chi_c3)
 
 # Pairwise comparisons
-test(emtrends(marea_chi_c3, ~1, "vpd90")) # Increases with VPD
 test(emtrends(marea_chi_c3, ~1, "soil.no3n")) # Decreases with soil N
+test(emtrends(marea_chi_c3, ~wn20_perc, "soil.no3n",
+              at = list(wn20_perc = c(0.2, 0.5, 0.8))))
+
 
 ##########################################################################
 ## Marea:chi - C4
 ##########################################################################
 marea_chi_c4 <- lmer(log(marea_chi) ~ vpd60 + (wn07_perc * soil.no3n) + (1 | NCRS.code),
-                     data = subset(df, pft != "c3_legume" & photo == "c4"))
+                     data = subset(df_completeCases, pft == "c4_nonlegume"))
 
 # Check model assumptions
 plot(marea_chi_c4)
@@ -394,18 +370,16 @@ outlierTest(marea_chi_c4)
 # Model output
 round(summary(marea_chi_c4)$coefficients, digits = 3)
 Anova(marea_chi_c4)
-r.squaredGLMM(marea_chi_c4)
+performance(marea_chi_c4)
 
 # Pairwise comparisons
-test(emtrends(marea_chi_c4, ~1, "wn07_perc")) # Increases with soil moisture
+test(emtrends(marea_chi_c4, ~1, "vpd60")) # Decreases with VPD
 
 ##########################################################################
 ## Nmass:chi - C3
 ##########################################################################
-df$nmass_chi[c(454)] <- NA
-
 nmass_chi_c3 <- lmer(log(nmass_chi) ~ vpd90 + (wn20_perc * soil.no3n) + (1 | NCRS.code),
-                     data = subset(df, pft != "c3_legume" & photo == "c3"))
+                     data = subset(df_completeCases, pft == "c3_nonlegume"))
 
 # Check model assumptions
 plot(nmass_chi_c3)
@@ -419,18 +393,17 @@ outlierTest(nmass_chi_c3)
 # Model output
 round(summary(nmass_chi_c3)$coefficients, digits = 3)
 Anova(nmass_chi_c3)
-r.squaredGLMM(nmass_chi_c3)
+performance(nmass_chi_c3)
 
 # Pairwise comparisons
-test(emtrends(nmass_chi_c3, ~1, "soil.no3n")) # Increases with VPD
+test(emtrends(nmass_chi_c3, ~1, "soil.no3n"))
 test(emtrends(nmass_chi_c3, ~wn20_perc, "soil.no3n",
-              at = list(wn20_perc = seq(0.2, 0.8, 0.2)))) # Increases with soil N
-
+              at = list(wn20_perc = c(0.2, 0.5, 0.8))))
 ##########################################################################
 ## Nmass:chi - C4
 ##########################################################################
 nmass_chi_c4 <- lmer(log(nmass_chi) ~ vpd60 + (wn07_perc * soil.no3n) + (1 | NCRS.code),
-                     data = subset(df, pft != "c3_legume" & photo == "c4"))
+                     data = subset(df_completeCases, pft == "c4_nonlegume"))
 
 # Check model assumptions
 plot(nmass_chi_c4)
@@ -444,7 +417,7 @@ outlierTest(nmass_chi_c4)
 # Model output
 round(summary(nmass_chi_c4)$coefficients, digits = 3)
 Anova(nmass_chi_c4)
-r.squaredGLMM(nmass_chi_c4)
+performance(nmass_chi_c4)
 
 # Pairwise comparisons
 test(emtrends(nmass_chi_c4, ~1, "vpd60")) # Decreases with VPD
@@ -452,7 +425,7 @@ test(emtrends(nmass_chi_c4, ~1, "vpd60")) # Decreases with VPD
 ##########################################################################
 ## Structural equation model - all photosynthetic pathways
 ##########################################################################
-df.psem <- subset(df, pft!= "c3_legume") %>%
+df.psem <- subset(df_completeCases, pft!= "c3_legume") %>%
   dplyr::select(site:leaf.area, nmass = n.leaf, cmass = c.leaf, everything())
 df.psem$narea.trans <- log(df.psem$narea)
 df.psem$nmass.trans <- log(df.psem$nmass)
@@ -463,16 +436,14 @@ sem_vars_c3 <- c("NCRS.code", "narea.trans", "narea", "nmass.trans", "nmass",
                  "marea.trans", "marea", "chi", "vpd90", "wn20_perc", 
                  "soil.no3n")
 df.psem.c3 <- subset(df.psem, photo == "c3") %>%
-  dplyr::select(all_of(sem_vars_c3)) %>%
-  na.omit()
+  dplyr::select(all_of(sem_vars_c3))
 
 # Create C4 pSEM dataset
 sem_vars_c4 <- c("NCRS.code", "narea.trans", "narea", "nmass.trans", "nmass", 
                  "marea.trans", "marea", "chi", "vpd60", "wn07_perc", 
                  "soil.no3n")
 df.psem.c4 <- subset(df.psem, photo == "c4") %>%
-  dplyr::select(all_of(sem_vars_c4)) %>%
-  na.omit()
+  dplyr::select(all_of(sem_vars_c4))
 
 ##########################################################################
 ## Structural equation model - C3 only

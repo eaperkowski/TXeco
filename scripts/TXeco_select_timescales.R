@@ -35,6 +35,12 @@ df <- read.csv("../../TXeco/data/TXeco_data.csv",
 df.nolegume <- subset(df, pft != "c3_legume")
 df.nolegume$chi[404] <- NA
 
+# Subset dataset to include complete cases only (i.e., those that do not have any 
+# NA values across chi, Narea, Nmass, and Marea)
+model_vars <- c("narea", "n.leaf", "marea", "chi")
+df_completeCases <- df.nolegume[complete.cases(df.nolegume[, model_vars]), ]
+
+
 ###############################################################################
 # Let's figure out the best timescale combination
 ###############################################################################
@@ -45,7 +51,7 @@ full_grid <- expand.grid(photo = c("c3", "c4"),
                          sm_ts = timescales, 
                          vpd_ts = timescales,
                          stringsAsFactors = FALSE) %>%
-  mutate(data_subset = map(photo, ~subset(df.nolegume, photo == .x)),
+  mutate(data_subset = map(photo, ~subset(df_completeCases, photo == .x)),
          vpd_var = paste0("vpd", sprintf("%02d", vpd_ts)),
          sm_var  = paste0("wn", sprintf("%02d", sm_ts), "_perc"))
 
