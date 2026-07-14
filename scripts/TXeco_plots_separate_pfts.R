@@ -201,7 +201,8 @@ narea_no3n_c3_plot <- ggplot(data = subset(df_completeCases, pft == "c3_nonlegum
   theme(legend.text.align = 0,
         panel.border = element_rect(size = 1.25),
         axis.title = element_text(face = "bold", size = 20),
-        axis.text = element_text(color = "black", size = 20))
+        axis.text = element_text(color = "black", size = 20),
+        legend.title = element_text(size = 24))
 narea_no3n_c3_plot
 
 ##########################################################################
@@ -570,7 +571,7 @@ narea_chi_vpd_c3_plot <- ggplot(data = subset(df_completeCases, pft == "c3_nonle
   geom_line(data = narea_chi_vpd_c3_reg, 
             aes(x = vpd90, y = emmean),
             size = 2, color = "black") +
-  scale_y_continuous(limits = c(-0.25, 2.25), breaks = seq(0, 2.25, 1)) +
+  scale_y_continuous(limits = c(-0.25, 2.5), breaks = seq(0, 2.5, 1)) +
   labs(x = expression(bold("VPD"["90"]*" (kPa)")),
        y = expression(bold(ln)*bolditalic(" N")[bold("area")]*bold(":"*chi*" (unitless)"))) +
   theme_bw(base_size = 20) +
@@ -579,6 +580,27 @@ narea_chi_vpd_c3_plot <- ggplot(data = subset(df_completeCases, pft == "c3_nonle
         axis.title = element_text(face = "bold", size = 20),
         axis.text = element_text(color = "black", size = 20))
 narea_chi_vpd_c3_plot
+
+##########################################################################
+## Narea:chi - Soil moisture (C3)
+##########################################################################
+# Check model results
+Anova(narea_chi_c3)
+
+# Plot
+narea_chi_wn_c3_plot <- ggplot(data = subset(df_completeCases, pft == "c3_nonlegume"), 
+                               aes(x = wn20_perc, y = log(narea_chi))) +
+  geom_point(size = 3, alpha = 0.6, shape = 21, fill = "lightgrey") +
+  scale_x_continuous(limits = c(0, 1), breaks = c(0, 0.33, 0.67, 1)) +
+  scale_y_continuous(limits = c(-0.25, 2.5), breaks = seq(0, 2, 1)) +
+  labs(x = expression(bold("SM"["20"]*" (% WHC)")),
+       y = expression(bold(ln)*bolditalic(" N")[bold("area")]*bold(":"*chi*" (unitless)"))) +
+  theme_bw(base_size = 20) +
+  theme(legend.text.align = 0,
+        panel.border = element_rect(size = 1.25),
+        axis.title = element_text(face = "bold", size = 20),
+        axis.text = element_text(color = "black", size = 20))
+narea_chi_wn_c3_plot
 
 ##########################################################################
 ## Narea:chi - Soil N (C3)
@@ -602,7 +624,7 @@ narea_chi_soilN_c3_plot <- ggplot(data = subset(df_completeCases, pft == "c3_non
               aes(x = soil.no3n, y = emmean, color = factor(wn20_perc), 
                   linetype = linetype), size = 2, lineend = "round") +
   scale_x_continuous(limits = c(-1, 80), breaks = seq(0, 80, 20)) +
-  scale_y_continuous(limits = c(-0.25, 2.25), breaks = seq(0, 2.25, 1)) +
+  scale_y_continuous(limits = c(-0.25, 2.5), breaks = seq(0, 2, 1)) +
   scale_color_manual(values = c("#D11807", "#FD9A44", "#00767B"),
                      labels = c("20", "50", "80")) +
   scale_linetype_manual(values = c("dashed", "solid")) +
@@ -629,7 +651,7 @@ test(emtrends(nmass_chi_c3, ~1, "vpd90"))
 nmass_chi_vpd_c3_reg <- data.frame(emmeans(nmass_chi_c3, ~1, "vpd90",
                                            at = list(vpd90 = seq(0.95, 1.35, 0.01))))
 
-# Model
+# Plot
 nmass_chi_vpd_c3_plot <- ggplot(data = subset(df_completeCases, pft == "c3_nonlegume"), 
                                 aes(x = vpd90, y = log(nmass_chi))) +
   geom_point(size = 3, alpha = 0.6, shape = 21, fill = "lightgrey") +
@@ -641,7 +663,7 @@ nmass_chi_vpd_c3_plot <- ggplot(data = subset(df_completeCases, pft == "c3_nonle
             size = 2, color = "black") +
   scale_y_continuous(limits = c(-0.25, 2.25), breaks = seq(0, 2.25, 1)) +
   labs(x = expression(bold("VPD"["90"]*" (kPa)")),
-       y = expression(bold(ln)*bolditalic(" N")[bold("area")]*bold(":"*chi*" (unitless)"))) +
+       y = expression(bold(ln)*bolditalic(" N")[bold("mass")]*bold(":"*chi*" (unitless)"))) +
   theme_bw(base_size = 20) +
   theme(legend.text.align = 0,
         panel.border = element_rect(size = 1.25),
@@ -650,10 +672,45 @@ nmass_chi_vpd_c3_plot <- ggplot(data = subset(df_completeCases, pft == "c3_nonle
 nmass_chi_vpd_c3_plot
 
 ##########################################################################
+## Nmass:chi - soil moisture (C3)
+##########################################################################
+# Check model result
+Anova(nmass_chi_c3)
+test(emtrends(nmass_chi_c3, ~1, "wn20_perc"))
+
+# Trendline prep
+nmass_chi_wn_c3_reg <- data.frame(emmeans(nmass_chi_c3, ~1, "wn20_perc",
+                                           at = list(wn20_perc = seq(0, 1, 0.01))))
+
+# Plot
+nmass_chi_wn_c3_plot <- ggplot(data = subset(df_completeCases, pft == "c3_nonlegume"), 
+                                aes(x = wn20_perc, y = log(nmass_chi))) +
+  geom_point(size = 3, alpha = 0.6, shape = 21, fill = "lightgrey") +
+  geom_ribbon(data = nmass_chi_wn_c3_reg, 
+              aes(x = wn20_perc, y = emmean, ymin = lower.CL, ymax = upper.CL), 
+              alpha = 0.3, fill = "black") +
+  geom_line(data = nmass_chi_wn_c3_reg, 
+            aes(x = wn20_perc, y = emmean),
+            size = 2, color = "black") +
+  scale_x_continuous(limits = c(0, 1), breaks = c(0, 0.33, 0.67, 1),
+                     labels = c("0", "33", "67", "100")) +
+  scale_y_continuous(limits = c(-0.25, 2.25), breaks = seq(0, 2.25, 1)) +
+  labs(x = expression(bold("SM"["20"]*" (% WHC)")),
+       y = expression(bold(ln)*bolditalic(" N")[bold("mass")]*bold(":"*chi*" (unitless)"))) +
+  theme_bw(base_size = 20) +
+  theme(legend.text.align = 0,
+        panel.border = element_rect(size = 1.25),
+        axis.title = element_text(face = "bold", size = 20),
+        axis.text = element_text(color = "black", size = 20))
+nmass_chi_wn_c3_plot
+
+##########################################################################
 ## Nmass:chi - soil N (C3)
 ##########################################################################
 # Check model results
 Anova(nmass_chi_c3)
+test(emtrends(nmass_chi_c3, ~1, "wn20_perc"))
+
 test(emtrends(nmass_chi_c3, ~wn20_perc, "soil.no3n", at = list(wn20_perc = c(0.2, 0.5, 0.8))))
 
 # Trendline prep
@@ -686,32 +743,11 @@ nmass_chi_soilN_c3_plot <- ggplot(data = subset(df_completeCases, pft == "c3_non
 nmass_chi_soilN_c3_plot
 
 ##########################################################################
-## Narea:chi - Soil moisture (C3)
-##########################################################################
-# Check model results
-Anova(narea_chi_c3)
-
-# Plot
-narea_chi_wn_c3_plot <- ggplot(data = subset(df_completeCases, pft == "c3_nonlegume"), 
-                               aes(x = wn20_perc, y = log(narea_chi))) +
-  geom_point(size = 3, alpha = 0.6, shape = 21, fill = "lightgrey") +
-  scale_x_continuous(limits = c(0, 1), breaks = c(0, 0.33, 0.67, 1)) +
-  scale_y_continuous(limits = c(-0.25, 2.5), breaks = seq(0, 2, 1)) +
-  labs(x = expression(bold("SM"["20"]*" (% WHC)")),
-       y = expression(bold(ln)*bolditalic(" N")[bold("area")]*bold(":"*chi*" (unitless)"))) +
-  theme_bw(base_size = 20) +
-  theme(legend.text.align = 0,
-        panel.border = element_rect(size = 1.25),
-        axis.title = element_text(face = "bold", size = 20),
-        axis.text = element_text(color = "black", size = 20))
-narea_chi_wn_c3_plot
-
-
-##########################################################################
 ## Marea:chi - VPD (C3)
 ##########################################################################
 # Check model results
 Anova(marea_chi_c3)
+test(emtrends(marea_chi_c3, ~1, "soil.no3n"))
 
 # Plot
 marea_chi_vpd_c3_plot <- ggplot(data = subset(df_completeCases, pft == "c3_nonlegume"), 
@@ -726,6 +762,29 @@ marea_chi_vpd_c3_plot <- ggplot(data = subset(df_completeCases, pft == "c3_nonle
         axis.title = element_text(face = "bold", size = 20),
         axis.text = element_text(color = "black", size = 20))
 marea_chi_vpd_c3_plot
+
+##########################################################################
+## Marea:chi - soil moisture (C3)
+##########################################################################
+# Check model result
+Anova(marea_chi_c3)
+test(emtrends(nmass_chi_c3, ~1, "wn20_perc"))
+
+# Plot
+marea_chi_wn_c3_plot <- ggplot(data = subset(df_completeCases, pft == "c3_nonlegume"), 
+                               aes(x = wn20_perc, y = log(marea_chi))) +
+  geom_point(size = 3, alpha = 0.6, shape = 21, fill = "lightgrey") +
+  scale_x_continuous(limits = c(0, 1), breaks = c(0, 0.33, 0.67, 1),
+                     labels = c("0", "33", "67", "100")) +
+  scale_y_continuous(limits = c(3, 6), breaks = seq(3, 6, 1)) +
+  labs(x = expression(bold("SM"["20"]*" (% WHC)")),
+       y = expression(bold(ln)*bolditalic(" M")[bold("area")]*bold(":"*chi*" (unitless)"))) +
+  theme_bw(base_size = 20) +
+  theme(legend.text.align = 0,
+        panel.border = element_rect(size = 1.25),
+        axis.title = element_text(face = "bold", size = 20),
+        axis.text = element_text(color = "black", size = 20))
+marea_chi_wn_c3_plot
 
 ##########################################################################
 ## Marea:chi - soil N (C3)
@@ -1085,7 +1144,8 @@ marea_no3n_c4_plot <- ggplot(data = subset(df_completeCases, pft == "c4_nonlegum
   theme(legend.text.align = 0,
         panel.border = element_rect(size = 1.25),
         axis.title = element_text(face = "bold", size = 20),
-        axis.text = element_text(color = "black", size = 20))
+        axis.text = element_text(color = "black", size = 20),
+        legend.title = element_text(size = 24))
 marea_no3n_c4_plot
 
 ##########################################################################
@@ -1103,7 +1163,7 @@ chi_vpd_c4_reg <- data.frame(emmeans(chi_c4, ~1, "vpd60",
 chi_vpd_c4_plot <- ggplot(data = subset(df_completeCases, pft == "c4_nonlegume"), 
                             aes(x = vpd60, y = chi)) +
   geom_point(size = 3, alpha = 0.6, shape = 21, fill = "#695B24") +
-  geom_ribbon(data = chi_vpd60_c4_reg, 
+  geom_ribbon(data = chi_vpd_c4_reg, 
               aes(x = vpd60, y = emmean, ymin = lower.CL, 
                   ymax = upper.CL), fill = "black", alpha = 0.5) +
   geom_smooth(data = chi_vpd_c4_reg, aes(x = vpd60, y = emmean), 
@@ -1180,7 +1240,7 @@ narea_chi_vpd_c4_plot <- ggplot(data = subset(df_completeCases, pft == "c4_nonle
   geom_smooth(data = narea_chi_vpd_c4_reg, aes(x = vpd60, y = emmean), 
               linewidth = 2, color = "black") +
   scale_x_continuous(limits = c(0.6, 1.8), breaks = seq(0.6, 1.8, 0.4)) +
-  scale_y_continuous(limits = c(0, 2.5), breaks = seq(0, 2, 1)) +
+  scale_y_continuous(limits = c(-0.25, 2.5), breaks = seq(0, 2, 1)) +
   labs(x = expression(bold("VPD"["60"]*" (kPa)")),
        y = expression(bold(ln)*bolditalic(" N")[bold("area")]*bold(":"*chi*" (unitless)"))) +
   theme_bw(base_size = 20) +
@@ -1233,59 +1293,238 @@ narea_chi_soilN_c4_plot <- ggplot(data = subset(df, pft == "c4_nonlegume"),
 narea_chi_soilN_c4_plot
 
 ##########################################################################
-## Create plot for C3 and C4 N-H20 correlations
+## Nmass:chi - VPD (C4)
 ##########################################################################
-png("../plots/TXeco_fig2_nChi_corr.png", height = 8, width = 12, units = "in", res = 600)
-ggarrange(narea_chi_c3_plot, nmass_chi_c3_plot, marea_chi_c3_plot,
-          narea_chi_c4_plot, nmass_chi_c4_plot, marea_chi_c4_plot,
-          ncol = 3, nrow = 2, legend = "none", 
-          align = "hv", labels = c("(a)", "(b)", "(c)", "(d)", "(e)", "(f)"), 
-          font.label = list(size = 22))
-dev.off()
+# Check model results
+Anova(nmass_chi_c4)
+
+# Tendline prep
+nmass_chi_vpd_c4_reg <- data.frame(
+  emmeans(nmass_chi_c4, ~1, "vpd60", 
+          at = list(vpd60 = seq(0.78, 1.8, 0.01))))
+
+# Plot
+nmass_chi_vpd_c4_plot <- ggplot(data = subset(df_completeCases, pft == "c4_nonlegume"), 
+                          aes(x = vpd60, y = log(nmass_chi))) +
+  geom_point(size = 3, alpha = 0.6, shape = 21, fill = "#695B24") +
+  geom_ribbon(data = nmass_chi_vpd_c4_reg, 
+              aes(x = vpd60, y = emmean, ymin = lower.CL, 
+                  ymax = upper.CL), fill = "black", alpha = 0.5) +
+  geom_smooth(data = nmass_chi_vpd_c4_reg, aes(x = vpd60, y = emmean), 
+              linewidth = 2, color = "black") +
+  scale_x_continuous(limits = c(0.6, 1.8), breaks = seq(0.6, 1.8, 0.4)) +
+  scale_y_continuous(limits = c(0, 2.5), breaks = seq(0, 2, 1)) +
+  labs(x = expression(bold("VPD"["60"]*" (kPa)")),
+       y = expression(bold(ln)*bolditalic(" N")[bold("mass")]*bold(":"*chi*" (unitless)"))) +
+  theme_bw(base_size = 20) +
+  theme(legend.text.align = 0,
+        panel.border = element_rect(size = 1.25),
+        axis.title = element_text(face = "bold", size = 20),
+        axis.text = element_text(color = "black", size = 20))
+nmass_chi_vpd_c4_plot
+
+##########################################################################
+## Nmass:chi - soil moisture (C4)
+##########################################################################
+# Check model results
+Anova(nmass_chi_c4)
+
+# Plot
+nmass_chi_wn_c4_plot <- ggplot(data = subset(df_completeCases, pft == "c4_nonlegume"), 
+                                aes(x = wn07_perc, y = log(nmass_chi))) +
+  geom_point(size = 3, alpha = 0.6, shape = 21, fill = "#695B24") +
+  scale_x_continuous(limits = c(0, 1), breaks = c(0, 0.33, 0.67, 1),
+                     labels = c("0", "33", "67", "100")) +
+  scale_y_continuous(limits = c(0, 2.5), breaks = seq(0, 2, 1)) +
+  labs(x = expression(bold("VPD"["60"]*" (kPa)")),
+       y = expression(bold(ln)*bolditalic(" N")[bold("mass")]*bold(":"*chi*" (unitless)"))) +
+  theme_bw(base_size = 20) +
+  theme(legend.text.align = 0,
+        panel.border = element_rect(size = 1.25),
+        axis.title = element_text(face = "bold", size = 20),
+        axis.text = element_text(color = "black", size = 20))
+nmass_chi_wn_c4_plot
+
+##########################################################################
+## Nmass:chi - soil moisture (C4)
+##########################################################################
+# Check model results
+Anova(nmass_chi_c4)
+
+# Plot
+nmass_chi_soilN_c4_plot <- ggplot(data = subset(df_completeCases, pft == "c4_nonlegume"), 
+                               aes(x = soil.no3n, y = log(nmass_chi))) +
+  geom_point(size = 3, alpha = 0.6, shape = 21, fill = "#695B24") +
+  scale_x_continuous(limits = c(0, 80), breaks = seq(0, 80, 20)) +
+  scale_y_continuous(limits = c(0, 2.5), breaks = seq(0, 2, 1)) +
+  labs(x = expression(bold("VPD"["60"]*" (kPa)")),
+       y = expression(bold(ln)*bolditalic(" N")[bold("mass")]*bold(":"*chi*" (unitless)"))) +
+  theme_bw(base_size = 20) +
+  theme(legend.text.align = 0,
+        panel.border = element_rect(size = 1.25),
+        axis.title = element_text(face = "bold", size = 20),
+        axis.text = element_text(color = "black", size = 20))
+nmass_chi_soilN_c4_plot
+
+##########################################################################
+## Marea:chi - VPD (C4)
+##########################################################################
+# Check model results
+Anova(marea_chi_c4)
+
+# Tendline prep
+marea_chi_vpd_c4_reg <- data.frame(
+  emmeans(marea_chi_c4, ~1, "vpd60", 
+          at = list(vpd60 = seq(0.78, 1.8, 0.01))))
+
+# Plot
+marea_chi_vpd_c4_plot <- ggplot(data = subset(df_completeCases, pft == "c4_nonlegume"), 
+                                aes(x = vpd60, y = log(marea_chi))) +
+  geom_point(size = 3, alpha = 0.6, shape = 21, fill = "#695B24") +
+  geom_ribbon(data = marea_chi_vpd_c4_reg, 
+              aes(x = vpd60, y = emmean, ymin = lower.CL, 
+                  ymax = upper.CL), fill = "black", alpha = 0.3) +
+  geom_smooth(data = marea_chi_vpd_c4_reg, aes(x = vpd60, y = emmean), 
+              linewidth = 2, color = "black") +
+  scale_x_continuous(limits = c(0.6, 1.8), breaks = seq(0.6, 1.8, 0.4)) +
+  scale_y_continuous(limits = c(4, 7), breaks = seq(4, 7, 1)) +
+  labs(x = expression(bold("VPD"["60"]*" (kPa)")),
+       y = expression(bold(ln)*bolditalic(" M")[bold("area")]*bold(":"*chi*" (unitless)"))) +
+  theme_bw(base_size = 20) +
+  theme(legend.text.align = 0,
+        panel.border = element_rect(size = 1.25),
+        axis.title = element_text(face = "bold", size = 20),
+        axis.text = element_text(color = "black", size = 20))
+marea_chi_vpd_c4_plot
+
+##########################################################################
+## Nmass:chi - soil moisture (C4)
+##########################################################################
+# Check model results
+Anova(nmass_chi_c4)
+
+# Plot
+marea_chi_wn_c4_plot <- ggplot(data = subset(df_completeCases, pft == "c4_nonlegume"), 
+                               aes(x = wn07_perc, y = log(marea_chi))) +
+  geom_point(size = 3, alpha = 0.6, shape = 21, fill = "#695B24") +
+  scale_x_continuous(limits = c(0, 1), breaks = c(0, 0.33, 0.67, 1),
+                     labels = c("0", "33", "67", "100")) +
+  scale_y_continuous(limits = c(4, 7), breaks = seq(4, 7, 1)) +
+  labs(x = expression(bold("WN"["07"]*" (% WHC)")),
+       y = expression(bold(ln)*bolditalic(" M")[bold("area")]*bold(":"*chi*" (unitless)"))) +
+  theme_bw(base_size = 20) +
+  theme(legend.text.align = 0,
+        panel.border = element_rect(size = 1.25),
+        axis.title = element_text(face = "bold", size = 20),
+        axis.text = element_text(color = "black", size = 20))
+marea_chi_wn_c4_plot
+
+##########################################################################
+## Marea:chi - soil moisture (C4)
+##########################################################################
+# Check model results
+Anova(marea_chi_c4)
+
+# Plot
+marea_chi_soilN_c4_plot <- ggplot(data = subset(df_completeCases, pft == "c4_nonlegume"), 
+                                  aes(x = soil.no3n, y = log(marea_chi))) +
+  geom_point(size = 3, alpha = 0.6, shape = 21, fill = "#695B24") +
+  scale_x_continuous(limits = c(0, 80), breaks = seq(0, 80, 20)) +
+  scale_y_continuous(limits = c(4, 7), breaks = seq(4, 7, 1)) +
+  labs(x = expression(bold("Soil N (ppm NO"["3"]*"-N)")),
+       y = expression(bold(ln)*bolditalic(" M")[bold("area")]*bold(":"*chi*" (unitless)"))) +
+  theme_bw(base_size = 20) +
+  theme(legend.text.align = 0,
+        panel.border = element_rect(size = 1.25),
+        axis.title = element_text(face = "bold", size = 20),
+        axis.text = element_text(color = "black", size = 20))
+marea_chi_soilN_c4_plot
 
 ##########################################################################
 ## Create plot for C3 leaf N content traits
 ##########################################################################
 
-png("../plots/TXeco_fig3_c3_traits.png",
-    height = 16, width = 16, units = 'in', res = 600)
+png("../plots/TXeco_fig2_c3_traits.png",
+    height = 16, width = 14, units = 'in', res = 600)
 ggarrange(narea_vpd_c3_plot, narea_wn_c3_plot, narea_no3n_c3_plot,
           nmass_vpd_c3_plot, nmass_wn_c3_plot, nmass_no3n_c3_plot, 
           marea_vpd_c3_plot, marea_wn_c3_plot, marea_no3n_c3_plot,
           chi_vpd_c3_plot, chi_wn_c3_plot, chi_no3n_c3_plot,
-          ncol = 3, nrow = 4, common.legend = TRUE, legend = "right", 
+          ncol = 3, nrow = 4, common.legend = TRUE, legend = "bottom", 
           align = "hv", labels = c("(a)", "(b)", "(c)", "(d)", "(e)",
                                    "(f)", "(g)", "(h)", "(i)", "(j)", "(k)", "(l)"), 
           font.label = list(size = 22))
+dev.off()
+
+##########################################################################
+## Create plot for C3 N-H2O tradeoffs
+##########################################################################
+png("../plots/TXeco_fig3_c3_nh2o_trade.png", height = 9, width = 12.5, 
+    units = "in", res = 600)
+ggarrange(narea_chi_c3_plot, nmass_chi_c3_plot, marea_chi_c3_plot,
+          narea_chi_vpd_c3_plot, narea_chi_wn_c3_plot, narea_chi_soilN_c3_plot,
+          ncol = 3, nrow = 2, common.legend = TRUE, legend = "bottom", 
+          align = "hv", labels = c("(a)", "(b)", "(c)", "(d)", "(e)",
+                                   "(f)", "(g)", "(h)", "(i)"), 
+          font.label = list(size = 18))
 dev.off()
 
 ##########################################################################
 ## Create plot for C4 spp traits
 ##########################################################################
 png("../plots/TXeco_fig4_c4_traits.png",
-     height = 16, width = 16, units = 'in', res = 600)
+     height = 16, width = 14, units = 'in', res = 600)
 ggarrange(narea_vpd_c4_plot, narea_wn_c4_plot, narea_no3n_c4_plot,
           nmass_vpd_c4_plot, nmass_wn_c4_plot, nmass_no3n_c4_plot, 
           marea_vpd_c4_plot, marea_wn_c4_plot, marea_no3n_c4_plot, 
           chi_vpd_c4_plot, chi_wn_c4_plot, chi_no3n_c4_plot,
-          ncol = 3, nrow = 4, common.legend = TRUE, legend = "right", 
+          ncol = 3, nrow = 4, common.legend = TRUE, legend = "bottom", 
           align = "hv", labels = c("(a)", "(b)", "(c)", "(d)", "(e)",
                                    "(f)", "(g)", "(h)", "(i)", "(j)", "(k)", "(l)"), 
           font.label = list(size = 18))
 dev.off()
 
 ##########################################################################
-## Create plot for C3/C4 Narea-chi tradeoffs
+## Create plot for C3 N-H2O tradeoffs
 ##########################################################################
-png("../plots/TXeco_fig5_tradeoffs.png", height = 8, width = 14, 
+png("../plots/TXeco_fig5_c4_nh2o_trade.png", height = 8, width = 12.5, 
     units = "in", res = 600)
-ggarrange(narea_chi_vpd_c3_plot, narea_chi_wn_c3_plot, narea_chi_soilN_c3_plot,
+ggarrange(narea_chi_c4_plot, nmass_chi_c4_plot, marea_chi_c4_plot,
           narea_chi_vpd_c4_plot, narea_chi_wn_c4_plot, narea_chi_soilN_c4_plot,
-          ncol = 3, nrow = 2, common.legend = TRUE, legend = "right", 
+          ncol = 3, nrow = 2, common.legend = TRUE, legend = "bottom", 
           align = "hv", labels = c("(a)", "(b)", "(c)", "(d)", "(e)",
                                    "(f)", "(g)", "(h)", "(i)"), 
           font.label = list(size = 18))
 dev.off()
+
+
+##########################################################################
+## Create supplement plot for C3 N-H2O tradeoffs (Nmass:chi, Marea:chi)
+##########################################################################
+png("../plots/TXeco_figS4_c3_nh2o_tradeoffs.png", width = 12, height = 9,
+    units = "in", res = 600)
+ggarrange(nmass_chi_vpd_c3_plot, nmass_chi_wn_c3_plot, nmass_chi_soilN_c3_plot,
+          marea_chi_vpd_c3_plot, marea_chi_wn_c3_plot, marea_chi_soilN_c3_plot,
+          ncol = 3, nrow = 2, common.legend = TRUE, legend = "bottom", 
+          align = "hv", labels = c("(a)", "(b)", "(c)", "(d)", "(e)",
+                                   "(f)", "(g)", "(h)", "(i)"), 
+          font.label = list(size = 18))
+dev.off()
+
+
+##########################################################################
+## Create supplement plot for C4 N-H2O tradeoffs (Nmass:chi, Marea:chi)
+##########################################################################
+png("../plots/TXeco_figS5_c4_nh2o_tradeoffs.png", width = 12, height = 8.5,
+    units = "in", res = 600)
+ggarrange(nmass_chi_vpd_c4_plot, nmass_chi_wn_c4_plot, nmass_chi_soilN_c4_plot,
+          marea_chi_vpd_c4_plot, marea_chi_wn_c4_plot, marea_chi_soilN_c4_plot,
+          ncol = 3, nrow = 2, common.legend = TRUE, legend = "bottom", 
+          align = "hv", labels = c("(a)", "(b)", "(c)", "(d)", "(e)",
+                                   "(f)", "(g)", "(h)", "(i)"), 
+          font.label = list(size = 18))
+dev.off()
+
 
 
 
