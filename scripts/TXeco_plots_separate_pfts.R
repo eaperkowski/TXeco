@@ -383,7 +383,7 @@ marea_vpd_c3_plot <- ggplot(data = subset(df_completeCases, pft == "c3_nonlegume
 marea_vpd_c3_plot
 
 ##########################################################################
-## Nmass - soil moisture  (C3)
+## Marea - soil moisture  (C3)
 ##########################################################################
 # Check model result
 Anova(marea_c3)
@@ -573,7 +573,7 @@ narea_chi_vpd_c3_plot <- ggplot(data = subset(df_completeCases, pft == "c3_nonle
             size = 2, color = "black") +
   scale_y_continuous(limits = c(-0.25, 2.5), breaks = seq(0, 2.5, 1)) +
   labs(x = expression(bold("VPD"["90"]*" (kPa)")),
-       y = expression(bold(ln)*bolditalic(" N")[bold("area")]*bold(":"*chi*" (unitless)"))) +
+       y = expression(bold(ln)*bolditalic(" N")[bold("area")]*bold(" - "*chi*" (gN m"^"-2"*")"))) +
   theme_bw(base_size = 20) +
   theme(legend.text.align = 0,
         panel.border = element_rect(size = 1.25),
@@ -594,7 +594,7 @@ narea_chi_wn_c3_plot <- ggplot(data = subset(df_completeCases, pft == "c3_nonleg
   scale_x_continuous(limits = c(0, 1), breaks = c(0, 0.33, 0.67, 1)) +
   scale_y_continuous(limits = c(-0.25, 2.5), breaks = seq(0, 2, 1)) +
   labs(x = expression(bold("SM"["20"]*" (% WHC)")),
-       y = expression(bold(ln)*bolditalic(" N")[bold("area")]*bold(":"*chi*" (unitless)"))) +
+       y = expression(bold(ln)*bolditalic(" N")[bold("area")]*bold(" - "*chi*" (gN m"^"-2"*")"))) +
   theme_bw(base_size = 20) +
   theme(legend.text.align = 0,
         panel.border = element_rect(size = 1.25),
@@ -629,7 +629,7 @@ narea_chi_soilN_c3_plot <- ggplot(data = subset(df_completeCases, pft == "c3_non
                      labels = c("20", "50", "80")) +
   scale_linetype_manual(values = c("dashed", "solid")) +
   labs(x = expression(bold("Soil N (ppm NO"[3]*"-N)")),
-       y = expression(bold(ln)*bolditalic(" N")[bold("area")]*bold(":"*chi*" (unitless)")),
+       y = expression(bold(ln)*bolditalic(" N")[bold("area")]*bold(" - "*chi*" (gN m"^"-2"*")")),
        color = expression(bold("SM"["20"]*" (% WHC)"))) +
   guides(linetype = "none",
          color = guide_legend(override.aes = list(fill = NA))) +
@@ -663,7 +663,7 @@ nmass_chi_vpd_c3_plot <- ggplot(data = subset(df_completeCases, pft == "c3_nonle
             size = 2, color = "black") +
   scale_y_continuous(limits = c(-0.25, 2.25), breaks = seq(0, 2.25, 1)) +
   labs(x = expression(bold("VPD"["90"]*" (kPa)")),
-       y = expression(bold(ln)*bolditalic(" N")[bold("mass")]*bold(":"*chi*" (unitless)"))) +
+       y = expression(bold(ln)*bolditalic(" N")[bold("mass")]*bold(" - "*chi*" (gN g"^"-1"*")"))) +
   theme_bw(base_size = 20) +
   theme(legend.text.align = 0,
         panel.border = element_rect(size = 1.25),
@@ -696,7 +696,7 @@ nmass_chi_wn_c3_plot <- ggplot(data = subset(df_completeCases, pft == "c3_nonleg
                      labels = c("0", "33", "67", "100")) +
   scale_y_continuous(limits = c(-0.25, 2.25), breaks = seq(0, 2.25, 1)) +
   labs(x = expression(bold("SM"["20"]*" (% WHC)")),
-       y = expression(bold(ln)*bolditalic(" N")[bold("mass")]*bold(":"*chi*" (unitless)"))) +
+       y = expression(bold(ln)*bolditalic(" N")[bold("mass")]*bold(" - "*chi*" (gN g"^"-1"*")"))) +
   theme_bw(base_size = 20) +
   theme(legend.text.align = 0,
         panel.border = element_rect(size = 1.25),
@@ -731,7 +731,7 @@ nmass_chi_soilN_c3_plot <- ggplot(data = subset(df_completeCases, pft == "c3_non
   scale_color_manual(values = c("#D11807", "#FD9A44", "#00767B"),
                      labels = c("20", "50", "80")) +
   labs(x = expression(bold("Soil N (ppm NO"[3]*"-N)")),
-       y = expression(bold(ln)*bolditalic(" N")[bold("mass")]*bold(":"*chi*" (unitless)")),
+       y = expression(bold(ln)*bolditalic(" N")[bold("mass")]*bold(" - "*chi*" (gN g"^"-1"*")")),
        color = expression(bold("SM"["20"]*" (% WHC)"))) +
   guides(linetype = "none",
          color = guide_legend(override.aes = list(fill = NA))) +
@@ -755,7 +755,7 @@ marea_chi_vpd_c3_plot <- ggplot(data = subset(df_completeCases, pft == "c3_nonle
   geom_point(size = 3, alpha = 0.6, shape = 21, fill = "lightgrey") +
   scale_y_continuous(limits = c(3, 6), breaks = seq(3, 6, 1)) +
   labs(x = expression(bold("VPD"["90"]*" (kPa)")),
-       y = expression(bold(ln)*bolditalic(" M")[bold("area")]*bold(":"*chi*" (unitless)"))) +
+       y = expression(bold(ln)*bolditalic(" M")[bold("area")]*bold(" - "*chi*" (g m"^"-2"*")"))) +
   theme_bw(base_size = 20) +
   theme(legend.text.align = 0,
         panel.border = element_rect(size = 1.25),
@@ -778,7 +778,7 @@ marea_chi_wn_c3_plot <- ggplot(data = subset(df_completeCases, pft == "c3_nonleg
                      labels = c("0", "33", "67", "100")) +
   scale_y_continuous(limits = c(3, 6), breaks = seq(3, 6, 1)) +
   labs(x = expression(bold("SM"["20"]*" (% WHC)")),
-       y = expression(bold(ln)*bolditalic(" M")[bold("area")]*bold(":"*chi*" (unitless)"))) +
+       y = expression(bold(ln)*bolditalic(" M")[bold("area")]*bold(" - "*chi*" (g m"^"-2"*")"))) +
   theme_bw(base_size = 20) +
   theme(legend.text.align = 0,
         panel.border = element_rect(size = 1.25),
@@ -813,7 +813,7 @@ marea_chi_soilN_c3_plot <- ggplot(data = subset(df_completeCases, pft == "c3_non
                      labels = c("20", "50", "80")) +
   scale_linetype_manual(values = c("dashed", "solid")) +
   labs(x = expression(bold("Soil N (ppm NO"[3]*"-N)")),
-       y = expression(bold(ln)*bolditalic(" M")[bold("area")]*bold(":"*chi*" (unitless)")),
+       y = expression(bold(ln)*bolditalic(" M")[bold("area")]*bold(" - "*chi*" (g m"^"-2"*")")),
        color = expression(bold("SM"["20"]*" (% WHC)"))) +
   guides(linetype = "none",
          color = guide_legend(override.aes = list(fill = NA))) +
@@ -1242,7 +1242,7 @@ narea_chi_vpd_c4_plot <- ggplot(data = subset(df_completeCases, pft == "c4_nonle
   scale_x_continuous(limits = c(0.6, 1.8), breaks = seq(0.6, 1.8, 0.4)) +
   scale_y_continuous(limits = c(-0.25, 2.5), breaks = seq(0, 2, 1)) +
   labs(x = expression(bold("VPD"["60"]*" (kPa)")),
-       y = expression(bold(ln)*bolditalic(" N")[bold("area")]*bold(":"*chi*" (unitless)"))) +
+       y = expression(bold(ln)*bolditalic(" N")[bold("area")]*bold(" - "*chi*" (gN m"^"-2"*")"))) +
   theme_bw(base_size = 20) +
   theme(legend.text.align = 0,
         panel.border = element_rect(size = 1.25),
@@ -1263,7 +1263,7 @@ narea_chi_wn_c4_plot <- ggplot(data = subset(df_completeCases, pft == "c4_nonleg
   scale_x_continuous(limits = c(0, 1), breaks = c(0, 0.33, 0.67, 1)) +
   scale_y_continuous(limits = c(0, 2.5), breaks = seq(0, 2, 1)) +
   labs(x = expression(bold("SM"["07"]*" (% WHC)")),
-       y = expression(bold(ln)*bolditalic(" N")[bold("area")]*bold(":"*chi*" (unitless)"))) +
+       y = expression(bold(ln)*bolditalic(" N")[bold("area")]*bold(" - "*chi*" (gN m"^"-2"*")"))) +
   theme_bw(base_size = 20) +
   theme(legend.text.align = 0,
         panel.border = element_rect(size = 1.25),
@@ -1284,7 +1284,7 @@ narea_chi_soilN_c4_plot <- ggplot(data = subset(df, pft == "c4_nonlegume"),
   scale_x_continuous(limits = c(0, 80), breaks = seq(0, 80, 20)) +
   scale_y_continuous(limits = c(0, 2.5), breaks = seq(0, 2, 1)) +
   labs(x = expression(bold("Soil N (ppm NO"["3"]*"-N)")),
-       y = expression(bold(ln)*bolditalic(" N")[bold("area")]*bold(":"*chi*" (unitless)"))) +
+       y = expression(bold(ln)*bolditalic(" N")[bold("area")]*bold(" - "*chi*" (gN m"^"-2"*")"))) +
   theme_bw(base_size = 20) +
   theme(legend.text.align = 0,
         panel.border = element_rect(size = 1.25),
@@ -1309,13 +1309,13 @@ nmass_chi_vpd_c4_plot <- ggplot(data = subset(df_completeCases, pft == "c4_nonle
   geom_point(size = 3, alpha = 0.6, shape = 21, fill = "#695B24") +
   geom_ribbon(data = nmass_chi_vpd_c4_reg, 
               aes(x = vpd60, y = emmean, ymin = lower.CL, 
-                  ymax = upper.CL), fill = "black", alpha = 0.5) +
+                  ymax = upper.CL), fill = "black", alpha = 0.3) +
   geom_smooth(data = nmass_chi_vpd_c4_reg, aes(x = vpd60, y = emmean), 
               linewidth = 2, color = "black") +
   scale_x_continuous(limits = c(0.6, 1.8), breaks = seq(0.6, 1.8, 0.4)) +
   scale_y_continuous(limits = c(0, 2.5), breaks = seq(0, 2, 1)) +
   labs(x = expression(bold("VPD"["60"]*" (kPa)")),
-       y = expression(bold(ln)*bolditalic(" N")[bold("mass")]*bold(":"*chi*" (unitless)"))) +
+       y = expression(bold(ln)*bolditalic(" N")[bold("mass")]*bold(" - "*chi*" (gN g"^"-1"*")"))) +
   theme_bw(base_size = 20) +
   theme(legend.text.align = 0,
         panel.border = element_rect(size = 1.25),
@@ -1337,7 +1337,7 @@ nmass_chi_wn_c4_plot <- ggplot(data = subset(df_completeCases, pft == "c4_nonleg
                      labels = c("0", "33", "67", "100")) +
   scale_y_continuous(limits = c(0, 2.5), breaks = seq(0, 2, 1)) +
   labs(x = expression(bold("VPD"["60"]*" (kPa)")),
-       y = expression(bold(ln)*bolditalic(" N")[bold("mass")]*bold(":"*chi*" (unitless)"))) +
+       y = expression(bold(ln)*bolditalic(" N")[bold("mass")]*bold(" - "*chi*" (gN g"^"-1"*")"))) +
   theme_bw(base_size = 20) +
   theme(legend.text.align = 0,
         panel.border = element_rect(size = 1.25),
@@ -1358,7 +1358,7 @@ nmass_chi_soilN_c4_plot <- ggplot(data = subset(df_completeCases, pft == "c4_non
   scale_x_continuous(limits = c(0, 80), breaks = seq(0, 80, 20)) +
   scale_y_continuous(limits = c(0, 2.5), breaks = seq(0, 2, 1)) +
   labs(x = expression(bold("VPD"["60"]*" (kPa)")),
-       y = expression(bold(ln)*bolditalic(" N")[bold("mass")]*bold(":"*chi*" (unitless)"))) +
+       y = expression(bold(ln)*bolditalic(" N")[bold("mass")]*bold(" - "*chi*" (gN g"^"-1"*")"))) +
   theme_bw(base_size = 20) +
   theme(legend.text.align = 0,
         panel.border = element_rect(size = 1.25),
@@ -1389,7 +1389,7 @@ marea_chi_vpd_c4_plot <- ggplot(data = subset(df_completeCases, pft == "c4_nonle
   scale_x_continuous(limits = c(0.6, 1.8), breaks = seq(0.6, 1.8, 0.4)) +
   scale_y_continuous(limits = c(4, 7), breaks = seq(4, 7, 1)) +
   labs(x = expression(bold("VPD"["60"]*" (kPa)")),
-       y = expression(bold(ln)*bolditalic(" M")[bold("area")]*bold(":"*chi*" (unitless)"))) +
+       y = expression(bold(ln)*bolditalic(" M")[bold("area")]*bold(" - "*chi*" (g m"^"-2"*")"))) +
   theme_bw(base_size = 20) +
   theme(legend.text.align = 0,
         panel.border = element_rect(size = 1.25),
@@ -1411,7 +1411,7 @@ marea_chi_wn_c4_plot <- ggplot(data = subset(df_completeCases, pft == "c4_nonleg
                      labels = c("0", "33", "67", "100")) +
   scale_y_continuous(limits = c(4, 7), breaks = seq(4, 7, 1)) +
   labs(x = expression(bold("WN"["07"]*" (% WHC)")),
-       y = expression(bold(ln)*bolditalic(" M")[bold("area")]*bold(":"*chi*" (unitless)"))) +
+       y = expression(bold(ln)*bolditalic(" M")[bold("area")]*bold(" - "*chi*" (g m"^"-2"*")"))) +  
   theme_bw(base_size = 20) +
   theme(legend.text.align = 0,
         panel.border = element_rect(size = 1.25),
@@ -1432,7 +1432,7 @@ marea_chi_soilN_c4_plot <- ggplot(data = subset(df_completeCases, pft == "c4_non
   scale_x_continuous(limits = c(0, 80), breaks = seq(0, 80, 20)) +
   scale_y_continuous(limits = c(4, 7), breaks = seq(4, 7, 1)) +
   labs(x = expression(bold("Soil N (ppm NO"["3"]*"-N)")),
-       y = expression(bold(ln)*bolditalic(" M")[bold("area")]*bold(":"*chi*" (unitless)"))) +
+       y = expression(bold(ln)*bolditalic(" M")[bold("area")]*bold(" - "*chi*" (g m"^"-2"*")"))) +  
   theme_bw(base_size = 20) +
   theme(legend.text.align = 0,
         panel.border = element_rect(size = 1.25),
