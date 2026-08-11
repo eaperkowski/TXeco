@@ -96,7 +96,10 @@ performance(narea_c3)
 
 ## Post hoc comparisons
 test(emtrends(narea_c3, ~1, "chi", type = "response"))
-test(emtrends(narea_c3, ~1, "wn20_perc", type = "response"))
+test(emtrends(narea_c3, ~soil.no3n, "wn20_perc", type = "response",
+              at = list(soil.no3n = c(0, 40, 80))))
+
+
 test(emtrends(narea_c3, ~wn20_perc, "soil.no3n", type = "response", 
               at = list(wn20_perc = c(0.2, 0.5, 0.8))))
 
@@ -146,6 +149,8 @@ Anova(nmass_c3)
 performance(nmass_c3)
 
 # Post hoc tests
+test(emtrends(nmass_c3, ~soi))
+
 test(emtrends(nmass_c3, ~wn20_perc, "soil.no3n", type = "response", 
               at = list(wn20_perc = seq(0, 1, 0.01))))
 

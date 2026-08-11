@@ -150,21 +150,44 @@ narea_vpd_c3_plot
 ##########################################################################
 # Check model result
 Anova(narea_c3)
+test(emtrends(narea_c3, ~soil.no3n, "wn20_perc", at = list(soil.no3n = c(10, 40, 70))))
+
+# Trendline prep
+narea_wn20_c3_reg <- data.frame(emmeans(narea_c3, ~soil.no3n, "wn20_perc",
+                                        at = list(wn20_perc = seq(0, 1, 0.01),
+                                                  soil.no3n = c(10, 40, 70)))) %>%
+  mutate(linetype = ifelse(soil.no3n == 40, "dashed", "solid"))
 
 # Plot
 narea_wn_c3_plot <- ggplot(data = subset(df_completeCases, pft == "c3_nonlegume"),
                             aes(x = wn20_perc, y = log(narea))) +
-  geom_point(size = 3, alpha = 0.6, shape = 21, fill = "lightgray") +
+  geom_point(aes(fill = soil.no3n), size = 3, alpha = 0.6, shape = 21) +
+  geom_smooth(data = narea_wn20_c3_reg, 
+              aes(x = wn20_perc, y = emmean, color = factor(soil.no3n), 
+                  linetype = linetype), size = 2, lineend = "round") +
   scale_x_continuous(limits = c(0, 1), breaks = c(0, 0.33, 0.67, 1),
                      labels = c("0", "33", "67", "100")) +
   scale_y_continuous(limits = c(-0.5, 2.25), breaks = seq(-0, 2, 1)) +
+  scale_fill_gradientn(colors = c("#4A148C", "#9C27B0", "#FF9800", "#43A047", "#1B5E20"),
+                       values = c(0, 10, 40, 70, 80) / 80,
+                       limits = c(0, 80),
+                       breaks = c(10, 40, 70),
+                       labels = c("10", "40", "70")) +
+  scale_color_manual(values = c("#9C27B0", "#FF9800", "#43A047"),
+                     labels = c("10", "40", "70")) +
+  scale_linetype_manual(values = c("dashed", "solid")) +
   labs(x = expression(bold("SM"["20"]*" (% WHC)")),
-       y = expression(bold(ln)*bolditalic(" N")[bold("area")]*bold(" (gN m"^"-2"*")"))) +
+       y = expression(bold(ln)*bolditalic(" N")[bold("area")]*bold(" (gN m"^"-2"*")")),
+       fill = expression(bold("Soil N (ppm NO"["3"]*"-N)")),
+       color = expression(bold("Soil N (ppm NO"["3"]*"-N)"))) +
+  guides(linetype = "none",
+         color = guide_legend(override.aes = list(fill = NA))) +
   theme_bw(base_size = 20) +
   theme(legend.text.align = 0,
         panel.border = element_rect(size = 1.25),
         axis.title = element_text(face = "bold", size = 20),
-        axis.text = element_text(color = "black", size = 20))
+        axis.text = element_text(color = "black", size = 20),
+        legend.title = element_text(size = 24))
 narea_wn_c3_plot
 
 ##########################################################################
@@ -183,18 +206,24 @@ narea_no3n_c3_reg <- data.frame(emmeans(narea_c3, ~wn20_perc, "soil.no3n",
 # Plot
 narea_no3n_c3_plot <- ggplot(data = subset(df_completeCases, pft == "c3_nonlegume"),
                              aes(x = soil.no3n, y = log(narea))) +
-  geom_point(size = 3, alpha = 0.6, shape = 21, fill = "lightgray") +
+  geom_point(aes(fill = wn20_perc), size = 3, alpha = 0.6, shape = 21) +
   geom_smooth(data = narea_no3n_c3_reg, 
               aes(x = soil.no3n, y = emmean, color = factor(wn20_perc), 
                   linetype = linetype), size = 2, lineend = "round") +
   scale_x_continuous(limits = c(0, 80), breaks = seq(0, 80, 20)) +
   scale_y_continuous(limits = c(-0.5, 2.25), breaks = seq(-0, 2, 1)) +
+  scale_fill_gradientn(colors = c("#B40000", "#D11807", "#FD9A44", "#00767B", "#005EA0"),
+                       values = c(0, 0.2, 0.5, 0.8, 1),
+                       limits = c(0, 1),
+                       breaks = c(0.2, 0.5, 0.8),
+                       labels = c("20", "50", "80")) +
   scale_color_manual(values = c("#D11807", "#FD9A44", "#00767B"),
                      labels = c("20", "50", "80")) +
   scale_linetype_manual(values = c("dashed", "solid")) +
   labs(x = expression(bold("Soil N (ppm NO"["3"]*"-N)")),
        y = expression(bold(ln)*bolditalic(" N")[bold("area")]*bold(" (gN m"^"-2"*")")),
-       color = expression(bold("SM"["20"]*" (% WHC)"))) +
+       color = expression(bold("SM"["20"]*" (% WHC)")),
+       fill = expression(bold("SM"["20"]* " (% WHC)"))) +
   guides(linetype = "none",
          color = guide_legend(override.aes = list(fill = NA))) +
   theme_bw(base_size = 20) +
@@ -261,26 +290,39 @@ nmass_vpd_c3_plot
 ##########################################################################
 # Check model result
 Anova(nmass_c3)
+test(emtrends(nmass_c3, ~soil.no3n, "wn20_perc", at = list(soil.no3n = c(10, 40, 70))))
 
 # Trendline prep
-nmass_wn_c3_reg <- data.frame(emmeans(nmass_c3, ~1, "wn20_perc",
-                                       at = list(wn20_perc = seq(0, 1, 0.01))))
+nmass_wn_c3_reg <- data.frame(emmeans(nmass_c3, ~soil.no3n, "wn20_perc",
+                                       at = list(wn20_perc = seq(0, 1, 0.01),
+                                                 soil.no3n = c(10, 40, 70)))) %>%
+  mutate(linetype = ifelse(soil.no3n == 40, "dashed", "solid"))
 
 
 # Plot
 nmass_wn_c3_plot <- ggplot(data = subset(df_completeCases, pft == "c3_nonlegume"),
                            aes(x = wn20_perc, y = log(n.leaf))) +
-  geom_point(size = 3, alpha = 0.6, shape = 21, fill = "lightgray") +
-  geom_ribbon(data = nmass_wn_c3_reg, 
-              aes(x = wn20_perc, y = emmean, ymin = lower.CL, 
-                  ymax = upper.CL), fill = "black", alpha = 0.3) +
-  geom_line(data = nmass_wn_c3_reg, aes(x = wn20_perc, y = emmean), 
-            linewidth = 2, color = "black") +
+  geom_point(aes(fill = soil.no3n), size = 3, alpha = 0.6, shape = 21) +
+  geom_smooth(data = nmass_wn_c3_reg, 
+              aes(x = wn20_perc, y = emmean, color = factor(soil.no3n), 
+                  linetype = linetype), size = 2, lineend = "round") +
   scale_x_continuous(limits = c(0, 1), breaks = c(0, 0.33, 0.67, 1),
                      labels = c("0", "33", "67", "100")) +
   scale_y_continuous(limits = c(-0.5, 2.25), breaks = seq(-0, 2, 1)) +
+  scale_fill_gradientn(colors = c("#4A148C", "#9C27B0", "#FF9800", "#43A047", "#1B5E20"),
+                       values = c(0, 10, 40, 70, 80) / 80,
+                       limits = c(0, 80),
+                       breaks = c(10, 40, 70),
+                       labels = c("10", "40", "70")) +
+  scale_color_manual(values = c("#9C27B0", "#FF9800", "#43A047"),
+                     labels = c("10", "40", "70")) +
+  scale_linetype_manual(values = c("dashed", "solid")) +
   labs(x = expression(bold("SM"["20"]*" (% WHC)")),
-       y = expression(bold(ln)*bolditalic(" N")[bold("mass")]*bold(" (gN g"^"-1"*")"))) +
+       y = expression(bold(ln)*bolditalic(" N")[bold("mass")]*bold(" (gN g"^"-1"*")")),
+       fill = expression(bold("Soil N (ppm NO"["3"]*"-N)")),
+       color = expression(bold("Soil N (ppm NO"["3"]*"-N)"))) +
+  guides(linetype = "none",
+         color = guide_legend(override.aes = list(fill = NA))) +
   theme_bw(base_size = 20) +
   theme(legend.text.align = 0,
         panel.border = element_rect(size = 1.25),
@@ -304,18 +346,24 @@ nmass_no3n_c3_reg <- data.frame(emmeans(nmass_c3, ~wn20_perc, "soil.no3n",
 # Plot
 nmass_no3n_c3_plot <- ggplot(data = subset(df_completeCases, pft == "c3_nonlegume"),
                              aes(x = soil.no3n, y = log(n.leaf))) +
-  geom_point(size = 3, alpha = 0.6, shape = 21, fill = "lightgray") +
+  geom_point(aes(fill = wn20_perc), size = 3, alpha = 0.6, shape = 21) +
   geom_smooth(data = nmass_no3n_c3_reg, 
               aes(x = soil.no3n, y = emmean, color = factor(wn20_perc), 
                   linetype = linetype), size = 2, lineend = "round") +
   scale_x_continuous(limits = c(0, 80), breaks = seq(0, 80, 20)) +
   scale_y_continuous(limits = c(-0.5, 2), breaks = seq(-0, 2, 1)) +
+  scale_fill_gradientn(colors = c("#B40000", "#D11807", "#FD9A44", "#00767B", "#005EA0"),
+                       values = c(0, 0.2, 0.5, 0.8, 1),
+                       limits = c(0, 1),
+                       breaks = c(0.2, 0.5, 0.8),
+                       labels = c("20", "50", "80")) +
   scale_color_manual(values = c("#D11807", "#FD9A44", "#00767B"),
                      labels = c("20", "50", "80")) +
   scale_linetype_manual(values = c("dashed", "solid")) +
   labs(x = expression(bold("Soil N (ppm NO"["3"]*"-N)")),
        y = expression(bold(ln)*bolditalic(" N")[bold("mass")]*bold(" (gN g"^"-1"*")")),
-       color = expression(bold("SM"["20"]*" (% WHC)"))) +
+       color = expression(bold("SM"["20"]*" (% WHC)")),
+       fill = expression(bold("SM"["20"]*" (% WHC)"))) +
   guides(linetype = "none",
          color = guide_legend(override.aes = list(fill = NA))) +
   theme_bw(base_size = 20) +
@@ -387,26 +435,39 @@ marea_vpd_c3_plot
 ##########################################################################
 # Check model result
 Anova(marea_c3)
+test(emtrends(marea_c3, ~soil.no3n, "wn20_perc", at = list(soil.no3n = c(10, 40, 70))))
 
 # Trendline prep
-marea_wn_c3_reg <- data.frame(emmeans(marea_c3, ~1, "wn20_perc",
-                                      at = list(wn20_perc = seq(0, 1, 0.01))))
+marea_wn_c3_reg <- data.frame(emmeans(marea_c3, ~soil.no3n, "wn20_perc",
+                                      at = list(wn20_perc = seq(0, 1, 0.01),
+                                                soil.no3n = c(10, 40, 70)))) %>%
+  mutate(linetype = ifelse(soil.no3n == 10, "solid", "dashed"))
 
 
 # Plot
 marea_wn_c3_plot <- ggplot(data = subset(df_completeCases, pft == "c3_nonlegume"),
                            aes(x = wn20_perc, y = log(marea))) +
-  geom_point(size = 3, alpha = 0.6, shape = 21, fill = "lightgray") +
-  geom_ribbon(data = marea_wn_c3_reg, 
-              aes(x = wn20_perc, y = emmean, ymin = lower.CL, 
-                  ymax = upper.CL), fill = "black", alpha = 0.3) +
-  geom_line(data = marea_wn_c3_reg, aes(x = wn20_perc, y = emmean), 
-            linewidth = 2, color = "black") +
+  geom_point(aes(fill = soil.no3n), size = 3, alpha = 0.6, shape = 21) +
+  geom_smooth(data = marea_wn_c3_reg, 
+              aes(x = wn20_perc, y = emmean, color = factor(soil.no3n), 
+                  linetype = linetype), size = 2, lineend = "round") +
   scale_x_continuous(limits = c(0, 1), breaks = c(0, 0.33, 0.67, 1),
                      labels = c("0", "33", "67", "100")) +
   scale_y_continuous(limits = c(3, 6), breaks = seq(3, 6, 1)) +
+  scale_fill_gradientn(colors = c("#4A148C", "#9C27B0", "#FF9800", "#43A047", "#1B5E20"),
+                       values = c(0, 10, 40, 70, 80) / 80,
+                       limits = c(0, 80),
+                       breaks = c(10, 40, 70),
+                       labels = c("10", "40", "70")) +
+  scale_color_manual(values = c("#9C27B0", "#FF9800", "#43A047"),
+                     labels = c("10", "40", "70")) +
+  scale_linetype_manual(values = c("dashed", "solid")) +
   labs(x = expression(bold("SM"["20"]*" (% WHC)")),
-       y = expression(bold(ln)*bolditalic(" M")[bold("area")]*bold(" (g m"^"-2"*")"))) +
+       y = expression(bold(ln)*bolditalic(" M")[bold("area")]*bold(" (g m"^"-2"*")")),
+       fill = expression(bold("Soil N (ppm NO"["3"]*"-N)")),
+       color = expression(bold("Soil N (ppm NO"["3"]*"-N)"))) +
+  guides(linetype = "none",
+         color = guide_legend(override.aes = list(fill = NA))) +
   theme_bw(base_size = 20) +
   theme(legend.text.align = 0,
         panel.border = element_rect(size = 1.25),
@@ -430,18 +491,24 @@ marea_no3n_c3_reg <- data.frame(emmeans(marea_c3, ~wn20_perc, "soil.no3n",
 # Plot
 marea_no3n_c3_plot <- ggplot(data = subset(df_completeCases, pft == "c3_nonlegume"), 
                              aes(x = soil.no3n, y = log(marea))) +
-  geom_point(size = 3, alpha = 0.6, shape = 21, fill = "lightgrey") +
+  geom_point(aes(fill = wn20_perc), size = 3, alpha = 0.6, shape = 21) +
   geom_smooth(data = marea_no3n_c3_reg, 
               aes(x = soil.no3n, y = emmean, color = factor(wn20_perc), 
                   linetype = linetype), size = 2, lineend = "round") +
   scale_x_continuous(limits = c(-1, 80), breaks = seq(0, 80, 20)) +
   scale_y_continuous(limits = c(3, 6), breaks = seq(3, 6, 1)) +
+  scale_fill_gradientn(colors = c("#B40000", "#D11807", "#FD9A44", "#00767B", "#005EA0"),
+                       values = c(0, 0.2, 0.5, 0.8, 1),
+                       limits = c(0, 1),
+                       breaks = c(0.2, 0.5, 0.8),
+                       labels = c("20", "50", "80")) +
   scale_color_manual(values = c("#D11807", "#FD9A44", "#00767B"),
                      labels = c("20", "50", "80")) +
   scale_linetype_manual(values = c("dashed", "solid")) +
   labs(x = expression(bold("Soil N (ppm NO"[3]*"-N)")),
        y = expression(bold(ln)*bolditalic(" M")[bold("area")]*bold(" (g m"^"-2"*")")),
-       color = expression(bold("SM"["20"]*" (% WHC)"))) +
+       color = expression(bold("SM"["20"]*" (% WHC)")),
+       fill = expression(bold("SM"["20"]*" (% WHC)"))) +
   guides(linetype = "none",
          color = guide_legend(override.aes = list(fill = NA))) +
   theme_bw(base_size = 20) +
@@ -486,26 +553,38 @@ chi_vpd_c3_plot
 ##########################################################################
 # Check model result
 Anova(chi_c3)
+test(emtrends(chi_c3, ~soil.no3n, "wn20_perc", at = list(soil.no3n = c(10, 40, 70))))
 
 # Trendline prep
-chi_wn_c3_reg <- data.frame(emmeans(chi_c3, ~1, "wn20_perc",
-                                      at = list(wn20_perc = seq(0, 1, 0.01))))
-
+chi_wn_c3_reg <- data.frame(emmeans(chi_c3, ~soil.no3n, "wn20_perc",
+                                      at = list(wn20_perc = seq(0, 1, 0.01),
+                                                soil.no3n = c(10, 40, 70)))) %>%
+  mutate(linetype = ifelse(soil.no3n == 10, "solid", "dashed"))
 
 # Plot
 chi_wn_c3_plot <- ggplot(data = subset(df_completeCases, pft == "c3_nonlegume"),
                            aes(x = wn20_perc, y = chi)) +
-  geom_point(size = 3, alpha = 0.6, shape = 21, fill = "lightgray") +
-  geom_ribbon(data = chi_wn_c3_reg, 
-              aes(x = wn20_perc, y = emmean, ymin = lower.CL, 
-                  ymax = upper.CL), fill = "black", alpha = 0.3) +
-  geom_line(data = chi_wn_c3_reg, aes(x = wn20_perc, y = emmean), 
-            linewidth = 2, color = "black") +
+  geom_point(aes(fill = soil.no3n), size = 3, alpha = 0.6, shape = 21) +
+  geom_smooth(data = chi_wn_c3_reg, 
+              aes(x = wn20_perc, y = emmean, color = factor(soil.no3n), 
+                  linetype = linetype), size = 2, lineend = "round") +
   scale_x_continuous(limits = c(0, 1), breaks = c(0, 0.33, 0.67, 1),
                      labels = c("0", "33", "67", "100")) +
   scale_y_continuous(limits = c(0.6, 1), breaks = seq(0.6, 1, 0.1)) +
+  scale_fill_gradientn(colors = c("#4A148C", "#9C27B0", "#FF9800", "#43A047", "#1B5E20"),
+                       values = c(0, 10, 40, 70, 80) / 80,
+                       limits = c(0, 80),
+                       breaks = c(10, 40, 70),
+                       labels = c("10", "40", "70")) +
+  scale_color_manual(values = c("#9C27B0", "#FF9800", "#43A047"),
+                     labels = c("10", "40", "70")) +
+  scale_linetype_manual(values = c("dashed", "solid")) +
   labs(x = expression(bold("SM"["20"]*" (% WHC)")),
-       y = expression(bold(chi*" (unitless)"))) +
+       y = expression(bold(chi*" (unitless)")),
+       fill = expression(bold("Soil N (ppm NO"["3"]*"-N)")),
+       color = expression(bold("Soil N (ppm NO"["3"]*"-N)"))) +
+  guides(linetype = "none",
+         color = guide_legend(override.aes = list(fill = NA))) +
   theme_bw(base_size = 20) +
   theme(legend.text.align = 0,
         panel.border = element_rect(size = 1.25),
@@ -529,18 +608,24 @@ chi_no3n_c3_reg <- data.frame(emmeans(chi_c3, ~wn20_perc, "soil.no3n",
 # Plot
 chi_no3n_c3_plot <- ggplot(data = subset(df_completeCases, pft == "c3_nonlegume"), 
                              aes(x = soil.no3n, y = chi)) +
-  geom_point(size = 3, alpha = 0.6, shape = 21, fill = "lightgrey") +
+  geom_point(aes(fill = wn20_perc), size = 3, alpha = 0.6, shape = 21) +
   geom_smooth(data = chi_no3n_c3_reg, 
               aes(x = soil.no3n, y = emmean, color = factor(wn20_perc), 
                   linetype = linetype), size = 2, lineend = "round") +
   scale_x_continuous(limits = c(-1, 80), breaks = seq(0, 80, 20)) +
   scale_y_continuous(limits = c(0.6, 1), breaks = seq(0.6, 1, 0.1)) +
+  scale_fill_gradientn(colors = c("#B40000", "#D11807", "#FD9A44", "#00767B", "#005EA0"),
+                       values = c(0, 0.2, 0.5, 0.8, 1),
+                       limits = c(0, 1),
+                       breaks = c(0.2, 0.5, 0.8),
+                       labels = c("20", "50", "80")) +
   scale_color_manual(values = c("#D11807", "#FD9A44", "#00767B"),
                      labels = c("20", "50", "80")) +
   scale_linetype_manual(values = c("dashed", "solid")) +
   labs(x = expression(bold("Soil N (ppm NO"[3]*"-N)")),
        y = expression(bold(chi*" (unitless)")),
-       color = expression(bold("SM"["20"]*" (% WHC)"))) +
+       color = expression(bold("SM"["20"]*" (% WHC)")),
+       fill = expression(bold("SM"["20"]*" (% WHC)"))) +
   guides(linetype = "none",
          color = guide_legend(override.aes = list(fill = NA))) +
   theme_bw(base_size = 20) +
@@ -573,7 +658,7 @@ narea_chi_vpd_c3_plot <- ggplot(data = subset(df_completeCases, pft == "c3_nonle
             size = 2, color = "black") +
   scale_y_continuous(limits = c(-0.25, 2.5), breaks = seq(0, 2.5, 1)) +
   labs(x = expression(bold("VPD"["90"]*" (kPa)")),
-       y = expression(bold(ln)*bolditalic(" N")[bold("area")]*bold(" - "*chi*" (gN m"^"-2"*")"))) +
+       y = expression(bold(ln)*bolditalic(" N")[bold("area")]*bold(":"*chi*" (gN m"^"-2"*")"))) +
   theme_bw(base_size = 20) +
   theme(legend.text.align = 0,
         panel.border = element_rect(size = 1.25),
@@ -586,15 +671,37 @@ narea_chi_vpd_c3_plot
 ##########################################################################
 # Check model results
 Anova(narea_chi_c3)
+test(emtrends(narea_chi_c3, ~soil.no3n, "wn20_perc", at = list(soil.no3n = c(10, 40, 70))))
+
+# Trendline prep
+narea_chi_c3_reg <- data.frame(emmeans(narea_chi_c3, ~soil.no3n, "wn20_perc",
+                                       at = list(wn20_perc = seq(0, 1, 0.01),
+                                                 soil.no3n = c(10, 40, 70)))) %>%
+  mutate(linetype = ifelse(soil.no3n == 40, "dashed", "solid"))
 
 # Plot
 narea_chi_wn_c3_plot <- ggplot(data = subset(df_completeCases, pft == "c3_nonlegume"), 
                                aes(x = wn20_perc, y = log(narea_chi))) +
-  geom_point(size = 3, alpha = 0.6, shape = 21, fill = "lightgrey") +
+  geom_point(aes(fill = soil.no3n), size = 3, alpha = 0.6, shape = 21) +
+  geom_smooth(data = narea_chi_c3_reg, 
+              aes(x = wn20_perc, y = emmean, color = factor(soil.no3n), 
+                  linetype = linetype), size = 2, lineend = "round") +
   scale_x_continuous(limits = c(0, 1), breaks = c(0, 0.33, 0.67, 1)) +
   scale_y_continuous(limits = c(-0.25, 2.5), breaks = seq(0, 2, 1)) +
+  scale_fill_gradientn(colors = c("#4A148C", "#9C27B0", "#FF9800", "#43A047", "#1B5E20"),
+                       values = c(0, 10, 40, 70, 80) / 80,
+                       limits = c(0, 80),
+                       breaks = c(10, 40, 70),
+                       labels = c("10", "40", "70")) +
+  scale_color_manual(values = c("#9C27B0", "#FF9800", "#43A047"),
+                     labels = c("10", "40", "70")) +
+  scale_linetype_manual(values = c("dashed", "solid")) +
   labs(x = expression(bold("SM"["20"]*" (% WHC)")),
-       y = expression(bold(ln)*bolditalic(" N")[bold("area")]*bold(" - "*chi*" (gN m"^"-2"*")"))) +
+       y = expression(bold(ln)*bolditalic(" N")[bold("area")]*bold(":"*chi*" (gN m"^"-2"*")")),
+       fill = expression(bold("Soil N (ppm NO"["3"]*"-N)")),
+       color = expression(bold("Soil N (ppm NO"["3"]*"-N)"))) +
+  guides(linetype = "none",
+         color = guide_legend(override.aes = list(fill = NA))) +
   theme_bw(base_size = 20) +
   theme(legend.text.align = 0,
         panel.border = element_rect(size = 1.25),
@@ -619,18 +726,25 @@ narea_chi_soiln_c3_reg <- data.frame(
 # Plot
 narea_chi_soilN_c3_plot <- ggplot(data = subset(df_completeCases, pft == "c3_nonlegume"), 
                                 aes(x = soil.no3n, y = log(narea_chi))) +
-  geom_point(size = 3, alpha = 0.6, shape = 21, fill = "lightgrey") +
+  geom_point(aes(fill = wn20_perc),
+             size = 3, alpha = 0.6, shape = 21) +
   geom_smooth(data = narea_chi_soiln_c3_reg, 
               aes(x = soil.no3n, y = emmean, color = factor(wn20_perc), 
                   linetype = linetype), size = 2, lineend = "round") +
   scale_x_continuous(limits = c(-1, 80), breaks = seq(0, 80, 20)) +
   scale_y_continuous(limits = c(-0.25, 2.5), breaks = seq(0, 2, 1)) +
+  scale_fill_gradientn(colors = c("#B40000", "#D11807", "#FD9A44", "#00767B", "#005EA0"),
+                       values = c(0, 0.2, 0.5, 0.8, 1),
+                       limits = c(0, 1),
+                       breaks = c(0.2, 0.5, 0.8),
+                       labels = c("20", "50", "80")) +
   scale_color_manual(values = c("#D11807", "#FD9A44", "#00767B"),
                      labels = c("20", "50", "80")) +
   scale_linetype_manual(values = c("dashed", "solid")) +
   labs(x = expression(bold("Soil N (ppm NO"[3]*"-N)")),
-       y = expression(bold(ln)*bolditalic(" N")[bold("area")]*bold(" - "*chi*" (gN m"^"-2"*")")),
-       color = expression(bold("SM"["20"]*" (% WHC)"))) +
+       y = expression(bold(ln)*bolditalic(" N")[bold("area")]*bold(":"*chi*" (gN m"^"-2"*")")),
+       color = expression(bold("SM"["20"]*" (% WHC)")),
+       fill = expression(bold("SM"["20"]*" (% WHC)"))) +
   guides(linetype = "none",
          color = guide_legend(override.aes = list(fill = NA))) +
   theme_bw(base_size = 20) +
@@ -676,27 +790,38 @@ nmass_chi_vpd_c3_plot
 ##########################################################################
 # Check model result
 Anova(nmass_chi_c3)
-test(emtrends(nmass_chi_c3, ~1, "wn20_perc"))
+test(emtrends(nmass_chi_c3, ~soil.no3n, "wn20_perc", at = list(soil.no3n = c(10, 40, 70))))
 
 # Trendline prep
-nmass_chi_wn_c3_reg <- data.frame(emmeans(nmass_chi_c3, ~1, "wn20_perc",
-                                           at = list(wn20_perc = seq(0, 1, 0.01))))
+nmass_chi_wn_c3_reg <- data.frame(emmeans(nmass_chi_c3, ~soil.no3n, "wn20_perc",
+                                           at = list(wn20_perc = seq(0, 1, 0.01),
+                                                     soil.no3n = c(10, 40, 70)))) %>%
+  mutate(linetype = ifelse(soil.no3n == 40, "dashed", "solid"))
 
 # Plot
 nmass_chi_wn_c3_plot <- ggplot(data = subset(df_completeCases, pft == "c3_nonlegume"), 
                                 aes(x = wn20_perc, y = log(nmass_chi))) +
-  geom_point(size = 3, alpha = 0.6, shape = 21, fill = "lightgrey") +
-  geom_ribbon(data = nmass_chi_wn_c3_reg, 
-              aes(x = wn20_perc, y = emmean, ymin = lower.CL, ymax = upper.CL), 
-              alpha = 0.3, fill = "black") +
-  geom_line(data = nmass_chi_wn_c3_reg, 
-            aes(x = wn20_perc, y = emmean),
-            size = 2, color = "black") +
+  geom_point(aes(fill = soil.no3n), size = 3, alpha = 0.6, shape = 21) +
+  geom_smooth(data = nmass_chi_wn_c3_reg, 
+              aes(x = wn20_perc, y = emmean, color = factor(soil.no3n), 
+                  linetype = linetype), size = 2, lineend = "round") +
   scale_x_continuous(limits = c(0, 1), breaks = c(0, 0.33, 0.67, 1),
                      labels = c("0", "33", "67", "100")) +
   scale_y_continuous(limits = c(-0.25, 2.25), breaks = seq(0, 2.25, 1)) +
+  scale_fill_gradientn(colors = c("#4A148C", "#9C27B0", "#FF9800", "#43A047", "#1B5E20"),
+                       values = c(0, 10, 40, 70, 80) / 80,
+                       limits = c(0, 80),
+                       breaks = c(10, 40, 70),
+                       labels = c("10", "40", "70")) +
+  scale_color_manual(values = c("#9C27B0", "#FF9800", "#43A047"),
+                     labels = c("10", "40", "70")) +
+  scale_linetype_manual(values = c("dashed", "solid")) +
   labs(x = expression(bold("SM"["20"]*" (% WHC)")),
-       y = expression(bold(ln)*bolditalic(" N")[bold("mass")]*bold(" - "*chi*" (gN g"^"-1"*")"))) +
+       y = expression(bold(ln)*bolditalic(" N")[bold("mass")]*bold(":"*chi*" (gN g"^"-1"*")")),
+       fill = expression(bold("Soil N (ppm NO"["3"]*"-N)")),
+       color = expression(bold("Soil N (ppm NO"["3"]*"-N)"))) +
+  guides(linetype = "none",
+         color = guide_legend(override.aes = list(fill = NA))) +
   theme_bw(base_size = 20) +
   theme(legend.text.align = 0,
         panel.border = element_rect(size = 1.25),
@@ -715,24 +840,30 @@ test(emtrends(nmass_chi_c3, ~wn20_perc, "soil.no3n", at = list(wn20_perc = c(0.2
 
 # Trendline prep
 nmass_chi_soiln_c3_reg <- data.frame(
-  emmeans(nmass_chi_c3, ~wn20_perc, "soil.no3n",
-          at = list(soil.no3n = seq(0, 80, 1),
-                    wn20_perc = c(0.2, 0.5, 0.8))))
+  emmeans(nmass_chi_c3, ~wn20_perc, "soil.no3n", at = list(soil.no3n = seq(0, 80, 1),
+                                                           wn20_perc = c(0.2, 0.5, 0.8))))
 
 # Plot
 nmass_chi_soilN_c3_plot <- ggplot(data = subset(df_completeCases, pft == "c3_nonlegume"), 
                                   aes(x = soil.no3n, y = log(nmass_chi))) +
-  geom_point(size = 3, alpha = 0.6, shape = 21, fill = "lightgrey") +
+  geom_point(aes(fill = wn20_perc),
+             size = 3, alpha = 0.6, shape = 21) +
   geom_smooth(data = nmass_chi_soiln_c3_reg, 
               aes(x = soil.no3n, y = emmean, color = factor(wn20_perc)), 
               size = 2, lineend = "round") +
   scale_x_continuous(limits = c(-1, 80), breaks = seq(0, 80, 20)) +
   scale_y_continuous(limits = c(-0.25, 2.25), breaks = seq(0, 2, 1)) +
+  scale_fill_gradientn(colors = c("#B40000", "#D11807", "#FD9A44", "#00767B", "#005EA0"),
+                       values = c(0, 0.2, 0.5, 0.8, 1),
+                       limits = c(0, 1),
+                       breaks = c(0.2, 0.5, 0.8),
+                       labels = c("20", "50", "80")) +
   scale_color_manual(values = c("#D11807", "#FD9A44", "#00767B"),
                      labels = c("20", "50", "80")) +
   labs(x = expression(bold("Soil N (ppm NO"[3]*"-N)")),
-       y = expression(bold(ln)*bolditalic(" N")[bold("mass")]*bold(" - "*chi*" (gN g"^"-1"*")")),
-       color = expression(bold("SM"["20"]*" (% WHC)"))) +
+       y = expression(bold(ln)*bolditalic(" N")[bold("mass")]*bold(":"*chi*" (gN g"^"-1"*")")),
+       color = expression(bold("SM"["20"]*" (% WHC)")),
+       fill = expression(bold("SM"["20"]*" (% WHC)"))) +
   guides(linetype = "none",
          color = guide_legend(override.aes = list(fill = NA))) +
   theme_bw(base_size = 20) +
@@ -755,7 +886,7 @@ marea_chi_vpd_c3_plot <- ggplot(data = subset(df_completeCases, pft == "c3_nonle
   geom_point(size = 3, alpha = 0.6, shape = 21, fill = "lightgrey") +
   scale_y_continuous(limits = c(3, 6), breaks = seq(3, 6, 1)) +
   labs(x = expression(bold("VPD"["90"]*" (kPa)")),
-       y = expression(bold(ln)*bolditalic(" M")[bold("area")]*bold(" - "*chi*" (g m"^"-2"*")"))) +
+       y = expression(bold(ln)*bolditalic(" M")[bold("area")]*bold(":"*chi*" (g m"^"-2"*")"))) +
   theme_bw(base_size = 20) +
   theme(legend.text.align = 0,
         panel.border = element_rect(size = 1.25),
@@ -768,17 +899,38 @@ marea_chi_vpd_c3_plot
 ##########################################################################
 # Check model result
 Anova(marea_chi_c3)
-test(emtrends(nmass_chi_c3, ~1, "wn20_perc"))
+test(emtrends(nmass_chi_c3, ~soil.no3n, "wn20_perc", at = list(soil.no3n = c(10, 40, 70))))
+
+# Trendline prep
+marea_chi_wn_c3_reg <- data.frame(emmeans(marea_chi_c3, ~soil.no3n, "wn20_perc",
+                                          at = list(wn20_perc = seq(0, 1, 0.01),
+                                                    soil.no3n = c(0, 40, 80)))) %>%
+  mutate(linetype = ifelse(soil.no3n == 40, "dashed", "solid"))
 
 # Plot
 marea_chi_wn_c3_plot <- ggplot(data = subset(df_completeCases, pft == "c3_nonlegume"), 
                                aes(x = wn20_perc, y = log(marea_chi))) +
-  geom_point(size = 3, alpha = 0.6, shape = 21, fill = "lightgrey") +
+  geom_point(aes(fill = soil.no3n), size = 3, alpha = 0.6, shape = 21) +
+  geom_smooth(data = marea_chi_wn_c3_reg, 
+              aes(x = wn20_perc, y = emmean, color = factor(soil.no3n), 
+                  linetype = linetype), size = 2, lineend = "round") +
   scale_x_continuous(limits = c(0, 1), breaks = c(0, 0.33, 0.67, 1),
                      labels = c("0", "33", "67", "100")) +
   scale_y_continuous(limits = c(3, 6), breaks = seq(3, 6, 1)) +
+  scale_fill_gradientn(colors = c("#4A148C", "#9C27B0", "#FF9800", "#43A047", "#1B5E20"),
+                       values = c(0, 10, 40, 70, 80) / 80,
+                       limits = c(0, 80),
+                       breaks = c(10, 40, 70),
+                       labels = c("10", "40", "70")) +
+  scale_color_manual(values = c("#9C27B0", "#FF9800", "#43A047"),
+                     labels = c("10", "40", "70")) +
+  scale_linetype_manual(values = c("dashed", "solid")) +
   labs(x = expression(bold("SM"["20"]*" (% WHC)")),
-       y = expression(bold(ln)*bolditalic(" M")[bold("area")]*bold(" - "*chi*" (g m"^"-2"*")"))) +
+       y = expression(bold(ln)*bolditalic(" M")[bold("area")]*bold(":"*chi*" (g m"^"-2"*")")),
+       fill = expression(bold("Soil N (ppm NO"["3"]*"-N)")),
+       color = expression(bold("Soil N (ppm NO"["3"]*"-N)"))) +
+  guides(linetype = "none",
+         color = guide_legend(override.aes = list(fill = NA))) +
   theme_bw(base_size = 20) +
   theme(legend.text.align = 0,
         panel.border = element_rect(size = 1.25),
@@ -803,18 +955,24 @@ marea_chi_soiln_c3_reg <- data.frame(
 # Plot
 marea_chi_soilN_c3_plot <- ggplot(data = subset(df_completeCases, pft == "c3_nonlegume"), 
                                   aes(x = soil.no3n, y = log(marea_chi))) +
-  geom_point(size = 3, alpha = 0.6, shape = 21, fill = "lightgrey") +
+  geom_point(aes(fill = wn20_perc), size = 3, alpha = 0.6, shape = 21) +
   geom_smooth(data = marea_chi_soiln_c3_reg, 
               aes(x = soil.no3n, y = emmean, color = factor(wn20_perc), 
                   linetype = linetype), size = 2, lineend = "round") +
   scale_x_continuous(limits = c(-1, 80), breaks = seq(0, 80, 20)) +
   scale_y_continuous(limits = c(3, 6), breaks = seq(3, 6, 1)) +
+  scale_fill_gradientn(colors = c("#B40000", "#D11807", "#FD9A44", "#00767B", "#005EA0"),
+                       values = c(0, 0.2, 0.5, 0.8, 1),
+                       limits = c(0, 1),
+                       breaks = c(0.2, 0.5, 0.8),
+                       labels = c("20", "50", "80")) +
   scale_color_manual(values = c("#D11807", "#FD9A44", "#00767B"),
                      labels = c("20", "50", "80")) +
   scale_linetype_manual(values = c("dashed", "solid")) +
   labs(x = expression(bold("Soil N (ppm NO"[3]*"-N)")),
        y = expression(bold(ln)*bolditalic(" M")[bold("area")]*bold(" - "*chi*" (g m"^"-2"*")")),
-       color = expression(bold("SM"["20"]*" (% WHC)"))) +
+       color = expression(bold("SM"["20"]*" (% WHC)")),
+       fill = expression(bold("SM"["20"]*" (% WHC)"))) +
   guides(linetype = "none",
          color = guide_legend(override.aes = list(fill = NA))) +
   theme_bw(base_size = 20) +
@@ -823,8 +981,6 @@ marea_chi_soilN_c3_plot <- ggplot(data = subset(df_completeCases, pft == "c3_non
         axis.title = element_text(face = "bold", size = 20),
         axis.text = element_text(color = "black", size = 20))
 marea_chi_soilN_c3_plot
-
-
 
 ##########################################################################
 ##########################################################################
@@ -842,7 +998,7 @@ test(emtrends(narea_c4, ~1, "chi"))
 # Plot
 narea_chi_c4_plot <- ggplot(data = subset(df_completeCases, pft == "c4_nonlegume"),
                             aes(x = chi, y = log(narea))) +
-  geom_point(size = 3, alpha = 0.6, shape = 21, fill = "#695B24") +
+  geom_point(size = 3, alpha = 0.6, shape = 24, fill = "#695B24") +
   scale_x_continuous(limits = c(0, 0.9), breaks = seq(0, 0.9, 0.3)) +
   scale_y_continuous(limits = c(-1, 1), breaks = seq(-1, 1, 1)) +
   labs(x = expression(bold(chi*" (unitless)")),
@@ -868,7 +1024,7 @@ narea_vpd_c4_reg <- data.frame(emmeans(narea_c4, ~1, "vpd60",
 # Plot
 narea_vpd_c4_plot <- ggplot(data = subset(df_completeCases, pft == "c4_nonlegume"),
                             aes(x = vpd60, y = log(narea))) +
-  geom_point(size = 3, alpha = 0.6, shape = 21, fill = "#695B24") +
+  geom_point(size = 3, alpha = 0.6, shape = 24, fill = "#695B24") +
   geom_ribbon(data = narea_vpd_c4_reg, 
               aes(x = vpd60, y = emmean, ymin = lower.CL, ymax = upper.CL), 
               alpha = 0.3, fill = "black") +
@@ -894,7 +1050,7 @@ Anova(narea_c4)
 # Plot
 narea_wn_c4_plot <- ggplot(data = subset(df_completeCases, pft == "c4_nonlegume"),
                            aes(x = wn07_perc, y = log(narea))) +
-  geom_point(size = 3, alpha = 0.6, shape = 21, fill = "#695B24") +
+  geom_point(size = 3, alpha = 0.6, shape = 24, fill = "#695B24") +
   scale_x_continuous(limits = c(0, 1), breaks = c(0, 0.33, 0.67, 1),
                      labels = c("0", "33", "67", "100")) +
   scale_y_continuous(limits = c(-1, 1), breaks = seq(-1, 1, 1)) +
@@ -916,7 +1072,7 @@ Anova(narea_c4)
 # Plot
 narea_no3n_c4_plot <- ggplot(data = subset(df_completeCases, pft == "c4_nonlegume"),
                              aes(x = soil.no3n, y = log(narea))) +
-  geom_point(size = 3, alpha = 0.6, shape = 21, fill = "#695B24") +
+  geom_point(size = 3, alpha = 0.6, shape = 24, fill = "#695B24") +
   scale_x_continuous(limits = c(0, 80), breaks = seq(0, 80, 20)) +
   scale_y_continuous(limits = c(-1, 1), breaks = seq(-1, 1, 1)) +
   labs(x = expression(bold("Soil N (ppm NO"["3"]*"-N)")),
@@ -942,7 +1098,7 @@ nmass_chi_c4_reg <- data.frame(emmeans(nmass_c4, ~1, "chi",
 # Plot
 nmass_chi_c4_plot <- ggplot(data = subset(df_completeCases, pft == "c4_nonlegume"),
                             aes(x = chi, y = log(n.leaf))) +
-  geom_point(size = 3, alpha = 0.6, shape = 21, fill = "#695B24") +
+  geom_point(size = 3, alpha = 0.6, shape = 24, fill = "#695B24") +
   geom_ribbon(data = nmass_chi_c4_reg, 
               aes(x = chi, y = emmean, ymin = lower.CL, ymax = upper.CL), 
               alpha = 0.3, fill = "black") +
@@ -973,7 +1129,7 @@ nmass_vpd_c4_reg <- data.frame(emmeans(nmass_c4, ~1, "vpd60", at = list(vpd60 = 
 # Plot
 nmass_vpd_c4_plot <- ggplot(data = subset(df_completeCases, pft == "c4_nonlegume"),
                             aes(x = vpd60, y = log(n.leaf))) +
-  geom_point(size = 3, alpha = 0.6, shape = 21, fill = "#695B24") +
+  geom_point(size = 3, alpha = 0.6, shape = 24, fill = "#695B24") +
   geom_ribbon(data = nmass_vpd_c4_reg, 
               aes(x = vpd60, y = emmean, ymin = lower.CL, ymax = upper.CL), 
               alpha = 0.3, fill = "black") +
@@ -1000,7 +1156,7 @@ Anova(nmass_c4)
 # Plot
 nmass_wn_c4_plot <- ggplot(data = subset(df_completeCases, pft == "c4_nonlegume"),
                          aes(x = wn07_perc, y = log(n.leaf))) +
-  geom_point(size = 3, alpha = 0.6, shape = 21, fill = "#695B24") +
+  geom_point(size = 3, alpha = 0.6, shape = 24, fill = "#695B24") +
   scale_x_continuous(limits = c(0, 1), breaks = c(0, 0.33, 0.67, 1),
                      labels = c("0", "33", "67", "100")) +
   scale_y_continuous(limits = c(-1, 1), breaks = seq(-1, 1, 1)) +
@@ -1027,7 +1183,7 @@ nmass_no3n_c4_reg <- data.frame(emmeans(nmass_c4, ~1, "soil.no3n",
 # Plot
 nmass_no3n_c4_plot <- ggplot(data = subset(df_completeCases, pft == "c4_nonlegume"),
                              aes(x = soil.no3n, y = log(n.leaf))) +
-  geom_point(size = 3, alpha = 0.6, shape = 21, fill = "#695B24") +
+  geom_point(size = 3, alpha = 0.6, shape = 24, fill = "#695B24") +
   geom_ribbon(data = nmass_no3n_c4_reg, 
               aes(x = soil.no3n, y = emmean, ymin = lower.CL, ymax = upper.CL), 
               alpha = 0.3, fill = "black") +
@@ -1054,7 +1210,7 @@ Anova(marea_c4)
 # Plot
 marea_chi_c4_plot <- ggplot(data = subset(df_completeCases, pft == "c4_nonlegume"), 
                             aes(x = chi, y = log(marea))) +
-  geom_point(size = 3, alpha = 0.6, shape = 21, fill = "#695B24") +
+  geom_point(size = 3, alpha = 0.6, shape = 24, fill = "#695B24") +
   scale_x_continuous(limits = c(0, 0.9), breaks = seq(0, 0.9, 0.3)) +
   scale_y_continuous(limits = c(3, 6), breaks = seq(3, 6, 1)) +
   labs(x = expression(bold(chi*" (unitless)")),
@@ -1075,7 +1231,7 @@ Anova(marea_c4)
 # Plot
 marea_vpd_c4_plot <- ggplot(data = subset(df_completeCases, pft == "c4_nonlegume"),
                             aes(x = vpd60, y = log(marea))) +
-  geom_point(size = 3, alpha = 0.6, shape = 21, fill = "#695B24") +
+  geom_point(size = 3, alpha = 0.6, shape = 24, fill = "#695B24") +
   scale_x_continuous(limits = c(0.6, 1.8), breaks = seq(0.6, 1.8, 0.4)) +
   scale_y_continuous(limits = c(3, 6), breaks = seq(3, 6, 1)) +
   labs(x = expression(bold("VPD"["60"]*" (kPa)")),
@@ -1092,16 +1248,35 @@ marea_vpd_c4_plot
 ##########################################################################
 # Check model result
 Anova(marea_c4)
+test(emtrends(marea_c4, ~soil.no3n, "wn07_perc", 
+     at = list(soil.no3n = c(10, 40, 70))))
+
+# Trendline prep
+marea_wn_c4_reg <- data.frame(emmeans(marea_c4, ~soil.no3n, "wn07_perc",
+                                      at = list(wn07_perc = seq(0, 1, 0.01),
+                                                soil.no3n = c(10, 40, 70))))
 
 # Plot
 marea_wn_c4_plot <- ggplot(data = subset(df_completeCases, pft == "c4_nonlegume"),
                             aes(x = wn07_perc, y = log(marea))) +
-  geom_point(size = 3, alpha = 0.6, shape = 21, fill = "#695B24") +
+  geom_point(aes(fill = soil.no3n), size = 3, alpha = 0.6, shape = 24) +
+  geom_smooth(data = marea_wn_c4_reg, 
+              aes(x = wn07_perc, y = emmean, color = factor(soil.no3n)), 
+              size = 2, lineend = "round", linetype = "dashed") +
   scale_x_continuous(limits = c(0, 1), breaks = c(0, 0.33, 0.67, 1),
                      labels = c("0", "33", "67", "100")) +
   scale_y_continuous(limits = c(3, 6), breaks = seq(3, 6, 1)) +
+  scale_fill_gradientn(colors = c("#4A148C", "#9C27B0", "#FF9800", "#43A047", "#1B5E20"),
+                       values = c(0, 10, 40, 70, 80) / 80,
+                       limits = c(0, 80),
+                       breaks = c(10, 40, 70),
+                       labels = c("10", "40", "70")) +
+  scale_color_manual(values = c("#9C27B0", "#FF9800", "#43A047"),
+                     labels = c("10", "40", "70")) +
   labs(x = expression(bold("SM"["07"]*" (% WHC)")),
-       y = expression(bold(ln)*bolditalic(" M")[bold("area")]*bold(" (g m"^"-2"*")"))) +
+       y = expression(bold(ln)*bolditalic(" M")[bold("area")]*bold(" (g m"^"-2"*")")),
+       fill = expression(bold("Soil N (ppm NO"["3"]*"-N)")),
+       color = expression(bold("Soil N (ppm NO"["3"]*"-N)"))) +
   theme_bw(base_size = 20) +
   theme(legend.text.align = 0,
         panel.border = element_rect(size = 1.25),
@@ -1126,18 +1301,24 @@ marea_no3n_c4_reg <- data.frame(emmeans(marea_c4, ~wn07_perc, "soil.no3n",
 # Plot
 marea_no3n_c4_plot <- ggplot(data = subset(df_completeCases, pft == "c4_nonlegume"), 
                              aes(x = soil.no3n, y = log(marea))) +
-  geom_point(size = 3, alpha = 0.6, shape = 21, fill = "#695B24") +
+  geom_point(aes(fill = wn07_perc), size = 3, alpha = 0.6, shape = 24) +
   geom_smooth(data = marea_no3n_c4_reg, 
               aes(x = soil.no3n, y = emmean, color = factor(wn07_perc), 
                   linetype = linetype), size = 2, lineend = "round") +
   scale_x_continuous(limits = c(-1, 80), breaks = seq(0, 80, 20)) +
   scale_y_continuous(limits = c(3, 6), breaks = seq(3, 6, 1)) +
+  scale_fill_gradientn(colors = c("#B40000", "#D11807", "#FD9A44", "#00767B", "#005EA0"),
+                       values = c(0, 0.2, 0.5, 0.8, 1),
+                       limits = c(0, 1),
+                       breaks = c(0.2, 0.5, 0.8),
+                       labels = c("20", "50", "80")) +
   scale_color_manual(values = c("#D11807", "#FD9A44", "#00767B"),
                      labels = c("20", "50", "80")) +
   scale_linetype_manual(values = c("dashed", "solid")) +
   labs(x = expression(bold("Soil N (ppm NO"["3"]*"-N)")),
        y = expression(bold(ln)*bolditalic(" M")[bold("area")]*bold(" (g m"^"-2"*")")),
-       color = expression(bold("SM"["07"]*" (% WHC)"))) +
+       color = expression(bold("SM"["07"]*" (% WHC)")),
+       fill = expression(bold("SM"["07"]*" (% WHC)"))) +
   guides(linetype = "none",
          color = guide_legend(override.aes = list(fill = NA))) +
   theme_bw(base_size = 20) +
@@ -1162,10 +1343,10 @@ chi_vpd_c4_reg <- data.frame(emmeans(chi_c4, ~1, "vpd60",
 # Plot
 chi_vpd_c4_plot <- ggplot(data = subset(df_completeCases, pft == "c4_nonlegume"), 
                             aes(x = vpd60, y = chi)) +
-  geom_point(size = 3, alpha = 0.6, shape = 21, fill = "#695B24") +
+  geom_point(size = 3, alpha = 0.6, shape = 24, fill = "#695B24") +
   geom_ribbon(data = chi_vpd_c4_reg, 
               aes(x = vpd60, y = emmean, ymin = lower.CL, 
-                  ymax = upper.CL), fill = "black", alpha = 0.5) +
+                  ymax = upper.CL), fill = "black", alpha = 0.3) +
   geom_smooth(data = chi_vpd_c4_reg, aes(x = vpd60, y = emmean), 
               linewidth = 2, color = "black") +
   scale_x_continuous(limits = c(0.6, 1.8), breaks = seq(0.6, 1.8, 0.4)) +
@@ -1188,7 +1369,7 @@ Anova(chi_c4)
 # Plot
 chi_wn_c4_plot <- ggplot(data = subset(df_completeCases, pft == "c4_nonlegume"),
                            aes(x = wn07_perc, y = chi)) +
-  geom_point(size = 3, alpha = 0.6, shape = 21, fill = "#695B24") +
+  geom_point(size = 3, alpha = 0.6, shape = 24, fill = "#695B24") +
   scale_x_continuous(limits = c(0, 1), breaks = c(0, 0.33, 0.67, 1),
                      labels = c("0", "33", "67", "100")) +
   scale_y_continuous(limits = c(0, 0.9), breaks = seq(0, 0.9, 0.3)) +
@@ -1204,11 +1385,13 @@ chi_wn_c4_plot
 ##########################################################################
 ## Chi - soil N (C4)
 ##########################################################################
+Anova(chi_c4)
+
 
 # Plot
 chi_no3n_c4_plot <- ggplot(data = subset(df_completeCases, pft == "c4_nonlegume"),
                            aes(x = soil.no3n, y = chi)) +
-  geom_point(size = 3, alpha = 0.6, shape = 21, fill = "#695B24") +
+  geom_point(size = 3, alpha = 0.6, shape = 24, fill = "#695B24") +
   scale_x_continuous(limits = c(-1, 80), breaks = seq(0, 80, 20)) +
   scale_y_continuous(limits = c(0, 0.9), breaks = seq(0, 0.9, 0.3)) +
   labs(x = expression(bold("Soil N (ppm NO"["3"]*"-N)")),
@@ -1233,7 +1416,7 @@ narea_chi_vpd_c4_reg <- data.frame(
 # Plot
 narea_chi_vpd_c4_plot <- ggplot(data = subset(df_completeCases, pft == "c4_nonlegume"), 
                                 aes(x = vpd60, y = log(narea_chi))) +
-  geom_point(size = 3, alpha = 0.6, shape = 21, fill = "#695B24") +
+  geom_point(size = 3, alpha = 0.6, shape = 24, fill = "#695B24") +
   geom_ribbon(data = narea_chi_vpd_c4_reg, 
               aes(x = vpd60, y = emmean, ymin = lower.CL, 
                   ymax = upper.CL), fill = "black", alpha = 0.3) +
@@ -1242,7 +1425,7 @@ narea_chi_vpd_c4_plot <- ggplot(data = subset(df_completeCases, pft == "c4_nonle
   scale_x_continuous(limits = c(0.6, 1.8), breaks = seq(0.6, 1.8, 0.4)) +
   scale_y_continuous(limits = c(-0.25, 2.5), breaks = seq(0, 2, 1)) +
   labs(x = expression(bold("VPD"["60"]*" (kPa)")),
-       y = expression(bold(ln)*bolditalic(" N")[bold("area")]*bold(" - "*chi*" (gN m"^"-2"*")"))) +
+       y = expression(bold(ln)*bolditalic(" N")[bold("area")]*bold(":"*chi*" (gN m"^"-2"*")"))) +
   theme_bw(base_size = 20) +
   theme(legend.text.align = 0,
         panel.border = element_rect(size = 1.25),
@@ -1259,11 +1442,11 @@ Anova(narea_chi_c4)
 # Plot
 narea_chi_wn_c4_plot <- ggplot(data = subset(df_completeCases, pft == "c4_nonlegume"), 
                                 aes(x = wn07_perc, y = log(narea_chi))) +
-  geom_point(size = 3, alpha = 0.6, shape = 21, fill = "#695B24") +
+  geom_point(size = 3, alpha = 0.6, shape = 24, fill = "#695B24") +
   scale_x_continuous(limits = c(0, 1), breaks = c(0, 0.33, 0.67, 1)) +
   scale_y_continuous(limits = c(0, 2.5), breaks = seq(0, 2, 1)) +
   labs(x = expression(bold("SM"["07"]*" (% WHC)")),
-       y = expression(bold(ln)*bolditalic(" N")[bold("area")]*bold(" - "*chi*" (gN m"^"-2"*")"))) +
+       y = expression(bold(ln)*bolditalic(" N")[bold("area")]*bold(":"*chi*" (gN m"^"-2"*")"))) +
   theme_bw(base_size = 20) +
   theme(legend.text.align = 0,
         panel.border = element_rect(size = 1.25),
@@ -1280,11 +1463,11 @@ Anova(narea_chi_c4)
 # Plot
 narea_chi_soilN_c4_plot <- ggplot(data = subset(df, pft == "c4_nonlegume"), 
                                   aes(x = soil.no3n, y = log(narea_chi))) +
-  geom_point(size = 3, alpha = 0.6, shape = 21, fill = "#695B24") +
+  geom_point(size = 3, alpha = 0.6, shape = 24, fill = "#695B24") +
   scale_x_continuous(limits = c(0, 80), breaks = seq(0, 80, 20)) +
   scale_y_continuous(limits = c(0, 2.5), breaks = seq(0, 2, 1)) +
   labs(x = expression(bold("Soil N (ppm NO"["3"]*"-N)")),
-       y = expression(bold(ln)*bolditalic(" N")[bold("area")]*bold(" - "*chi*" (gN m"^"-2"*")"))) +
+       y = expression(bold(ln)*bolditalic(" N")[bold("area")]*bold(":"*chi*" (gN m"^"-2"*")"))) +
   theme_bw(base_size = 20) +
   theme(legend.text.align = 0,
         panel.border = element_rect(size = 1.25),
@@ -1306,7 +1489,7 @@ nmass_chi_vpd_c4_reg <- data.frame(
 # Plot
 nmass_chi_vpd_c4_plot <- ggplot(data = subset(df_completeCases, pft == "c4_nonlegume"), 
                           aes(x = vpd60, y = log(nmass_chi))) +
-  geom_point(size = 3, alpha = 0.6, shape = 21, fill = "#695B24") +
+  geom_point(size = 3, alpha = 0.6, shape = 24, fill = "#695B24") +
   geom_ribbon(data = nmass_chi_vpd_c4_reg, 
               aes(x = vpd60, y = emmean, ymin = lower.CL, 
                   ymax = upper.CL), fill = "black", alpha = 0.3) +
@@ -1315,7 +1498,7 @@ nmass_chi_vpd_c4_plot <- ggplot(data = subset(df_completeCases, pft == "c4_nonle
   scale_x_continuous(limits = c(0.6, 1.8), breaks = seq(0.6, 1.8, 0.4)) +
   scale_y_continuous(limits = c(0, 2.5), breaks = seq(0, 2, 1)) +
   labs(x = expression(bold("VPD"["60"]*" (kPa)")),
-       y = expression(bold(ln)*bolditalic(" N")[bold("mass")]*bold(" - "*chi*" (gN g"^"-1"*")"))) +
+       y = expression(bold(ln)*bolditalic(" N")[bold("mass")]*bold(":"*chi*" (gN g"^"-1"*")"))) +
   theme_bw(base_size = 20) +
   theme(legend.text.align = 0,
         panel.border = element_rect(size = 1.25),
@@ -1332,12 +1515,12 @@ Anova(nmass_chi_c4)
 # Plot
 nmass_chi_wn_c4_plot <- ggplot(data = subset(df_completeCases, pft == "c4_nonlegume"), 
                                 aes(x = wn07_perc, y = log(nmass_chi))) +
-  geom_point(size = 3, alpha = 0.6, shape = 21, fill = "#695B24") +
+  geom_point(size = 3, alpha = 0.6, shape = 24, fill = "#695B24") +
   scale_x_continuous(limits = c(0, 1), breaks = c(0, 0.33, 0.67, 1),
                      labels = c("0", "33", "67", "100")) +
   scale_y_continuous(limits = c(0, 2.5), breaks = seq(0, 2, 1)) +
   labs(x = expression(bold("VPD"["60"]*" (kPa)")),
-       y = expression(bold(ln)*bolditalic(" N")[bold("mass")]*bold(" - "*chi*" (gN g"^"-1"*")"))) +
+       y = expression(bold(ln)*bolditalic(" N")[bold("mass")]*bold(":"*chi*" (gN g"^"-1"*")"))) +
   theme_bw(base_size = 20) +
   theme(legend.text.align = 0,
         panel.border = element_rect(size = 1.25),
@@ -1354,11 +1537,11 @@ Anova(nmass_chi_c4)
 # Plot
 nmass_chi_soilN_c4_plot <- ggplot(data = subset(df_completeCases, pft == "c4_nonlegume"), 
                                aes(x = soil.no3n, y = log(nmass_chi))) +
-  geom_point(size = 3, alpha = 0.6, shape = 21, fill = "#695B24") +
+  geom_point(size = 3, alpha = 0.6, shape = 24, fill = "#695B24") +
   scale_x_continuous(limits = c(0, 80), breaks = seq(0, 80, 20)) +
   scale_y_continuous(limits = c(0, 2.5), breaks = seq(0, 2, 1)) +
   labs(x = expression(bold("VPD"["60"]*" (kPa)")),
-       y = expression(bold(ln)*bolditalic(" N")[bold("mass")]*bold(" - "*chi*" (gN g"^"-1"*")"))) +
+       y = expression(bold(ln)*bolditalic(" N")[bold("mass")]*bold(":"*chi*" (gN g"^"-1"*")"))) +
   theme_bw(base_size = 20) +
   theme(legend.text.align = 0,
         panel.border = element_rect(size = 1.25),
@@ -1380,7 +1563,7 @@ marea_chi_vpd_c4_reg <- data.frame(
 # Plot
 marea_chi_vpd_c4_plot <- ggplot(data = subset(df_completeCases, pft == "c4_nonlegume"), 
                                 aes(x = vpd60, y = log(marea_chi))) +
-  geom_point(size = 3, alpha = 0.6, shape = 21, fill = "#695B24") +
+  geom_point(size = 3, alpha = 0.6, shape = 24, fill = "#695B24") +
   geom_ribbon(data = marea_chi_vpd_c4_reg, 
               aes(x = vpd60, y = emmean, ymin = lower.CL, 
                   ymax = upper.CL), fill = "black", alpha = 0.3) +
@@ -1389,7 +1572,7 @@ marea_chi_vpd_c4_plot <- ggplot(data = subset(df_completeCases, pft == "c4_nonle
   scale_x_continuous(limits = c(0.6, 1.8), breaks = seq(0.6, 1.8, 0.4)) +
   scale_y_continuous(limits = c(4, 7), breaks = seq(4, 7, 1)) +
   labs(x = expression(bold("VPD"["60"]*" (kPa)")),
-       y = expression(bold(ln)*bolditalic(" M")[bold("area")]*bold(" - "*chi*" (g m"^"-2"*")"))) +
+       y = expression(bold(ln)*bolditalic(" M")[bold("area")]*bold(":"*chi*" (g m"^"-2"*")"))) +
   theme_bw(base_size = 20) +
   theme(legend.text.align = 0,
         panel.border = element_rect(size = 1.25),
@@ -1401,17 +1584,17 @@ marea_chi_vpd_c4_plot
 ## Nmass:chi - soil moisture (C4)
 ##########################################################################
 # Check model results
-Anova(nmass_chi_c4)
+Anova(marea_chi_c4)
 
 # Plot
 marea_chi_wn_c4_plot <- ggplot(data = subset(df_completeCases, pft == "c4_nonlegume"), 
                                aes(x = wn07_perc, y = log(marea_chi))) +
-  geom_point(size = 3, alpha = 0.6, shape = 21, fill = "#695B24") +
+  geom_point(size = 3, alpha = 0.6, shape = 24, fill = "#695B24") +
   scale_x_continuous(limits = c(0, 1), breaks = c(0, 0.33, 0.67, 1),
                      labels = c("0", "33", "67", "100")) +
   scale_y_continuous(limits = c(4, 7), breaks = seq(4, 7, 1)) +
   labs(x = expression(bold("WN"["07"]*" (% WHC)")),
-       y = expression(bold(ln)*bolditalic(" M")[bold("area")]*bold(" - "*chi*" (g m"^"-2"*")"))) +  
+       y = expression(bold(ln)*bolditalic(" M")[bold("area")]*bold(":"*chi*" (g m"^"-2"*")"))) +  
   theme_bw(base_size = 20) +
   theme(legend.text.align = 0,
         panel.border = element_rect(size = 1.25),
@@ -1428,11 +1611,11 @@ Anova(marea_chi_c4)
 # Plot
 marea_chi_soilN_c4_plot <- ggplot(data = subset(df_completeCases, pft == "c4_nonlegume"), 
                                   aes(x = soil.no3n, y = log(marea_chi))) +
-  geom_point(size = 3, alpha = 0.6, shape = 21, fill = "#695B24") +
+  geom_point(size = 3, alpha = 0.6, shape = 24, fill = "#695B24") +
   scale_x_continuous(limits = c(0, 80), breaks = seq(0, 80, 20)) +
   scale_y_continuous(limits = c(4, 7), breaks = seq(4, 7, 1)) +
   labs(x = expression(bold("Soil N (ppm NO"["3"]*"-N)")),
-       y = expression(bold(ln)*bolditalic(" M")[bold("area")]*bold(" - "*chi*" (g m"^"-2"*")"))) +  
+       y = expression(bold(ln)*bolditalic(" M")[bold("area")]*bold(":"*chi*" (g m"^"-2"*")"))) +  
   theme_bw(base_size = 20) +
   theme(legend.text.align = 0,
         panel.border = element_rect(size = 1.25),
