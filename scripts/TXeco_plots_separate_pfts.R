@@ -6,6 +6,7 @@ library(lme4)
 library(emmeans)
 library(tidyverse)
 library(ggpubr)
+library(patchwork)
 library(car)
 
 # Turn off digit rounding in emmean args
@@ -181,14 +182,39 @@ narea_wn_c3_plot <- ggplot(data = subset(df_completeCases, pft == "c3_nonlegume"
        fill = expression(bold("Soil N (ppm NO"["3"]*"-N)")),
        color = expression(bold("Soil N (ppm NO"["3"]*"-N)"))) +
   guides(linetype = "none",
-         color = guide_legend(override.aes = list(fill = NA))) +
+         color = guide_legend(order = 1,
+                              title = expression(bold("Soil N (ppm NO"["3"]*"-N)")),
+                              title.position = "top",
+                              direction = "horizontal",
+                              override.aes = list(fill = NA, size = 4),
+                              theme = theme(legend.text = element_text(hjust = 0.5),
+                                            legend.title = element_text(hjust = 0.5),
+                                            legend.margin = margin(b = 4))),
+         fill = guide_colorbar(order = 2,
+                               title = NULL,
+                               direction = "horizontal",
+                               barwidth = 11,
+                               barheight = 1,
+                               label.hjust = 0.5,
+                               theme = theme(legend.margin = margin(t = 4)))) +
   theme_bw(base_size = 20) +
-  theme(legend.text.align = 0,
+  theme(legend.position = "bottom",
+        legend.box = "vertical",
+        legend.box.just = "center",
+        legend.box.background = element_rect(color = "grey90", linewidth = 0.6),
+        legend.box.margin = margin(6, 8, 6, 8),
+        legend.spacing.y = unit(0.3, "cm"),
+        legend.text.align = 0,
         panel.border = element_rect(size = 1.25),
         axis.title = element_text(face = "bold", size = 20),
-        axis.text = element_text(color = "black", size = 20),
-        legend.title = element_text(size = 24))
+        axis.text = element_text(color = "black", size = 20))
 narea_wn_c3_plot
+
+
+png("../plots/test.png", width = 10, height = 6, units = "in", res = 600)
+narea_wn_c3_plot
+dev.off()
+
 
 ##########################################################################
 ## Narea - soil N  (C3)
@@ -225,13 +251,32 @@ narea_no3n_c3_plot <- ggplot(data = subset(df_completeCases, pft == "c3_nonlegum
        color = expression(bold("SM"["20"]*" (% WHC)")),
        fill = expression(bold("SM"["20"]* " (% WHC)"))) +
   guides(linetype = "none",
-         color = guide_legend(override.aes = list(fill = NA))) +
+         color = guide_legend(order = 1,
+                              title = expression(bold("SM"["20"]*" (% WHC)")),
+                              title.position = "top",
+                              direction = "horizontal",
+                              override.aes = list(fill = NA, size = 4),
+                              theme = theme(legend.text = element_text(hjust = 0.5),
+                                            legend.title = element_text(hjust = 0.5),
+                                            legend.margin = margin(b = 4))),
+         fill = guide_colorbar(order = 2,
+                               title = NULL,
+                               direction = "horizontal",
+                               barwidth = 11,
+                               barheight = 1,
+                               label.hjust = 0.5,
+                               theme = theme(legend.margin = margin(t = 4)))) +
   theme_bw(base_size = 20) +
-  theme(legend.text.align = 0,
+  theme(legend.position = "bottom",
+        legend.box = "vertical",
+        legend.box.just = "center",
+        legend.box.background = element_rect(color = "grey90", linewidth = 0.6),
+        legend.box.margin = margin(6, 8, 6, 8),
+        legend.spacing.y = unit(0.3, "cm"),
+        legend.text.align = 0,
         panel.border = element_rect(size = 1.25),
         axis.title = element_text(face = "bold", size = 20),
-        axis.text = element_text(color = "black", size = 20),
-        legend.title = element_text(size = 24))
+        axis.text = element_text(color = "black", size = 20))
 narea_no3n_c3_plot
 
 ##########################################################################
@@ -686,7 +731,8 @@ narea_chi_wn_c3_plot <- ggplot(data = subset(df_completeCases, pft == "c3_nonleg
   geom_smooth(data = narea_chi_c3_reg, 
               aes(x = wn20_perc, y = emmean, color = factor(soil.no3n), 
                   linetype = linetype), size = 2, lineend = "round") +
-  scale_x_continuous(limits = c(0, 1), breaks = c(0, 0.33, 0.67, 1)) +
+  scale_x_continuous(limits = c(0, 1), breaks = c(0, 0.33, 0.67, 1),
+                     labels = c(0, 33, 67, 100)) +
   scale_y_continuous(limits = c(-0.25, 2.5), breaks = seq(0, 2, 1)) +
   scale_fill_gradientn(colors = c("#4A148C", "#9C27B0", "#FF9800", "#43A047", "#1B5E20"),
                        values = c(0, 10, 40, 70, 80) / 80,
@@ -970,7 +1016,7 @@ marea_chi_soilN_c3_plot <- ggplot(data = subset(df_completeCases, pft == "c3_non
                      labels = c("20", "50", "80")) +
   scale_linetype_manual(values = c("dashed", "solid")) +
   labs(x = expression(bold("Soil N (ppm NO"[3]*"-N)")),
-       y = expression(bold(ln)*bolditalic(" M")[bold("area")]*bold(" - "*chi*" (g m"^"-2"*")")),
+       y = expression(bold(ln)*bolditalic(" M")[bold("area")]*bold(":"*chi*" (g m"^"-2"*")")),
        color = expression(bold("SM"["20"]*" (% WHC)")),
        fill = expression(bold("SM"["20"]*" (% WHC)"))) +
   guides(linetype = "none",
@@ -1443,7 +1489,7 @@ Anova(narea_chi_c4)
 narea_chi_wn_c4_plot <- ggplot(data = subset(df_completeCases, pft == "c4_nonlegume"), 
                                 aes(x = wn07_perc, y = log(narea_chi))) +
   geom_point(size = 3, alpha = 0.6, shape = 24, fill = "#695B24") +
-  scale_x_continuous(limits = c(0, 1), breaks = c(0, 0.33, 0.67, 1)) +
+  scale_x_continuous(limits = c(0, 1), breaks = c(0, 0.33, 0.67, 1), labels = c(0, 33, 67, 100)) +
   scale_y_continuous(limits = c(0, 2.5), breaks = seq(0, 2, 1)) +
   labs(x = expression(bold("SM"["07"]*" (% WHC)")),
        y = expression(bold(ln)*bolditalic(" N")[bold("area")]*bold(":"*chi*" (gN m"^"-2"*")"))) +
@@ -1519,7 +1565,7 @@ nmass_chi_wn_c4_plot <- ggplot(data = subset(df_completeCases, pft == "c4_nonleg
   scale_x_continuous(limits = c(0, 1), breaks = c(0, 0.33, 0.67, 1),
                      labels = c("0", "33", "67", "100")) +
   scale_y_continuous(limits = c(0, 2.5), breaks = seq(0, 2, 1)) +
-  labs(x = expression(bold("VPD"["60"]*" (kPa)")),
+  labs(x = expression(bold("SM"["07"]*" (% WHC)")),
        y = expression(bold(ln)*bolditalic(" N")[bold("mass")]*bold(":"*chi*" (gN g"^"-1"*")"))) +
   theme_bw(base_size = 20) +
   theme(legend.text.align = 0,
@@ -1540,7 +1586,7 @@ nmass_chi_soilN_c4_plot <- ggplot(data = subset(df_completeCases, pft == "c4_non
   geom_point(size = 3, alpha = 0.6, shape = 24, fill = "#695B24") +
   scale_x_continuous(limits = c(0, 80), breaks = seq(0, 80, 20)) +
   scale_y_continuous(limits = c(0, 2.5), breaks = seq(0, 2, 1)) +
-  labs(x = expression(bold("VPD"["60"]*" (kPa)")),
+  labs(x = expression(bold("Soil N (ppm NO"["3"]*"-N)")),
        y = expression(bold(ln)*bolditalic(" N")[bold("mass")]*bold(":"*chi*" (gN g"^"-1"*")"))) +
   theme_bw(base_size = 20) +
   theme(legend.text.align = 0,
@@ -1593,7 +1639,7 @@ marea_chi_wn_c4_plot <- ggplot(data = subset(df_completeCases, pft == "c4_nonleg
   scale_x_continuous(limits = c(0, 1), breaks = c(0, 0.33, 0.67, 1),
                      labels = c("0", "33", "67", "100")) +
   scale_y_continuous(limits = c(4, 7), breaks = seq(4, 7, 1)) +
-  labs(x = expression(bold("WN"["07"]*" (% WHC)")),
+  labs(x = expression(bold("SM"["07"]*" (% WHC)")),
        y = expression(bold(ln)*bolditalic(" M")[bold("area")]*bold(":"*chi*" (g m"^"-2"*")"))) +  
   theme_bw(base_size = 20) +
   theme(legend.text.align = 0,
@@ -1626,49 +1672,73 @@ marea_chi_soilN_c4_plot
 ##########################################################################
 ## Create plot for C3 leaf N content traits
 ##########################################################################
+# Create legends
+wn_guides <- get_plot_component(narea_wn_c3_plot, "guide-box", return_all = TRUE)
+no3n_guides <- get_plot_component(narea_no3n_c3_plot, "guide-box", return_all = TRUE)
+blank <- ggplot() + theme_void()
 
+wn_legend <- plot_grid(plotlist = wn_guides, ncol = 1, rel_heights = c(1, 1))
+no3n_legend <- plot_grid(plotlist = no3n_guides, ncol = 1, rel_heights = c(1, 1))
+
+
+legend_grid <- ggarrange(blank, wn_legend, no3n_legend, nrow = 1, ncol = 3,
+                         widths = c(1.025, 1.25, 0.8))
+
+# Main grid
+fig2_grid <- ggarrange(narea_vpd_c3_plot, narea_wn_c3_plot, narea_no3n_c3_plot,
+                       nmass_vpd_c3_plot, nmass_wn_c3_plot, nmass_no3n_c3_plot, 
+                       marea_vpd_c3_plot, marea_wn_c3_plot, marea_no3n_c3_plot,
+                       chi_vpd_c3_plot, chi_wn_c3_plot, chi_no3n_c3_plot,
+                       ncol = 3, nrow = 4, legend = "none", 
+                       align = "hv", labels = c("(a)", "(b)", "(c)", "(d)", "(e)",
+                                                "(f)", "(g)", "(h)", "(i)", "(j)", "(k)", "(l)"), 
+                       font.label = list(size = 22), vjust = 1.2)
+
+# Main grid + legend
 png("../plots/TXeco_fig2_c3_traits.png",
     height = 16, width = 14, units = 'in', res = 600)
-ggarrange(narea_vpd_c3_plot, narea_wn_c3_plot, narea_no3n_c3_plot,
-          nmass_vpd_c3_plot, nmass_wn_c3_plot, nmass_no3n_c3_plot, 
-          marea_vpd_c3_plot, marea_wn_c3_plot, marea_no3n_c3_plot,
-          chi_vpd_c3_plot, chi_wn_c3_plot, chi_no3n_c3_plot,
-          ncol = 3, nrow = 4, common.legend = TRUE, legend = "bottom", 
-          align = "hv", labels = c("(a)", "(b)", "(c)", "(d)", "(e)",
-                                   "(f)", "(g)", "(h)", "(i)", "(j)", "(k)", "(l)"), 
-          font.label = list(size = 22))
+ggarrange(fig2_grid, legend_grid, nrow = 2, heights = c(1, 0.12))
 dev.off()
 
 ##########################################################################
 ## Create plot for C3 N-H2O tradeoffs
 ##########################################################################
-png("../plots/TXeco_fig3_c3_nh2o_trade.png", height = 9, width = 12.5, 
+# Main grid
+fig3_grid <- ggarrange(narea_chi_c3_plot, nmass_chi_c3_plot, marea_chi_c3_plot,
+                       narea_chi_vpd_c3_plot, narea_chi_wn_c3_plot, narea_chi_soilN_c3_plot,
+                       ncol = 3, nrow = 2, legend = "none", 
+                       align = "hv", labels = c("(a)", "(b)", "(c)", "(d)", "(e)",
+                                                "(f)", "(g)", "(h)", "(i)"), 
+                       font.label = list(size = 22), vjust = 1.2)
+
+
+# Main grid + legend
+png("../plots/TXeco_fig3_c3_nh2o_trade.png", height = 10, width = 12.5, 
     units = "in", res = 600)
-ggarrange(narea_chi_c3_plot, nmass_chi_c3_plot, marea_chi_c3_plot,
-          narea_chi_vpd_c3_plot, narea_chi_wn_c3_plot, narea_chi_soilN_c3_plot,
-          ncol = 3, nrow = 2, common.legend = TRUE, legend = "bottom", 
-          align = "hv", labels = c("(a)", "(b)", "(c)", "(d)", "(e)",
-                                   "(f)", "(g)", "(h)", "(i)"), 
-          font.label = list(size = 18))
+ggarrange(fig3_grid, legend_grid, nrow = 2, heights = c(1, 0.2))
 dev.off()
 
 ##########################################################################
 ## Create plot for C4 spp traits
 ##########################################################################
+# Main grid
+fig4_grid <- ggarrange(narea_vpd_c4_plot, narea_wn_c4_plot, narea_no3n_c4_plot,
+                       nmass_vpd_c4_plot, nmass_wn_c4_plot, nmass_no3n_c4_plot, 
+                       marea_vpd_c4_plot, marea_wn_c4_plot, marea_no3n_c4_plot, 
+                       chi_vpd_c4_plot, chi_wn_c4_plot, chi_no3n_c4_plot,
+                       ncol = 3, nrow = 4, legend = "none", align = "hv", 
+                       labels = c("(a)", "(b)", "(c)", "(d)", "(e)",
+                                  "(f)", "(g)", "(h)", "(i)", "(j)", "(k)", "(l)"), 
+                       font.label = list(size = 22), vjust = 1.2)
+
+
 png("../plots/TXeco_fig4_c4_traits.png",
      height = 16, width = 14, units = 'in', res = 600)
-ggarrange(narea_vpd_c4_plot, narea_wn_c4_plot, narea_no3n_c4_plot,
-          nmass_vpd_c4_plot, nmass_wn_c4_plot, nmass_no3n_c4_plot, 
-          marea_vpd_c4_plot, marea_wn_c4_plot, marea_no3n_c4_plot, 
-          chi_vpd_c4_plot, chi_wn_c4_plot, chi_no3n_c4_plot,
-          ncol = 3, nrow = 4, common.legend = TRUE, legend = "bottom", 
-          align = "hv", labels = c("(a)", "(b)", "(c)", "(d)", "(e)",
-                                   "(f)", "(g)", "(h)", "(i)", "(j)", "(k)", "(l)"), 
-          font.label = list(size = 18))
+ggarrange(fig4_grid, legend_grid, nrow = 2, heights = c(1, 0.12))
 dev.off()
 
 ##########################################################################
-## Create plot for C3 N-H2O tradeoffs
+## Create plot for C4 4N-H2O tradeoffs
 ##########################################################################
 png("../plots/TXeco_fig5_c4_nh2o_trade.png", height = 8, width = 12.5, 
     units = "in", res = 600)
@@ -1684,14 +1754,17 @@ dev.off()
 ##########################################################################
 ## Create supplement plot for C3 N-H2O tradeoffs (Nmass:chi, Marea:chi)
 ##########################################################################
-png("../plots/TXeco_figS4_c3_nh2o_tradeoffs.png", width = 12, height = 9,
-    units = "in", res = 600)
-ggarrange(nmass_chi_vpd_c3_plot, nmass_chi_wn_c3_plot, nmass_chi_soilN_c3_plot,
-          marea_chi_vpd_c3_plot, marea_chi_wn_c3_plot, marea_chi_soilN_c3_plot,
-          ncol = 3, nrow = 2, common.legend = TRUE, legend = "bottom", 
-          align = "hv", labels = c("(a)", "(b)", "(c)", "(d)", "(e)",
+# Main grid
+figs4_grid <- ggarrange(nmass_chi_vpd_c3_plot, nmass_chi_wn_c3_plot, nmass_chi_soilN_c3_plot,
+                        marea_chi_vpd_c3_plot, marea_chi_wn_c3_plot, marea_chi_soilN_c3_plot,
+                        ncol = 3, nrow = 2, legend = "none", align = "hv", 
+                        labels = c("(a)", "(b)", "(c)", "(d)", "(e)",
                                    "(f)", "(g)", "(h)", "(i)"), 
-          font.label = list(size = 18))
+                        font.label = list(size = 22), vjust = 1.2)
+
+png("../plots/TXeco_figS4_c3_nh2o_tradeoffs.png", width = 12.5, height = 10,
+    units = "in", res = 600)
+ggarrange(figs4_grid, legend_grid, nrow = 2, heights = c(1, 0.2))
 dev.off()
 
 
